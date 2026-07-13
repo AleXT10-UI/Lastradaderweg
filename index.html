@@ -96,6 +96,7 @@
     cursor:move;overflow:hidden;white-space:nowrap;
     display:flex;align-items:center;justify-content:space-between;gap:4px;
     transition:box-shadow .15s,transform .1s;
+    touch-action:none;
   }
   .block:hover{box-shadow:0 3px 9px rgba(160,35,35,.5);transform:translateY(-1px);}
   .block .txt{overflow:hidden;text-overflow:ellipsis;flex:1;}
@@ -121,7 +122,7 @@
   .addbar button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(160,35,35,.45);}
 
   @media (max-width: 720px){
-    :root{ --daylabel-w:78px; }
+    :root{ --daylabel-w:70px; }
     body{ padding:10px; }
     header{ padding:8px 10px; flex-wrap:wrap; gap:8px; }
     header h1{ font-size:16px; }
@@ -137,18 +138,23 @@
 
     .res-label{ font-size:11px; padding:6px 6px; }
     .res-label::before{ width:6px; height:6px; }
-    .hour-label{ font-size:8.5px; }
-    .hour-label.hl-day{ font-size:10px; padding:6px 0; }
+    .hour-label{ font-size:9px; }
+    .hour-label.hl-day{ font-size:11px; padding:6px 0; }
     .day-header{ font-size:10px; padding:5px 0; }
 
-    :root{ --rowh:56px; }
-    .block{ font-size:9.5px; padding:2px 4px; }
-    .block .del{ font-size:11px; }
+    :root{ --rowh:58px; }
+    .block{ font-size:10px; padding:2px 5px; }
+    .block .del{ font-size:13px; padding:2px 5px; }
+    .block .handle{ width:16px; }
+
+    .timeline-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    #tl-grid{ grid-template-columns: var(--daylabel-w) repeat(168, 26px) !important; width:max-content; min-width:100%; }
+    #day-grid{ grid-template-columns: var(--daylabel-w) repeat(24, 44px) !important; width:max-content; min-width:100%; }
 
     .addbar{ padding:10px; gap:6px; }
-    .addbar select, .addbar input{ font-size:11.5px; padding:6px 7px; }
-    .addbar input[type="text"]{ width:120px !important; }
-    .addbar button{ font-size:11.5px; padding:7px 11px; }
+    .addbar select, .addbar input{ font-size:12px; padding:7px 8px; min-height:38px; }
+    .addbar input[type="text"]{ width:130px !important; }
+    .addbar button{ font-size:12px; padding:9px 13px; min-height:38px; }
 
     .login-card{ width:88vw; padding:26px 22px; }
   }
@@ -661,6 +667,12 @@ function getHourPx(gridId){
 
 let activeDrag = null; // {mode:"move"|"resize", b, el, txt, dayIdx, startX, origStart, origEnd, hourPx}
 
+function getClientX(e){
+  if(e.touches && e.touches.length) return e.touches[0].clientX;
+  if(e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+  return e.clientX;
+}
+
 function buildBlock(dateKey, b, dayIdx, gridId){
   const hourPx = getHourPx(gridId);
   const el=document.createElement("div");
@@ -678,10 +690,12 @@ function buildBlock(dateKey, b, dayIdx, gridId){
   txt.textContent = fullLabel;
   el.appendChild(txt);
 
+  let movedDuringDrag = false;
+
   if(widthPx < 46){
     el.classList.add("block-narrow");
     el.addEventListener("click",(e)=>{
-      if(activeDrag) return;
+      if(movedDuringDrag){ movedDuringDrag=false; return; }
       if(confirm(fullLabel + "\n\nEliminare questa prenotazione?")){
         removeBooking(dateKey, b.id);
       }
@@ -691,30 +705,45 @@ function buildBlock(dateKey, b, dayIdx, gridId){
   const del=document.createElement("span");
   del.className="del";
   del.textContent="x";
-  del.onclick=(e)=>{e.stopPropagation(); removeBooking(dateKey, b.id);};
+  const delHandler=(e)=>{e.stopPropagation(); e.preventDefault(); removeBooking(dateKey, b.id);};
+  del.addEventListener("click", delHandler);
+  del.addEventListener("touchend", delHandler);
   el.appendChild(del);
 
   const rightHandle=document.createElement("div");
   rightHandle.className="handle";
   el.appendChild(rightHandle);
 
-  el.addEventListener("mousedown",(e)=>{
-    if(e.target===rightHandle) return;
-    activeDrag = {mode:"move", b, el, txt, dayIdx, startX:e.clientX, origStart:b.start, origEnd:b.end, hourPx, fullLabelFn:()=>b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)"};
-    e.preventDefault();
-  });
-  rightHandle.addEventListener("mousedown",(e)=>{
-    activeDrag = {mode:"resize", b, el, txt, dayIdx, startX:e.clientX, origStart:b.start, origEnd:b.end, hourPx, fullLabelFn:()=>b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)"};
-    e.preventDefault(); e.stopPropagation();
-  });
+  const startMove=(e)=>{
+    if(e.target===rightHandle || e.target===del) return;
+    movedDuringDrag = false;
+    activeDrag = {mode:"move", b, el, txt, dayIdx, startX:getClientX(e), origStart:b.start, origEnd:b.end, hourPx,
+      onMove:()=>{movedDuringDrag=true;},
+      fullLabelFn:()=>b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)"};
+    if(e.cancelable) e.preventDefault();
+  };
+  const startResize=(e)=>{
+    movedDuringDrag = true; // il resize non deve mai attivare il click di eliminazione
+    activeDrag = {mode:"resize", b, el, txt, dayIdx, startX:getClientX(e), origStart:b.start, origEnd:b.end, hourPx,
+      fullLabelFn:()=>b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)"};
+    if(e.cancelable) e.preventDefault();
+    e.stopPropagation();
+  };
+
+  el.addEventListener("mousedown", startMove);
+  el.addEventListener("touchstart", startMove, {passive:false});
+  rightHandle.addEventListener("mousedown", startResize);
+  rightHandle.addEventListener("touchstart", startResize, {passive:false});
 
   return el;
 }
 
-document.addEventListener("mousemove",(e)=>{
+function handleDragMove(e){
   if(!activeDrag) return;
   const d = activeDrag;
-  const deltaH = Math.round((e.clientX - d.startX)/d.hourPx);
+  const clientX = getClientX(e);
+  const deltaH = Math.round((clientX - d.startX)/d.hourPx);
+  if(Math.abs(clientX - d.startX) > 3 && d.onMove) d.onMove();
   if(d.mode === "move"){
     let ns = d.origStart+deltaH, ne = d.origEnd+deltaH;
     if(ns<0){ne-=ns; ns=0;}
@@ -729,9 +758,10 @@ document.addEventListener("mousemove",(e)=>{
     d.b.end=ne;
     d.el.style.width=((ne-d.b.start)*d.hourPx)+"px";
   }
-});
+  if(e.cancelable) e.preventDefault();
+}
 
-document.addEventListener("mouseup",()=>{
+function handleDragEnd(){
   if(!activeDrag) return;
   const d = activeDrag;
   activeDrag = null;
@@ -741,7 +771,13 @@ document.addEventListener("mouseup",()=>{
   saveData();
   render();
   renderDay();
-});
+}
+
+document.addEventListener("mousemove", handleDragMove);
+document.addEventListener("touchmove", handleDragMove, {passive:false});
+document.addEventListener("mouseup", handleDragEnd);
+document.addEventListener("touchend", handleDragEnd);
+document.addEventListener("touchcancel", handleDragEnd);
 
 function updateNowLine(){
   const container = document.getElementById("tl-grid");
