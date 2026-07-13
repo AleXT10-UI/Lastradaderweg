@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestionale</title>
+<style>
+  :root{
+    --border:#e0b3b3;
+    --head:#7a1f1f;
+    --accent:rgb(200,55,55);
+    --accent-dark:rgb(160,35,35);
+    --hourw:60px;
+    --daylabel-w:130px;
+    --rowh:72px;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;padding:20px;background:linear-gradient(135deg, rgb(200,55,55), rgb(255,255,255));min-height:100vh;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;background:#fff;padding:10px 16px;border-radius:10px;box-shadow:0 2px 10px rgba(160,35,35,.15);}
+  .header-left{display:flex;align-items:center;gap:14px;}
+  header img{height:50px;width:auto;background:#fff;border-radius:6px;}
+  header h1{font-size:20px;color:var(--head);margin:0;letter-spacing:.3px;}
+  .user-box{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--head);}
+  .user-box button{padding:7px 14px;border:none;background:#f7dbdb;color:var(--head);border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:background .15s,transform .12s;}
+  .user-box button:hover{background:#f0c3c3;transform:translateY(-1px);}
+
+  #login-overlay{
+    position:fixed;inset:0;background:linear-gradient(135deg, rgb(200,55,55), rgb(255,255,255));
+    display:flex;align-items:center;justify-content:center;z-index:100;
+  }
+  .login-card{
+    background:#fff;padding:34px 36px;border-radius:16px;width:320px;
+    box-shadow:0 15px 40px rgba(10,20,60,.35);text-align:center;
+  }
+  .login-card img{height:46px;margin-bottom:12px;}
+  .login-card h2{margin:0 0 20px;font-size:19px;color:var(--head);letter-spacing:.3px;}
+  .login-card input{
+    width:100%;padding:11px;margin-bottom:13px;border:1px solid var(--border);
+    border-radius:8px;font-size:14px;transition:border-color .15s,box-shadow .15s;
+  }
+  .login-card input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,55,55,.15);}
+  .captcha-row{display:flex;align-items:center;gap:8px;margin-bottom:13px;}
+  .captcha-box{
+    flex:1 1 auto;min-width:120px;width:auto;background:#fbeeee;border:1px dashed var(--border);border-radius:8px;
+    padding:12px 8px;font-size:26px;font-weight:700;letter-spacing:8px;
+    color:#7a1f1f;user-select:none;text-align:center;font-family:'Courier New',monospace;
+    min-height:24px;box-sizing:border-box;
+  }
+  .captcha-refresh{border:none;background:#f7dbdb;color:var(--head);border-radius:8px;padding:9px 13px;cursor:pointer;font-size:17px;transition:background .15s,transform .15s;}
+  .captcha-refresh:hover{background:#f0c3c3;transform:rotate(90deg);}
+  .login-card button.login-btn{
+    width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;
+    border-radius:9px;font-size:14.5px;cursor:pointer;font-weight:700;box-shadow:0 4px 12px rgba(160,35,35,.4);
+    letter-spacing:.3px;transition:transform .12s,box-shadow .12s;
+  }
+  .login-card button.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(160,35,35,.5);}
+  .login-card button.login-btn:active{transform:translateY(0);}
+  .login-error{color:#dc2626;font-size:12.5px;margin:-4px 0 12px;min-height:14px;}
+
+  .nav{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .nav button{padding:10px 18px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;box-shadow:0 3px 8px rgba(160,35,35,.35);transition:transform .12s,box-shadow .12s;letter-spacing:.2px;}
+  .nav button:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(160,35,35,.45);}
+  .nav button:active{transform:translateY(0);}
+  .nav span{font-weight:700;color:#fff;font-size:15px;background:rgba(120,20,20,.35);padding:9px 18px;border-radius:10px;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);}
+
+  .section-title{color:#fff;font-size:17px;font-weight:700;margin:26px 0 10px;letter-spacing:.4px;text-shadow:0 1px 4px rgba(100,10,10,.4);display:flex;align-items:center;gap:8px;}
+  .section-title::before{content:"";display:inline-block;width:5px;height:20px;background:#fff;border-radius:3px;}
+
+  .timeline-card{background:#fff;border-radius:14px;box-shadow:0 6px 26px rgba(90,10,10,.22);overflow:hidden;border:1px solid rgba(255,255,255,.6);}
+  .timeline-scroll{overflow-x:hidden;width:100%;}
+
+  .tl-grid{display:grid;grid-template-columns:var(--daylabel-w) repeat(168, minmax(0,1fr));position:relative;width:100%;}
+
+  .corner{position:sticky;left:0;top:0;background:#fff;z-index:3;border-right:2px solid var(--border);border-bottom:1px solid var(--border);}
+  .day-header{grid-column:span 24;text-align:center;font-size:12.5px;font-weight:700;color:#fff;padding:7px 0;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-right:2px solid var(--border);border-bottom:1px solid var(--border);}
+  .hour-label{text-align:center;font-size:10px;color:#8a94ab;padding:4px 0;border-bottom:1px solid var(--border);border-right:1px solid #eef1f7;background:#fafbfd;}
+  .hour-label.hl-day{font-size:12.5px;font-weight:600;color:#6b7280;padding:7px 0;}
+  .hour-label.day-edge{border-right:2px solid var(--border);}
+
+  .res-label{position:sticky;left:0;background:linear-gradient(90deg,#fff5f5,#ffffff);z-index:3;border-right:2px solid var(--border);border-top:1px solid var(--border);padding:8px 12px;font-size:13px;font-weight:700;color:var(--head);display:flex;align-items:center;gap:7px;}
+  .res-label::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .track{position:relative;grid-column:span 168;border-top:1px solid var(--border);height:var(--rowh);}
+  .track-inner{position:relative;height:100%;display:grid;grid-template-columns:repeat(168, minmax(0,1fr));}
+  .hour-cell{border-right:1px solid #eef1f7;background:#ffffff;}
+  .hour-cell.dim{background:#fafbfd;}
+  .hour-cell.day-edge{border-right:2px solid var(--border);}
+
+  .now-line{position:absolute;top:0;bottom:0;width:2px;background:#e11d48;z-index:5;pointer-events:none;box-shadow:0 0 6px rgba(225,29,72,.6);}
+  .now-line::before{content:"";position:absolute;top:-6px;left:-4px;width:10px;height:10px;border-radius:50%;background:#e11d48;}
+  .now-badge{position:absolute;top:-24px;left:-24px;background:#e11d48;color:#fff;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;z-index:6;box-shadow:0 2px 6px rgba(225,29,72,.4);}
+
+  .block{
+    position:absolute;top:8px;height:calc(var(--rowh) - 16px);border-radius:7px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:11px;padding:3px 7px;
+    box-shadow:0 2px 5px rgba(160,35,35,.35);
+    cursor:move;overflow:hidden;white-space:nowrap;
+    display:flex;align-items:center;justify-content:space-between;gap:4px;
+    transition:box-shadow .15s,transform .1s;
+  }
+  .block:hover{box-shadow:0 3px 9px rgba(160,35,35,.5);transform:translateY(-1px);}
+  .block .txt{overflow:hidden;text-overflow:ellipsis;flex:1;}
+  .block .handle{width:8px;height:100%;cursor:ew-resize;flex-shrink:0;}
+  .block .del{cursor:pointer;flex-shrink:0;font-weight:bold;padding:0 3px;border-radius:4px;}
+  .block .del:hover{background:rgba(255,255,255,.25);}
+  .block.block-narrow{padding:3px 2px;justify-content:center;}
+  .block.block-narrow .txt{display:none;}
+  .block.block-narrow .del{display:none;}
+  .block.block-narrow::after{content:"";width:6px;height:6px;border-radius:50%;background:#fff;}
+  .block.block-narrow .handle{display:none;}
+
+  .addbar{display:flex;gap:9px;padding:14px 16px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center;background:#fafbfd;}
+  .addbar select, .addbar input{
+    padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12.5px;
+  }
+  .addbar select:focus, .addbar input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,55,55,.12);}
+  .addbar button{
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;cursor:pointer;
+    padding:8px 16px;border-radius:7px;font-size:12.5px;font-weight:700;box-shadow:0 2px 6px rgba(160,35,35,.35);
+    transition:transform .12s,box-shadow .12s;
+  }
+  .addbar button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(160,35,35,.45);}
+
+  @media (max-width: 720px){
+    :root{ --daylabel-w:78px; }
+    body{ padding:10px; }
+    header{ padding:8px 10px; flex-wrap:wrap; gap:8px; }
+    header h1{ font-size:16px; }
+    header img{ height:36px; }
+    .user-box{ font-size:11px; gap:6px; }
+    .user-box button{ padding:6px 10px; font-size:11px; }
+
+    .nav{ gap:6px; margin-bottom:10px; }
+    .nav button{ padding:8px 12px; font-size:12.5px; }
+    .nav span{ font-size:12.5px; padding:7px 12px; width:100%; text-align:center; order:-1; }
+
+    .section-title{ font-size:14.5px; margin:18px 0 8px; }
+
+    .res-label{ font-size:11px; padding:6px 6px; }
+    .res-label::before{ width:6px; height:6px; }
+    .hour-label{ font-size:8.5px; }
+    .hour-label.hl-day{ font-size:10px; padding:6px 0; }
+    .day-header{ font-size:10px; padding:5px 0; }
+
+    :root{ --rowh:56px; }
+    .block{ font-size:9.5px; padding:2px 4px; }
+    .block .del{ font-size:11px; }
+
+    .addbar{ padding:10px; gap:6px; }
+    .addbar select, .addbar input{ font-size:11.5px; padding:6px 7px; }
+    .addbar input[type="text"]{ width:120px !important; }
+    .addbar button{ font-size:11.5px; padding:7px 11px; }
+
+    .login-card{ width:88vw; padding:26px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN DISATTIVATO TEMPORANEAMENTE — codice conservato per riattivazione futura
+<div id="login-overlay">
+  <div class="login-card">
+    <img src="L.jpg" alt="Logo">
+    <h2>Accesso</h2>
+    <input type="text" id="login-user" placeholder="Utente">
+    <input type="password" id="login-pass" placeholder="Password">
+    <div class="captcha-row">
+      <div class="captcha-box" id="captcha-text"></div>
+      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice">&#8635;</div>
+    </div>
+    <input type="text" id="login-captcha" placeholder="Inserisci il codice mostrato">
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="tryLogin()">Accedi</button>
+  </div>
+</div>
+-->
+
+<header>
+  <div class="header-left">
+    <img src="L.jpg" alt="Logo">
+    <h1>Gestionale</h1>
+  </div>
+</header>
+
+<div class="section-title">Vista settimanale</div>
+<div class="nav">
+  <button onclick="changeWeek(-1)">&larr; Settimana prec.</button>
+  <span id="week-label"></span>
+  <button onclick="changeWeek(1)">Settimana succ. &rarr;</button>
+  <button onclick="goToday()">Oggi</button>
+</div>
+
+<div class="timeline-card">
+  <div class="timeline-scroll" id="tl-scroll">
+    <div class="tl-grid" id="tl-grid"></div>
+  </div>
+  <div class="addbar" id="addbar"></div>
+</div>
+
+<div class="section-title" style="margin-top:30px;">Vista giornaliera — <span id="day-title-label"></span></div>
+<div class="timeline-card">
+  <div class="timeline-scroll" id="day-scroll">
+    <div class="tl-grid" id="day-grid"></div>
+  </div>
+  <div class="addbar" id="addbar-day"></div>
+</div>
+
+<script>
+const RESOURCES = ["Sala C","Furgone","Gazebo","Impianto audio","Tavoli"];
+let weekOffset = 0;
+let bookings = {}; // key: "YYYY-MM-DD" -> array of {id, res, start, end, label}
+let idCounter = 1;
+let currentUser = null;
+let currentCaptcha = "";
+let nowTimer = null;
+
+const ACCOUNTS = {
+  "Admin": "derweg"
+};
+
+function randCaptcha(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s="";
+  for(let i=0;i<5;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function newCaptcha(){
+  currentCaptcha = randCaptcha();
+  const box = document.getElementById("captcha-text");
+  const inp = document.getElementById("login-captcha");
+  if(box) box.textContent = currentCaptcha;
+  if(inp) inp.value="";
+}
+
+function tryLogin(){
+  const u = document.getElementById("login-user").value.trim();
+  const p = document.getElementById("login-pass").value;
+  const c = document.getElementById("login-captcha").value.trim().toUpperCase();
+  const errEl = document.getElementById("login-error");
+
+  if(c !== currentCaptcha){
+    errEl.textContent = "Codice non corretto.";
+    newCaptcha();
+    return;
+  }
+  if(!ACCOUNTS[u] || ACCOUNTS[u] !== p){
+    errEl.textContent = "Utente o password errati.";
+    newCaptcha();
+    return;
+  }
+  errEl.textContent = "";
+  safeSet("gestionale_saved_user", u);
+  safeSet("gestionale_saved_pass", p);
+  completeLogin(u);
+}
+
+function completeLogin(u){
+  currentUser = u;
+  loadData();
+  const overlay = document.getElementById("login-overlay");
+  if(overlay) overlay.style.display="none";
+  const curUserEl = document.getElementById("current-user");
+  if(curUserEl) curUserEl.textContent = u;
+  render();
+  renderDay();
+  startNowTimer();
+}
+
+function tryAutoLogin(){
+  const savedUser = safeGet("gestionale_saved_user");
+  const savedPass = safeGet("gestionale_saved_pass");
+  if(savedUser && ACCOUNTS[savedUser] && ACCOUNTS[savedUser] === savedPass){
+    completeLogin(savedUser);
+    return true;
+  }
+  return false;
+}
+
+function logout(){
+  currentUser = null;
+  if(nowTimer){ clearInterval(nowTimer); nowTimer=null; }
+  safeRemove("gestionale_saved_user");
+  safeRemove("gestionale_saved_pass");
+  document.getElementById("login-overlay").style.display="flex";
+  document.getElementById("login-user").value="";
+  document.getElementById("login-pass").value="";
+  newCaptcha();
+}
+
+function storageKey(){
+  return "gestionale_data_" + currentUser;
+}
+// Storage sicuro: su alcuni browser (es. Safari iOS con file://) localStorage
+// può lanciare eccezioni e bloccare l'intero script. Qui usiamo un fallback
+// in memoria se localStorage non è disponibile o accessibile.
+const memoryStore = {};
+let storageAvailable = true;
+try{
+  const testKey = "__test__";
+  localStorage.setItem(testKey, "1");
+  localStorage.removeItem(testKey);
+}catch(e){
+  storageAvailable = false;
+}
+function safeGet(key){
+  try{
+    if(storageAvailable) return localStorage.getItem(key);
+    return memoryStore[key] !== undefined ? memoryStore[key] : null;
+  }catch(e){
+    return memoryStore[key] !== undefined ? memoryStore[key] : null;
+  }
+}
+function safeSet(key, value){
+  try{
+    if(storageAvailable){ localStorage.setItem(key, value); return; }
+  }catch(e){ /* fallback sotto */ }
+  memoryStore[key] = value;
+}
+function safeRemove(key){
+  try{
+    if(storageAvailable){ localStorage.removeItem(key); }
+  }catch(e){ /* ignora */ }
+  delete memoryStore[key];
+}
+
+function saveData(){
+  if(!currentUser) return;
+  safeSet(storageKey(), JSON.stringify({bookings, idCounter}));
+}
+function loadData(){
+  const raw = safeGet(storageKey());
+  if(raw){
+    try{
+      const parsed = JSON.parse(raw);
+      bookings = parsed.bookings || {};
+      idCounter = parsed.idCounter || 1;
+    }catch(e){ bookings={}; idCounter=1; }
+  } else {
+    bookings = {}; idCounter = 1;
+  }
+}
+
+newCaptcha();
+setTimeout(()=>{
+  const box = document.getElementById("captcha-text");
+  if(box && !box.textContent.trim()){ newCaptcha(); }
+}, 200);
+
+function getMonday(offset){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() - day + 1 + offset*7);
+  return d;
+}
+
+function fmtDate(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return y+"-"+m+"-"+day;
+}
+
+function dayNameShort(d){
+  const s = d.toLocaleDateString("it-IT", {weekday:"short", day:"numeric", month:"short"});
+  return s.replace(/^\w/, c=>c.toUpperCase());
+}
+
+function changeWeek(delta){
+  weekOffset += delta;
+  render();
+}
+function goToday(){
+  weekOffset = 0;
+  render();
+}
+
+function addBooking(dateKey, res, start, end, label){
+  if(!bookings[dateKey]) bookings[dateKey] = [];
+  bookings[dateKey].push({id: idCounter++, res, start:+start, end:+end, label});
+  saveData();
+  render();
+  renderDay();
+}
+
+function removeBooking(dateKey, id){
+  bookings[dateKey] = bookings[dateKey].filter(b=>b.id!==id);
+  saveData();
+  render();
+  renderDay();
+}
+
+let weekDays = [];
+
+function render(){
+  const scrollPos = window.scrollY;
+  const monday = getMonday(weekOffset);
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate()+6);
+  document.getElementById("week-label").textContent =
+    "Lun " + monday.toLocaleDateString("it-IT",{day:"numeric",month:"short"}) + " – Dom " +
+    sunday.toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"numeric"});
+
+  weekDays = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(monday); d.setDate(d.getDate()+i);
+    weekDays.push(d);
+  }
+
+  buildGrid();
+  buildAddbar();
+  updateNowLine();
+  window.scrollTo(0, scrollPos);
+}
+
+function buildGrid(){
+  const grid = document.getElementById("tl-grid");
+  grid.innerHTML = "";
+
+  const corner = document.createElement("div");
+  corner.className = "corner";
+  grid.appendChild(corner);
+
+  weekDays.forEach(d=>{
+    const dh = document.createElement("div");
+    dh.className = "day-header";
+    dh.textContent = dayNameShort(d);
+    grid.appendChild(dh);
+  });
+
+  const corner2 = document.createElement("div");
+  corner2.className = "corner";
+  grid.appendChild(corner2);
+
+  for(let i=0;i<168;i++){
+    const h = i % 24;
+    const hl = document.createElement("div");
+    hl.className = "hour-label" + (h===23 ? " day-edge" : "");
+    hl.textContent = h % 6 === 0 ? String(h).padStart(2,"0") : "";
+    grid.appendChild(hl);
+  }
+
+  RESOURCES.forEach(res=>{
+    const label = document.createElement("div");
+    label.className = "res-label";
+    label.textContent = res;
+    grid.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "track";
+    track.dataset.res = res;
+    const inner = document.createElement("div");
+    inner.className = "track-inner";
+
+    for(let i=0;i<168;i++){
+      const h = i % 24;
+      const cell = document.createElement("div");
+      cell.className = "hour-cell" + (Math.floor(h/12)%2===1 ? " dim" : "") + (h===23 ? " day-edge" : "");
+      inner.appendChild(cell);
+    }
+
+    track.appendChild(inner);
+
+    weekDays.forEach((d, dayIdx)=>{
+      const key = fmtDate(d);
+      (bookings[key]||[]).filter(b=>b.res===res).forEach(b=>{
+        inner.appendChild(buildBlock(key, b, dayIdx));
+      });
+    });
+
+    grid.appendChild(track);
+  });
+}
+
+function buildAddbar(){
+  const bar = document.getElementById("addbar");
+  bar.innerHTML = "";
+
+  const daySel = document.createElement("select");
+  weekDays.forEach(d=>{
+    const o = document.createElement("option");
+    o.value = fmtDate(d);
+    o.textContent = dayNameShort(d);
+    daySel.appendChild(o);
+  });
+
+  const resSel = document.createElement("select");
+  RESOURCES.forEach(r=>{
+    const o = document.createElement("option"); o.value=r; o.textContent=r;
+    resSel.appendChild(o);
+  });
+
+  const startInp = document.createElement("input");
+  startInp.type="number"; startInp.min=0; startInp.max=23; startInp.value=9; startInp.style.width="55px";
+  startInp.title="Ora inizio";
+
+  const endInp = document.createElement("input");
+  endInp.type="number"; endInp.min=1; endInp.max=24; endInp.value=11; endInp.style.width="55px";
+  endInp.title="Ora fine";
+
+  const labelInp = document.createElement("input");
+  labelInp.type="text"; labelInp.placeholder="Descrizione lavoro"; labelInp.style.width="170px";
+
+  const addBtn = document.createElement("button");
+  addBtn.textContent="+ Aggiungi";
+  addBtn.onclick=()=>{
+    const s=+startInp.value, e=+endInp.value;
+    if(e<=s){alert("L'ora fine deve essere maggiore dell'ora inizio");return;}
+    addBooking(daySel.value, resSel.value, s, e, labelInp.value || resSel.value);
+  };
+
+  bar.appendChild(daySel);
+  bar.appendChild(resSel);
+  bar.appendChild(startInp);
+  bar.appendChild(document.createTextNode("-"));
+  bar.appendChild(endInp);
+  bar.appendChild(labelInp);
+  bar.appendChild(addBtn);
+}
+
+let currentDay = null; // Date object, sempre oggi
+
+function renderDay(){
+  const scrollPos = window.scrollY;
+  currentDay = new Date();
+  currentDay.setHours(0,0,0,0);
+  document.getElementById("day-title-label").textContent =
+    dayNameShort(currentDay);
+  buildDayGrid();
+  buildDayAddbar();
+  updateNowLineDay();
+  window.scrollTo(0, scrollPos);
+}
+
+function buildDayGrid(){
+  const grid = document.getElementById("day-grid");
+  grid.innerHTML = "";
+  grid.style.gridTemplateColumns = "var(--daylabel-w) repeat(24, minmax(0,1fr))";
+
+  const corner = document.createElement("div");
+  corner.className = "corner";
+  grid.appendChild(corner);
+
+  const dh = document.createElement("div");
+  dh.className = "day-header";
+  dh.style.gridColumn = "span 24";
+  dh.textContent = dayNameShort(currentDay);
+  grid.appendChild(dh);
+
+  const corner2 = document.createElement("div");
+  corner2.className = "corner";
+  grid.appendChild(corner2);
+
+  for(let h=0;h<24;h++){
+    const hl = document.createElement("div");
+    hl.className = "hour-label hl-day" + (h===23 ? " day-edge" : "");
+    hl.textContent = String(h).padStart(2,"0")+":00";
+    grid.appendChild(hl);
+  }
+
+  const key = fmtDate(currentDay);
+
+  RESOURCES.forEach(res=>{
+    const label = document.createElement("div");
+    label.className = "res-label";
+    label.textContent = res;
+    grid.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "track";
+    track.dataset.res = res;
+    const inner = document.createElement("div");
+    inner.className = "track-inner";
+    inner.style.gridTemplateColumns = "repeat(24, minmax(0,1fr))";
+
+    for(let h=0;h<24;h++){
+      const cell = document.createElement("div");
+      cell.className = "hour-cell" + (Math.floor(h/12)%2===1 ? " dim" : "") + (h===23 ? " day-edge" : "");
+      inner.appendChild(cell);
+    }
+
+    track.appendChild(inner);
+
+    (bookings[key]||[]).filter(b=>b.res===res).forEach(b=>{
+      inner.appendChild(buildBlock(key, b, 0, "day-grid"));
+    });
+
+    grid.appendChild(track);
+  });
+}
+
+function buildDayAddbar(){
+  const bar = document.getElementById("addbar-day");
+  bar.innerHTML = "";
+
+  const key = fmtDate(currentDay);
+
+  const resSel = document.createElement("select");
+  RESOURCES.forEach(r=>{
+    const o = document.createElement("option"); o.value=r; o.textContent=r;
+    resSel.appendChild(o);
+  });
+
+  const startInp = document.createElement("input");
+  startInp.type="number"; startInp.min=0; startInp.max=23; startInp.value=9; startInp.style.width="55px";
+  startInp.title="Ora inizio";
+
+  const endInp = document.createElement("input");
+  endInp.type="number"; endInp.min=1; endInp.max=24; endInp.value=11; endInp.style.width="55px";
+  endInp.title="Ora fine";
+
+  const labelInp = document.createElement("input");
+  labelInp.type="text"; labelInp.placeholder="Descrizione lavoro"; labelInp.style.width="170px";
+
+  const addBtn = document.createElement("button");
+  addBtn.textContent="+ Aggiungi";
+  addBtn.onclick=()=>{
+    const s=+startInp.value, e=+endInp.value;
+    if(e<=s){alert("L'ora fine deve essere maggiore dell'ora inizio");return;}
+    addBooking(key, resSel.value, s, e, labelInp.value || resSel.value);
+  };
+
+  bar.appendChild(resSel);
+  bar.appendChild(startInp);
+  bar.appendChild(document.createTextNode("-"));
+  bar.appendChild(endInp);
+  bar.appendChild(labelInp);
+  bar.appendChild(addBtn);
+}
+
+function updateNowLineDay(){
+  const container = document.getElementById("day-grid");
+  container.querySelectorAll(".now-line, .now-badge").forEach(n=>n.remove());
+
+  const now = new Date();
+  const hourPx = getHourPx("day-grid");
+  const hourDecimal = now.getHours() + now.getMinutes()/60;
+  const globalPos = hourDecimal * hourPx;
+
+  const tracks = container.querySelectorAll(".track-inner");
+  tracks.forEach((track, i)=>{
+    const line = document.createElement("div");
+    line.className = "now-line";
+    line.style.left = globalPos + "px";
+    track.appendChild(line);
+    if(i===0){
+      const badge = document.createElement("div");
+      badge.className = "now-badge";
+      badge.textContent = now.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+      badge.style.left = globalPos + "px";
+      track.appendChild(badge);
+    }
+  });
+}
+
+function getHourPx(gridId){
+  gridId = gridId || "tl-grid";
+  const grid = document.getElementById(gridId);
+  const labelW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--daylabel-w'));
+  const totalHours = gridId === "day-grid" ? 24 : 168;
+  return (grid.clientWidth - labelW) / totalHours;
+}
+
+let activeDrag = null; // {mode:"move"|"resize", b, el, txt, dayIdx, startX, origStart, origEnd, hourPx}
+
+function buildBlock(dateKey, b, dayIdx, gridId){
+  const hourPx = getHourPx(gridId);
+  const el=document.createElement("div");
+  el.className="block";
+  const globalStart = dayIdx*24 + b.start;
+  const widthPx = (b.end-b.start)*hourPx;
+  el.style.left = (globalStart*hourPx)+"px";
+  el.style.width = widthPx+"px";
+
+  const fullLabel = b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)";
+  el.title = fullLabel;
+
+  const txt=document.createElement("span");
+  txt.className="txt";
+  txt.textContent = fullLabel;
+  el.appendChild(txt);
+
+  if(widthPx < 46){
+    el.classList.add("block-narrow");
+    el.addEventListener("click",(e)=>{
+      if(activeDrag) return;
+      if(confirm(fullLabel + "\n\nEliminare questa prenotazione?")){
+        removeBooking(dateKey, b.id);
+      }
+    });
+  }
+
+  const del=document.createElement("span");
+  del.className="del";
+  del.textContent="x";
+  del.onclick=(e)=>{e.stopPropagation(); removeBooking(dateKey, b.id);};
+  el.appendChild(del);
+
+  const rightHandle=document.createElement("div");
+  rightHandle.className="handle";
+  el.appendChild(rightHandle);
+
+  el.addEventListener("mousedown",(e)=>{
+    if(e.target===rightHandle) return;
+    activeDrag = {mode:"move", b, el, txt, dayIdx, startX:e.clientX, origStart:b.start, origEnd:b.end, hourPx, fullLabelFn:()=>b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)"};
+    e.preventDefault();
+  });
+  rightHandle.addEventListener("mousedown",(e)=>{
+    activeDrag = {mode:"resize", b, el, txt, dayIdx, startX:e.clientX, origStart:b.start, origEnd:b.end, hourPx, fullLabelFn:()=>b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)"};
+    e.preventDefault(); e.stopPropagation();
+  });
+
+  return el;
+}
+
+document.addEventListener("mousemove",(e)=>{
+  if(!activeDrag) return;
+  const d = activeDrag;
+  const deltaH = Math.round((e.clientX - d.startX)/d.hourPx);
+  if(d.mode === "move"){
+    let ns = d.origStart+deltaH, ne = d.origEnd+deltaH;
+    if(ns<0){ne-=ns; ns=0;}
+    if(ne>24){ns-=(ne-24); ne=24;}
+    d.b.start=ns; d.b.end=ne;
+    d.el.style.left=((d.dayIdx*24+ns)*d.hourPx)+"px";
+    d.el.style.width=((ne-ns)*d.hourPx)+"px";
+  } else {
+    let ne = d.origEnd+deltaH;
+    if(ne<=d.b.start+1) ne=d.b.start+1;
+    if(ne>24) ne=24;
+    d.b.end=ne;
+    d.el.style.width=((ne-d.b.start)*d.hourPx)+"px";
+  }
+});
+
+document.addEventListener("mouseup",()=>{
+  if(!activeDrag) return;
+  const d = activeDrag;
+  activeDrag = null;
+  const newLabel = d.fullLabelFn ? d.fullLabelFn() : d.txt.textContent;
+  d.txt.textContent = newLabel;
+  d.el.title = newLabel;
+  saveData();
+  render();
+  renderDay();
+});
+
+function updateNowLine(){
+  const container = document.getElementById("tl-grid");
+  container.querySelectorAll(".now-line, .now-badge").forEach(n=>n.remove());
+
+  const now = new Date();
+  const todayKey = fmtDate(now);
+  const dayIdx = weekDays.findIndex(d=>fmtDate(d)===todayKey);
+  if(dayIdx === -1) return;
+
+  const hourPx = getHourPx();
+  const hourDecimal = now.getHours() + now.getMinutes()/60;
+  const globalPos = (dayIdx*24 + hourDecimal) * hourPx;
+
+  const tracks = container.querySelectorAll(".track-inner");
+  tracks.forEach((track, i)=>{
+    const line = document.createElement("div");
+    line.className = "now-line";
+    line.style.left = globalPos + "px";
+    track.appendChild(line);
+    if(i===0){
+      const badge = document.createElement("div");
+      badge.className = "now-badge";
+      badge.textContent = now.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+      badge.style.left = globalPos + "px";
+      track.appendChild(badge);
+    }
+  });
+}
+
+function startNowTimer(){
+  if(nowTimer) clearInterval(nowTimer);
+  updateNowLine();
+  updateNowLineDay();
+  nowTimer = setInterval(()=>{
+    updateNowLine();
+    // se è cambiato il giorno (mezzanotte passata), ricostruisco tutta la vista giorno
+    const today = new Date(); today.setHours(0,0,0,0);
+    if(!currentDay || today.getTime() !== currentDay.getTime()){
+      renderDay();
+    } else {
+      updateNowLineDay();
+    }
+  }, 5*60*1000);
+}
+
+let resizeDebounce = null;
+window.addEventListener("resize", ()=>{
+  clearTimeout(resizeDebounce);
+  resizeDebounce = setTimeout(()=>{
+    if(currentUser){ render(); renderDay(); }
+  }, 150);
+});
+
+// LOGIN DISATTIVATO TEMPORANEAMENTE: avvio diretto con utente fisso.
+// Per riattivare il login: ripristina il blocco HTML commentato sopra
+// e sostituisci la riga sotto con:
+// if(!tryAutoLogin()){ document.getElementById("login-overlay").style.display="flex"; }
+completeLogin("Admin");
+</script>
+
+</body>
+</html>
