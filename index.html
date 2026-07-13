@@ -154,7 +154,6 @@
 
     .timeline-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
     #tl-grid{ grid-template-columns: var(--daylabel-w) repeat(168, 28px) !important; width:max-content; min-width:100%; }
-    #day-grid{ grid-template-columns: var(--daylabel-w) repeat(24, 46px) !important; width:max-content; min-width:100%; }
 
     .addbar{ padding:8px; gap:6px; display:grid; grid-template-columns:1fr 1fr; align-items:stretch; }
     .addbar select{ grid-column:span 2; }
@@ -234,19 +233,10 @@
   <div class="addbar" id="addbar"></div>
 </div>
 
-<div class="section-title" style="margin-top:30px;">Vista giornaliera — <span id="day-title-label"></span></div>
-<div class="timeline-card">
-  <div class="timeline-scroll" id="day-scroll">
-    <div class="tl-grid" id="day-grid"></div>
-  </div>
-  <div class="addbar" id="addbar-day"></div>
-</div>
-
 <div id="bottom-nav">
   <button onclick="changeWeek(-1)"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>
   <button onclick="goToday()" class="bn-today"><i class="ti ti-calendar-event" aria-hidden="true"></i></button>
   <button onclick="changeWeek(1)"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>
-  <button onclick="document.getElementById('day-scroll').scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-sun" aria-hidden="true"></i></button>
   <button onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="ti ti-arrow-up" aria-hidden="true"></i></button>
 </div>
 
@@ -307,7 +297,6 @@ function completeLogin(u){
   const curUserEl = document.getElementById("current-user");
   if(curUserEl) curUserEl.textContent = u;
   render();
-  renderDay();
   startNowTimer();
 }
 
@@ -425,14 +414,12 @@ function addBooking(dateKey, res, start, end, label){
   bookings[dateKey].push({id: idCounter++, res, start:+start, end:+end, label});
   saveData();
   render();
-  renderDay();
 }
 
 function removeBooking(dateKey, id){
   bookings[dateKey] = bookings[dateKey].filter(b=>b.id!==id);
   saveData();
   render();
-  renderDay();
 }
 
 let weekDays = [];
@@ -480,7 +467,7 @@ function buildGrid(){
     const h = i % 24;
     const hl = document.createElement("div");
     hl.className = "hour-label" + (h===23 ? " day-edge" : "");
-    hl.textContent = h % 6 === 0 ? String(h).padStart(2,"0") : "";
+    hl.textContent = String(h).padStart(2,"0");
     grid.appendChild(hl);
   }
 
@@ -562,146 +549,11 @@ function buildAddbar(){
   bar.appendChild(addBtn);
 }
 
-let currentDay = null; // Date object, sempre oggi
-
-function renderDay(){
-  const scrollPos = window.scrollY;
-  currentDay = new Date();
-  currentDay.setHours(0,0,0,0);
-  document.getElementById("day-title-label").textContent =
-    dayNameShort(currentDay);
-  buildDayGrid();
-  buildDayAddbar();
-  updateNowLineDay();
-  window.scrollTo(0, scrollPos);
-}
-
-function buildDayGrid(){
-  const grid = document.getElementById("day-grid");
-  grid.innerHTML = "";
-  grid.style.gridTemplateColumns = "var(--daylabel-w) repeat(24, minmax(0,1fr))";
-
-  const corner = document.createElement("div");
-  corner.className = "corner";
-  grid.appendChild(corner);
-
-  const dh = document.createElement("div");
-  dh.className = "day-header";
-  dh.style.gridColumn = "span 24";
-  dh.textContent = dayNameShort(currentDay);
-  grid.appendChild(dh);
-
-  const corner2 = document.createElement("div");
-  corner2.className = "corner";
-  grid.appendChild(corner2);
-
-  for(let h=0;h<24;h++){
-    const hl = document.createElement("div");
-    hl.className = "hour-label hl-day" + (h===23 ? " day-edge" : "");
-    hl.textContent = String(h).padStart(2,"0")+":00";
-    grid.appendChild(hl);
-  }
-
-  const key = fmtDate(currentDay);
-
-  RESOURCES.forEach(res=>{
-    const label = document.createElement("div");
-    label.className = "res-label";
-    label.textContent = res;
-    grid.appendChild(label);
-
-    const track = document.createElement("div");
-    track.className = "track";
-    track.dataset.res = res;
-    const inner = document.createElement("div");
-    inner.className = "track-inner";
-    inner.style.gridTemplateColumns = "repeat(24, minmax(0,1fr))";
-
-    for(let h=0;h<24;h++){
-      const cell = document.createElement("div");
-      cell.className = "hour-cell" + (Math.floor(h/12)%2===1 ? " dim" : "") + (h===23 ? " day-edge" : "");
-      inner.appendChild(cell);
-    }
-
-    track.appendChild(inner);
-
-    (bookings[key]||[]).filter(b=>b.res===res).forEach(b=>{
-      inner.appendChild(buildBlock(key, b, 0, "day-grid"));
-    });
-
-    grid.appendChild(track);
-  });
-}
-
-function buildDayAddbar(){
-  const bar = document.getElementById("addbar-day");
-  bar.innerHTML = "";
-
-  const key = fmtDate(currentDay);
-
-  const resSel = document.createElement("select");
-  RESOURCES.forEach(r=>{
-    const o = document.createElement("option"); o.value=r; o.textContent=r;
-    resSel.appendChild(o);
-  });
-
-  const startInp = document.createElement("input");
-  startInp.type="number"; startInp.min=0; startInp.max=23; startInp.value=9; startInp.style.width="55px";
-  startInp.title="Ora inizio";
-
-  const endInp = document.createElement("input");
-  endInp.type="number"; endInp.min=1; endInp.max=24; endInp.value=11; endInp.style.width="55px";
-  endInp.title="Ora fine";
-
-  const labelInp = document.createElement("input");
-  labelInp.type="text"; labelInp.placeholder="Descrizione lavoro"; labelInp.style.width="170px";
-
-  const addBtn = document.createElement("button");
-  addBtn.textContent="+ Aggiungi";
-  addBtn.onclick=()=>{
-    const s=+startInp.value, e=+endInp.value;
-    if(e<=s){alert("L'ora fine deve essere maggiore dell'ora inizio");return;}
-    addBooking(key, resSel.value, s, e, labelInp.value || resSel.value);
-  };
-
-  bar.appendChild(resSel);
-  bar.appendChild(startInp);
-  bar.appendChild(document.createTextNode("-"));
-  bar.appendChild(endInp);
-  bar.appendChild(labelInp);
-  bar.appendChild(addBtn);
-}
-
-function updateNowLineDay(){
-  const container = document.getElementById("day-grid");
-  container.querySelectorAll(".now-line, .now-badge").forEach(n=>n.remove());
-
-  const now = new Date();
-  const hourPx = getHourPx("day-grid");
-  const hourDecimal = now.getHours() + now.getMinutes()/60;
-  const globalPos = hourDecimal * hourPx;
-
-  const tracks = container.querySelectorAll(".track-inner");
-  tracks.forEach((track, i)=>{
-    const line = document.createElement("div");
-    line.className = "now-line";
-    line.style.left = globalPos + "px";
-    track.appendChild(line);
-    if(i===0){
-      const badge = document.createElement("div");
-      badge.className = "now-badge";
-      badge.textContent = now.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
-      badge.style.left = globalPos + "px";
-      track.appendChild(badge);
-    }
-  });
-}
-
 function getHourPx(gridId){
   gridId = gridId || "tl-grid";
   const grid = document.getElementById(gridId);
   const labelW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--daylabel-w'));
-  const totalHours = gridId === "day-grid" ? 24 : 168;
+  const totalHours = 168;
   return (grid.clientWidth - labelW) / totalHours;
 }
 
@@ -810,7 +662,6 @@ function handleDragEnd(){
   d.el.title = newLabel;
   saveData();
   render();
-  renderDay();
 }
 
 document.addEventListener("mousemove", handleDragMove);
@@ -851,24 +702,14 @@ function updateNowLine(){
 function startNowTimer(){
   if(nowTimer) clearInterval(nowTimer);
   updateNowLine();
-  updateNowLineDay();
-  nowTimer = setInterval(()=>{
-    updateNowLine();
-    // se è cambiato il giorno (mezzanotte passata), ricostruisco tutta la vista giorno
-    const today = new Date(); today.setHours(0,0,0,0);
-    if(!currentDay || today.getTime() !== currentDay.getTime()){
-      renderDay();
-    } else {
-      updateNowLineDay();
-    }
-  }, 5*60*1000);
+  nowTimer = setInterval(updateNowLine, 5*60*1000);
 }
 
 let resizeDebounce = null;
 window.addEventListener("resize", ()=>{
   clearTimeout(resizeDebounce);
   resizeDebounce = setTimeout(()=>{
-    if(currentUser){ render(); renderDay(); }
+    if(currentUser){ render(); }
   }, 150);
 });
 
