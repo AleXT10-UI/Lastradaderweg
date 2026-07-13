@@ -123,51 +123,52 @@
 
   @media (max-width: 720px){
     :root{ --daylabel-w:62px; }
-    body{ padding:8px; }
-    header{ padding:7px 9px; gap:6px; border-radius:10px; }
-    header h1{ font-size:15px; }
-    header img{ height:32px; }
+    body{ padding:6px; }
+    header{ padding:5px 8px; gap:6px; border-radius:8px; margin-bottom:10px; }
+    header h1{ font-size:14px; }
+    header img{ height:26px; }
     .user-box{ font-size:11px; gap:6px; }
-    .user-box button{ padding:6px 10px; font-size:11px; }
+    .user-box button{ padding:5px 9px; font-size:11px; }
 
-    .nav{ gap:5px; margin-bottom:8px; }
-    .nav button{ padding:9px 10px; font-size:12.5px; flex:1; min-width:0; }
-    .nav span{ font-size:13px; padding:8px 10px; width:100%; text-align:center; order:-1; font-weight:700; }
+    .nav{ gap:5px; margin-bottom:6px; }
+    .nav button{ padding:7px 8px; font-size:12px; flex:1; min-width:0; }
+    .nav span{ font-size:12px; padding:6px 8px; width:100%; text-align:center; order:-1; font-weight:700; }
 
-    .section-title{ font-size:14px; margin:16px 0 7px; }
-    .section-title::before{ height:16px; }
+    .section-title{ font-size:13px; margin:10px 0 5px; }
+    .section-title::before{ height:14px; width:4px; }
 
-    .timeline-card{ border-radius:10px; }
+    .timeline-card{ border-radius:9px; }
 
-    .res-label{ font-size:11.5px; padding:5px 7px; gap:5px; }
-    .res-label::before{ width:6px; height:6px; }
-    .hour-label{ font-size:10.5px; font-weight:600; }
-    .hour-label.hl-day{ font-size:12px; padding:6px 0; }
-    .day-header{ font-size:10.5px; padding:5px 0; letter-spacing:0; }
+    .res-label{ font-size:10.5px; padding:3px 6px; gap:4px; }
+    .res-label::before{ width:5px; height:5px; }
+    .hour-label{ font-size:9.5px; font-weight:600; padding:2px 0; }
+    .hour-label.hl-day{ font-size:11px; padding:4px 0; }
+    .day-header{ font-size:9.5px; padding:3px 0; letter-spacing:0; }
 
-    :root{ --rowh:54px; }
-    .block{ font-size:10.5px; padding:2px 6px; border-radius:6px; }
-    .block .del{ font-size:14px; padding:3px 6px; }
-    .block .handle{ width:18px; }
+    :root{ --rowh:40px; }
+    .block{ top:4px; height:calc(var(--rowh) - 8px); font-size:9.5px; padding:1px 5px; border-radius:5px; }
+    .block .del{ font-size:12px; padding:2px 5px; }
+    .block .handle{ width:16px; }
 
     .timeline-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
-    #tl-grid{ grid-template-columns: var(--daylabel-w) repeat(168, 30px) !important; width:max-content; min-width:100%; }
-    #day-grid{ grid-template-columns: var(--daylabel-w) repeat(24, 50px) !important; width:max-content; min-width:100%; }
+    #tl-grid{ grid-template-columns: var(--daylabel-w) repeat(168, 28px) !important; width:max-content; min-width:100%; }
+    #day-grid{ grid-template-columns: var(--daylabel-w) repeat(24, 46px) !important; width:max-content; min-width:100%; }
 
-    .addbar{ padding:10px; gap:7px; flex-direction:column; align-items:stretch; }
-    .addbar select, .addbar input{ font-size:14px; padding:10px; min-height:42px; width:100%; }
-    .addbar input[type="text"]{ width:100% !important; }
-    .addbar button{ font-size:14px; padding:11px; min-height:42px; width:100%; font-weight:700; }
-    .addbar > *{ margin:0; }
+    .addbar{ padding:8px; gap:6px; display:grid; grid-template-columns:1fr 1fr; align-items:stretch; }
+    .addbar select{ grid-column:span 2; }
+    .addbar input[type="text"]{ grid-column:span 2; }
+    .addbar button{ grid-column:span 2; }
+    .addbar select, .addbar input{ font-size:13px; padding:8px; min-height:36px; width:100%; margin:0; }
+    .addbar button{ font-size:13px; padding:9px; min-height:36px; width:100%; font-weight:700; margin:0; }
 
-    .login-card{ width:88vw; padding:24px 20px; }
+    .login-card{ width:88vw; padding:20px 18px; }
   }
 
   @media (max-width: 380px){
-    header h1{ font-size:13px; }
-    header img{ height:28px; }
-    .nav button{ font-size:11.5px; padding:8px 6px; }
-    .nav span{ font-size:12px; }
+    header h1{ font-size:12px; }
+    header img{ height:24px; }
+    .nav button{ font-size:11px; padding:7px 5px; }
+    .nav span{ font-size:11px; }
   }
 </style>
 </head>
