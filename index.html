@@ -421,6 +421,30 @@
     width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
     background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 4px 14px var(--accent-shadow);
   }
+
+  .captcha-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .captcha-box{
+    flex:1 1 auto;min-width:120px;background:var(--bg-soft);border:1px dashed var(--border);border-radius:8px;
+    padding:12px 8px;font-size:24px;font-weight:700;letter-spacing:7px;color:var(--head);
+    user-select:none;text-align:center;font-family:'Courier New',monospace;min-height:24px;box-sizing:border-box;
+  }
+  .captcha-refresh{
+    border:none;background:var(--bg-soft);color:var(--head);border-radius:8px;padding:9px 13px;
+    cursor:pointer;font-size:17px;flex-shrink:0;transition:background .15s,transform .15s;
+  }
+  .captcha-refresh:hover{background:var(--border);transform:rotate(90deg);}
+
+  #loading-overlay{
+    display:none;position:fixed;inset:0;z-index:600;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
+  }
+  .loading-spinner{
+    width:46px;height:46px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--accent);
+    animation:spin .8s linear infinite;
+  }
+  .loading-text{color:var(--head);font-size:14px;font-weight:700;}
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
   .modal{background:var(--surface);border-radius:16px;padding:22px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
   .modal h3{margin:0 0 16px;color:var(--head);font-size:17px;}
   .modal label{display:block;font-size:12.5px;font-weight:600;color:var(--head);margin:12px 0 5px;}
@@ -553,10 +577,20 @@
     <img src="L.jpg" alt="Logo" class="login-logo">
     <h2>Accedi</h2>
     <input type="text" id="login-username" placeholder="Nome utente" autocomplete="username">
-    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter') attemptLogin()">
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+    <div class="captcha-row">
+      <div class="captcha-box" id="captcha-text"></div>
+      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice">&#8635;</div>
+    </div>
+    <input type="text" id="login-captcha" placeholder="Inserisci il codice mostrato" onkeydown="if(event.key==='Enter') attemptLogin()">
     <div class="login-error" id="login-error"></div>
     <button class="login-btn" onclick="attemptLogin()">Accedi</button>
   </div>
+</div>
+
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Caricamento...</div>
 </div>
 
 <div class="app">
@@ -785,23 +819,47 @@ function isAdmin(){ return currentUser === ADMIN_USERNAME; }
 function isSpecialViewer(){ return currentUser === SPECIAL_VIEWER_EMAIL; }
 function canSeeCheckmarkCounts(){ return isAdmin() || isSpecialViewer(); }
 
+let currentCaptcha = "";
+function randCaptcha(){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function newCaptcha(){
+  currentCaptcha = randCaptcha();
+  const box = document.getElementById("captcha-text");
+  const inp = document.getElementById("login-captcha");
+  if(box) box.textContent = currentCaptcha;
+  if(inp) inp.value = "";
+}
+
 async function attemptLogin(){
   const nameInp = document.getElementById("login-username");
   const passInp = document.getElementById("login-password");
+  const captchaInp = document.getElementById("login-captcha");
   const errEl = document.getElementById("login-error");
   const name = nameInp.value.trim();
   const pass = passInp.value;
+  const captchaValue = captchaInp.value.trim().toUpperCase();
 
   if(!name || !pass){
     errEl.textContent = "Inserisci nome utente e password.";
     return;
   }
 
+  if(captchaValue !== currentCaptcha){
+    errEl.textContent = "Codice di verifica non corretto.";
+    newCaptcha();
+    return;
+  }
+
   if(name === ADMIN_USERNAME){
     if(pass === ADMIN_PASSWORD){
-      completeLogin(ADMIN_USERNAME);
+      completeLogin(ADMIN_USERNAME, true);
     } else {
       errEl.textContent = "Password errata.";
+      newCaptcha();
     }
     return;
   }
@@ -810,17 +868,19 @@ async function attemptLogin(){
   const user = users[name];
   if(!user){
     errEl.textContent = "Utente non trovato.";
+    newCaptcha();
     return;
   }
   const hashed = await sha256(pass);
   if(hashed !== user.passwordHash){
     errEl.textContent = "Password errata.";
+    newCaptcha();
     return;
   }
-  completeLogin(name);
+  completeLogin(name, true);
 }
 
-function completeLogin(username){
+function completeLogin(username, showLoading){
   currentUser = username;
   try{ sessionStorage.setItem("gestionale_current_user", username); }catch(e){}
   document.getElementById("login-overlay").style.display = "none";
@@ -835,6 +895,20 @@ function completeLogin(username){
 
   refreshAnnouncementBadge();
   if(typeof switchView === "function") switchView("day");
+
+  if(showLoading){
+    showLoadingScreen();
+    setTimeout(hideLoadingScreen, 3000);
+  }
+}
+
+function showLoadingScreen(){
+  const el = document.getElementById("loading-overlay");
+  if(el) el.style.display = "flex";
+}
+function hideLoadingScreen(){
+  const el = document.getElementById("loading-overlay");
+  if(el) el.style.display = "none";
 }
 
 function doLogout(){
@@ -935,7 +1009,7 @@ document.getElementById("users-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="users-overlay") closeUsersPanel();
 });
 
-const DEFAULT_RESOURCES = ["Sala C","Furgone","Gazebo","Impianto audio","Tavoli"];
+const DEFAULT_RESOURCES = ["1"];
 
 
 let RESOURCES = loadResources();
@@ -2130,6 +2204,7 @@ document.getElementById("announce-overlay").addEventListener("click",(e)=>{
 });
 
 /* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
+newCaptcha();
 if(!tryRestoreSession()){
   document.getElementById("login-overlay").style.display = "flex";
 }
