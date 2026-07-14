@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestionale</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
 <style>
   :root{
     --border:#e8d0d0;
@@ -21,6 +20,7 @@
     font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;
     background:linear-gradient(160deg, rgb(200,55,55) 0%, rgb(255,255,255) 45%);
     min-height:100vh;color:#2a2a2a;
+    overscroll-behavior-y:contain;
   }
   .app{max-width:900px;margin:0 auto;padding:10px;padding-bottom:80px;}
 
@@ -76,7 +76,7 @@
   }
   .mini-timeline-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:#9a6a6a;margin-top:5px;padding:0 1px;}
 
-  .slot-list{padding:10px;display:flex;flex-direction:column;gap:8px;max-height:520px;overflow-y:auto;}
+  .slot-list{padding:10px;display:flex;flex-direction:column;gap:8px;max-height:65vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
   .slot{
     display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-radius:11px;
     border:1.5px solid var(--free-border);background:var(--free);cursor:pointer;transition:transform .1s,box-shadow .1s;
@@ -185,15 +185,15 @@
   </header>
 
   <div class="view-switch">
-    <button id="tab-day" onclick="switchView('day')"><i class="ti ti-sun"></i>Giorno</button>
-    <button id="tab-week" onclick="switchView('week')"><i class="ti ti-calendar-week"></i>Settimana</button>
-    <button id="tab-month" onclick="switchView('month')"><i class="ti ti-calendar"></i>Mese</button>
+    <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true">☀️</span>Giorno</button>
+    <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true">📅</span>Settimana</button>
+    <button id="tab-month" onclick="switchView('month')"><span aria-hidden="true">🗓️</span>Mese</button>
   </div>
 
   <div class="date-nav">
-    <button onclick="navPrev()"><i class="ti ti-chevron-left"></i></button>
+    <button onclick="navPrev()" aria-label="Precedente"><span aria-hidden="true">&#10094;</span></button>
     <div class="date-label" id="date-label"></div>
-    <button onclick="navNext()"><i class="ti ti-chevron-right"></i></button>
+    <button onclick="navNext()" aria-label="Successivo"><span aria-hidden="true">&#10095;</span></button>
   </div>
   <div style="text-align:center;margin:-4px 0 10px;">
     <button class="today-btn" onclick="goToday()">Oggi</button>
@@ -218,7 +218,7 @@
   <div id="month-detail"></div>
 </div>
 
-<button class="fab" onclick="openAddModal()" title="Aggiungi"><i class="ti ti-plus"></i></button>
+<button class="fab" onclick="openAddModal()" title="Aggiungi"><span aria-hidden="true">+</span></button>
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
@@ -230,11 +230,11 @@
     <div class="modal-row">
       <div>
         <label>Dalle</label>
-        <input type="number" id="modal-start" min="0" max="23" value="9">
+        <input type="time" id="modal-start" value="09:00" step="900">
       </div>
       <div>
         <label>Alle</label>
-        <input type="number" id="modal-end" min="1" max="24" value="11">
+        <input type="time" id="modal-end" value="11:00" step="900">
       </div>
     </div>
     <label>Descrizione</label>
@@ -248,6 +248,16 @@
 
 <script>
 const RESOURCES = ["Sala C","Furgone","Gazebo","Impianto audio","Tavoli"];
+const RESOURCE_COLORS = {
+  "Sala C": ["#e0a800","#b88700"],
+  "Furgone": ["#6c757d","#495157"],
+  "Gazebo": ["#2b7fd6","#1c5aa0"],
+  "Impianto audio": ["#8a4fd6","#6a35ab"],
+  "Tavoli": ["#2ca86b","#1f8253"]
+};
+function getResourceColor(res){
+  return RESOURCE_COLORS[res] || ["rgb(200,55,55)","rgb(160,35,35)"];
+}
 
 function safeGetInit(){
   try{
@@ -356,14 +366,16 @@ function renderMiniTimeline(dayBookings, containerId){
     const widthPct = (b.end-b.start)/24*100;
     seg.style.left = (b.start/24*100)+"%";
     seg.style.width = widthPct+"%";
-    seg.title = b.label + " (" + String(b.start).padStart(2,"0")+":00-"+String(b.end).padStart(2,"0")+":00)";
+    const colors = getResourceColor(b.res);
+    seg.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
+    seg.title = b.res + " — " + b.label + " (" + fmtHourLabel(b.start)+"-"+fmtHourLabel(b.end)+")";
     if(widthPct > 6){
       const txt = document.createElement("span");
-      txt.textContent = String(b.start).padStart(2,"0")+"-"+String(b.end).padStart(2,"0");
+      txt.textContent = fmtHourLabel(b.start)+"-"+fmtHourLabel(b.end);
       seg.appendChild(txt);
     }
     seg.onclick = ()=>{
-      const target = document.getElementById("slot-h"+b.start);
+      const target = document.getElementById("slot-h"+Math.floor(b.start*2));
       if(target) target.scrollIntoView({behavior:"smooth", block:"center"});
     };
     el.appendChild(seg);
@@ -388,7 +400,17 @@ function renderDayView(){
   tabsEl.innerHTML = "";
   RESOURCES.forEach(r=>{
     const b = document.createElement("button");
-    b.textContent = r;
+    const colors = getResourceColor(r);
+    const dot = document.createElement("span");
+    dot.style.display = "inline-block";
+    dot.style.width = "8px";
+    dot.style.height = "8px";
+    dot.style.borderRadius = "50%";
+    dot.style.marginRight = "6px";
+    dot.style.background = colors[0];
+    dot.style.verticalAlign = "middle";
+    b.appendChild(dot);
+    b.appendChild(document.createTextNode(r));
     b.className = r===selectedResource ? "active" : "";
     b.onclick = ()=>{ selectedResource = r; renderDayView(); };
     tabsEl.appendChild(b);
@@ -402,21 +424,22 @@ function renderDayView(){
   const mtEl = renderMiniTimeline(dayBookings, "mini-timeline");
   addNowLineToTimeline(mtEl, currentDate);
 
-  for(let h=0; h<24; h++){
+  for(let hh=0; hh<48; hh++){
+    const h = hh * 0.5;
     const covering = dayBookings.find(b=> h>=b.start && h<b.end);
     const slot = document.createElement("div");
     slot.className = "slot " + (covering ? "busy" : "free");
-    slot.id = "slot-h"+h;
+    slot.id = "slot-h"+hh;
 
     const timeSpan = document.createElement("span");
     timeSpan.className = "slot-time";
-    timeSpan.textContent = String(h).padStart(2,"0")+":00 – "+String(h+1).padStart(2,"0")+":00";
+    timeSpan.textContent = fmtHourLabel(h) + " – " + fmtHourLabel(h+0.5);
 
     const labelSpan = document.createElement("span");
     labelSpan.className = "slot-label";
 
     const iconSpan = document.createElement("i");
-    iconSpan.className = "slot-icon ti " + (covering ? "ti-lock" : "ti-plus");
+    iconSpan.textContent = covering ? "🔒" : "+";
 
     const left = document.createElement("div");
     left.style.display="flex"; left.style.flexDirection="column"; left.style.gap="2px";
@@ -426,14 +449,14 @@ function renderDayView(){
       labelSpan.textContent = covering.label;
       left.appendChild(labelSpan);
       slot.onclick = ()=>{
-        if(confirm(covering.label + " (" + String(covering.start).padStart(2,"0")+":00-"+String(covering.end).padStart(2,"0")+":00)\n\nEliminare?")){
+        if(confirm(covering.label + " (" + fmtHourLabel(covering.start)+"-"+fmtHourLabel(covering.end)+")\n\nEliminare?")){
           removeBooking(key, covering.id);
         }
       };
     } else {
       labelSpan.textContent = "Libero — tocca per aggiungere";
       left.appendChild(labelSpan);
-      slot.onclick = ()=>{ openAddModal(key, selectedResource, h, h+1); };
+      slot.onclick = ()=>{ openAddModal(key, selectedResource, h, h+0.5); };
     }
 
     slot.appendChild(left);
@@ -487,10 +510,10 @@ function renderWeekView(){
         const row = document.createElement("div");
         row.className = "week-item";
         const info = document.createElement("span");
-        info.innerHTML = "<span class='wi-res'>"+it.res+"</span> &nbsp; <span class='wi-time'>"+String(it.start).padStart(2,"0")+":00-"+String(it.end).padStart(2,"0")+":00 · "+escapeHtml(it.label)+"</span>";
+        info.innerHTML = "<span class='wi-res'>"+it.res+"</span> &nbsp; <span class='wi-time'>"+fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)+" · "+escapeHtml(it.label)+"</span>";
         const del = document.createElement("span");
         del.className = "wi-del";
-        del.innerHTML = "<i class='ti ti-trash'></i>";
+        del.innerHTML = "🗑";
         del.onclick = (e)=>{ e.stopPropagation(); removeBooking(key, it.id); };
         row.appendChild(info);
         row.appendChild(del);
@@ -584,7 +607,7 @@ function showMonthDayDetail(d){
     html += "<div class='dd-empty'>Nessun elemento. Usa il pulsante + per aggiungerne uno.</div>";
   } else {
     items.forEach(it=>{
-      html += "<div class='dd-item'><span><b>"+it.res+"</b> &nbsp; "+String(it.start).padStart(2,"0")+":00-"+String(it.end).padStart(2,"0")+":00 · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\")'><i class=\"ti ti-trash\"></i></span></div>";
+      html += "<div class='dd-item'><span><b>"+it.res+"</b> &nbsp; "+fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end) · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\")'>🗑</span></div>";
     });
   }
   html += "</div>";
@@ -611,6 +634,19 @@ function removeBooking(dateKey, id){
   renderAll();
 }
 
+function hourToTimeStr(h){
+  const hh = Math.floor(h);
+  const mm = Math.round((h-hh)*60);
+  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+}
+function timeStrToHour(s){
+  const parts = (s||"00:00").split(":").map(Number);
+  return parts[0] + (parts[1]||0)/60;
+}
+function fmtHourLabel(h){
+  return hourToTimeStr(h);
+}
+
 function openAddModal(prefDate, prefRes, prefStart, prefEnd){
   const dateInp = document.getElementById("modal-date");
   const resSel = document.getElementById("modal-resource");
@@ -622,8 +658,8 @@ function openAddModal(prefDate, prefRes, prefStart, prefEnd){
 
   dateInp.value = prefDate || fmtDate(currentDate);
   resSel.value = prefRes || selectedResource;
-  document.getElementById("modal-start").value = prefStart!==undefined ? prefStart : 9;
-  document.getElementById("modal-end").value = prefEnd!==undefined ? prefEnd : 11;
+  document.getElementById("modal-start").value = hourToTimeStr(prefStart!==undefined ? prefStart : 9);
+  document.getElementById("modal-end").value = hourToTimeStr(prefEnd!==undefined ? prefEnd : 11);
   document.getElementById("modal-label").value = "";
 
   document.getElementById("modal-overlay").classList.add("open");
@@ -634,8 +670,8 @@ function closeAddModal(){
 function confirmAddModal(){
   const date = document.getElementById("modal-date").value;
   const res = document.getElementById("modal-resource").value;
-  const start = +document.getElementById("modal-start").value;
-  const end = +document.getElementById("modal-end").value;
+  const start = timeStrToHour(document.getElementById("modal-start").value);
+  const end = timeStrToHour(document.getElementById("modal-end").value);
   const label = document.getElementById("modal-label").value.trim();
 
   if(!date){ alert("Seleziona una data."); return; }
