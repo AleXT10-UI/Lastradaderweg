@@ -84,6 +84,17 @@
     overscroll-behavior-y:contain;
   }
   .app{max-width:900px;margin:0 auto;padding:10px;padding-bottom:80px;}
+  .main-layout{display:block;}
+  .main-col{width:100%;}
+  .side-col{width:100%;margin-top:14px;}
+  .side-col:empty{display:none;margin-top:0;}
+
+  @media (min-width:900px){
+    .app{max-width:1180px;}
+    .main-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start;}
+    .main-col{min-width:0;}
+    .side-col{position:sticky;top:14px;display:flex;flex-direction:column;gap:14px;}
+  }
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
   header h1{flex:1;}
@@ -290,24 +301,31 @@
     <button onclick="navNext()" aria-label="Successivo"><span aria-hidden="true">&#10095;</span></button>
   </div>
 
-  <div class="card" id="view-day-el">
-    <div class="resource-tabs" id="resource-tabs"></div>
-    <div class="mini-timeline-wrap">
-      <div class="mini-timeline" id="mini-timeline"></div>
-      <div class="mini-timeline-labels"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>
+  <div class="main-layout">
+    <div class="main-col">
+      <div class="card" id="view-day-el">
+        <div class="resource-tabs" id="resource-tabs"></div>
+        <div class="mini-timeline-wrap">
+          <div class="mini-timeline" id="mini-timeline"></div>
+          <div class="mini-timeline-labels"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>
+        </div>
+        <div class="day-countdown" id="day-countdown" style="display:none;"></div>
+        <div class="slot-list" id="slot-list"></div>
+      </div>
+
+      <div class="card" id="view-week-el" style="display:none;">
+        <div class="week-list" id="week-list"></div>
+      </div>
+
+      <div class="card" id="view-month-el" style="display:none;">
+        <div class="month-grid" id="month-grid"></div>
+      </div>
     </div>
-    <div class="day-countdown" id="day-countdown" style="display:none;"></div>
-    <div class="slot-list" id="slot-list"></div>
-  </div>
 
-  <div class="card" id="view-week-el" style="display:none;">
-    <div class="week-list" id="week-list"></div>
+    <div class="side-col">
+      <div id="month-detail"></div>
+    </div>
   </div>
-
-  <div class="card" id="view-month-el" style="display:none;">
-    <div class="month-grid" id="month-grid"></div>
-  </div>
-  <div id="month-detail"></div>
 </div>
 
 <button class="fab" onclick="openAddModal()" title="Aggiungi"><span aria-hidden="true">+</span></button>
@@ -827,8 +845,8 @@ function closeEventDetail(){
 }
 function deleteFromDetail(dateKey, id){
   if(confirm("Eliminare questo elemento?")){
-    removeBooking(dateKey, id);
     closeEventDetail();
+    removeBooking(dateKey, id);
   }
 }
 document.getElementById("detail-overlay").addEventListener("click",(e)=>{
@@ -865,8 +883,8 @@ function confirmAddModal(){
   if(!date){ alert("Seleziona una data."); return; }
   if(end<=start){ alert("L'ora fine deve essere maggiore dell'ora inizio."); return; }
 
-  addBooking(date, res, start, end, label);
   closeAddModal();
+  addBooking(date, res, start, end, label);
 }
 
 document.getElementById("modal-overlay").addEventListener("click",(e)=>{
