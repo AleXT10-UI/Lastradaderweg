@@ -78,41 +78,23 @@
     --warn-border:#5a4a20;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{overflow-x:hidden;}
   body{
     font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;
     background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 45%);
     background-attachment:fixed;
     min-height:100vh;color:var(--text-main);
     overscroll-behavior-y:contain;
+    overflow-x:hidden;
     padding-top:env(safe-area-inset-top);
     padding-bottom:env(safe-area-inset-bottom);
   }
-  .app{max-width:900px;margin:0 auto;padding:10px;padding-bottom:80px;}
+  .app{max-width:900px;width:100%;margin:0 auto;padding:10px;padding-bottom:80px;box-sizing:border-box;}
   .main-layout{display:block;}
   .main-col{width:100%;}
   .side-col{width:100%;margin-top:14px;display:flex;flex-direction:column;gap:14px;}
 
   .side-card{padding:14px;}
-  .side-card-title{font-size:13px;font-weight:700;color:var(--head);margin-bottom:10px;}
-  .mini-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .mini-cal-nav button{border:none;background:var(--bg-soft);color:var(--accent-dark);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:12px;}
-  .mini-cal-nav button:hover{background:var(--border);}
-  .mini-cal-nav span{font-size:12.5px;font-weight:700;color:var(--head);}
-  .mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-  .mini-cal-dow{text-align:center;font-size:9.5px;font-weight:700;color:var(--text-muted);padding:2px 0;}
-  .mini-cal-cell{
-    aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;
-    font-size:11px;cursor:pointer;transition:background .12s;position:relative;color:var(--text-main);
-  }
-  .mini-cal-cell:hover{background:var(--bg-soft);}
-  .mini-cal-cell.other-month{opacity:.3;}
-  .mini-cal-cell.today{background:var(--accent);color:#fff;font-weight:700;}
-  .mini-cal-cell.selected:not(.today){background:var(--bg-soft);border:1.5px solid var(--accent);}
-  .mini-cal-cell.has-events::after{
-    content:"";position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
-    width:4px;height:4px;border-radius:50%;background:var(--accent);
-  }
-  .mini-cal-cell.today.has-events::after{background:#fff;}
 
   @media (min-width:900px){
     .app{max-width:1180px;}
@@ -123,12 +105,13 @@
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
   header h1{flex:1;}
-  #theme-toggle{
+  #theme-toggle, #search-toggle{
     border:none;background:var(--bg-soft);color:var(--head);width:38px;height:38px;border-radius:9px;
-    font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:background .15s;
   }
-  #theme-toggle:hover{background:var(--border);}
+  #theme-toggle:hover, #search-toggle:hover{background:var(--border);}
+  #search-toggle.active{background:var(--accent);color:#fff;}
   #logo-img{ transition:filter .2s, mix-blend-mode .2s; }
   body.dark-mode #logo-img{
     filter:invert(1) hue-rotate(210deg) saturate(3);
@@ -160,6 +143,15 @@
   .search-result-item .sr-meta{font-size:11.5px;color:var(--text-muted);}
   .search-no-results{padding:16px;text-align:center;color:var(--text-muted);font-size:12.5px;}
 
+  .agenda-notes{padding:14px;border-bottom:1px solid var(--border);}
+  .agenda-notes-title{font-size:12.5px;font-weight:700;color:var(--head);margin-bottom:8px;}
+  .agenda-notes textarea{
+    width:100%;min-height:80px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;
+    font-size:13.5px;font-family:inherit;background:var(--bg-soft);color:var(--text-main);resize:vertical;
+  }
+  .agenda-notes textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
+  .agenda-notes textarea::placeholder{color:var(--text-muted);}
+
   .agenda-list{padding:8px 4px;}
   .agenda-date-title{
     font-size:12.5px;font-weight:700;color:var(--head);padding:10px 14px 6px;
@@ -177,11 +169,11 @@
 
   .view-switch{display:flex;background:var(--surface);border-radius:11px;padding:4px;gap:3px;box-shadow:0 3px 14px var(--shadow-soft);margin-bottom:10px;border:1px solid var(--border);}
   .view-switch button{
-    flex:1;border:none;background:transparent;color:var(--head);padding:10px 8px;border-radius:9px;
-    font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;
-    display:flex;align-items:center;justify-content:center;gap:6px;
+    flex:1;min-width:0;border:none;background:transparent;color:var(--head);padding:10px 6px;border-radius:9px;
+    font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;
+    display:flex;align-items:center;justify-content:center;gap:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
   }
-  .view-switch button i{font-size:17px;}
+  .view-switch button i{font-size:17px;flex-shrink:0;}
   .view-switch button.active{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 2px 8px var(--accent-shadow);}
 
   .date-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);border-radius:11px;padding:6px 9px;margin-bottom:10px;box-shadow:0 2px 10px var(--shadow-soft);}
@@ -337,6 +329,8 @@
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
     .fab{right:16px;bottom:16px;width:54px;height:54px;font-size:24px;}
+    .view-switch button{font-size:10.5px;padding:9px 3px;gap:3px;}
+    .view-switch button i{font-size:14px;}
 
     .resource-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:8px;}
     .resource-tabs button{padding:8px 6px;font-size:11.5px;text-align:center;justify-content:center;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -353,10 +347,11 @@
   <header>
     <img src="L.jpg" alt="Logo" id="logo-img">
     <h1>Gestionale</h1>
+    <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca">🔍</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
   </header>
 
-  <div class="search-bar">
+  <div class="search-bar" id="search-bar" style="display:none;">
     <span class="search-icon" aria-hidden="true">🔍</span>
     <input type="text" id="search-input" placeholder="Cerca per descrizione o risorsa..." oninput="onSearchInput()">
     <button id="search-clear" onclick="clearSearch()" style="display:none;" aria-label="Cancella ricerca">✕</button>
@@ -400,20 +395,15 @@
       </div>
 
       <div class="card" id="view-agenda-el" style="display:none;">
+        <div class="agenda-notes">
+          <div class="agenda-notes-title">📝 Appunti</div>
+          <textarea id="agenda-notes-input" placeholder="Scrivi qui appunti generali, promemoria, cose da ricordare..." oninput="saveAgendaNotes()"></textarea>
+        </div>
         <div class="agenda-list" id="agenda-list"></div>
       </div>
     </div>
 
     <div class="side-col">
-      <div class="card side-card">
-        <div class="side-card-title">Panoramica mese</div>
-        <div class="mini-cal-nav">
-          <button onclick="miniCalNav(-1)" aria-label="Mese precedente"><span aria-hidden="true">&#10094;</span></button>
-          <span id="mini-cal-label"></span>
-          <button onclick="miniCalNav(1)" aria-label="Mese successivo"><span aria-hidden="true">&#10095;</span></button>
-        </div>
-        <div class="mini-cal-grid" id="mini-cal-grid"></div>
-      </div>
       <div class="card side-card" id="side-detail-card" style="display:none;">
         <div id="month-detail"></div>
       </div>
@@ -546,6 +536,21 @@ function clearSearch(){
   document.getElementById("search-results").style.display = "none";
 }
 
+function toggleSearchBar(){
+  const bar = document.getElementById("search-bar");
+  const btn = document.getElementById("search-toggle");
+  const isOpen = bar.style.display !== "none";
+  if(isOpen){
+    bar.style.display = "none";
+    btn.classList.remove("active");
+    clearSearch();
+  } else {
+    bar.style.display = "flex";
+    btn.classList.add("active");
+    document.getElementById("search-input").focus();
+  }
+}
+
 function switchView(view){
   currentView = view;
   document.getElementById("tab-day").classList.toggle("active", view==="day");
@@ -586,7 +591,6 @@ function renderAll(){
   else if(currentView==="week") renderWeekView();
   else if(currentView==="agenda") renderAgendaView();
   else renderMonthView();
-  renderMiniCal();
 }
 
 function updateDateLabel(){
@@ -857,60 +861,19 @@ function escapeHtml(s){
   return div.innerHTML;
 }
 
-let miniCalDate = todayDate();
-
-function miniCalNav(delta){
-  miniCalDate.setMonth(miniCalDate.getMonth()+delta);
-  renderMiniCal();
+function saveAgendaNotes(){
+  const val = document.getElementById("agenda-notes-input").value;
+  try{ localStorage.setItem("gestionale_agenda_notes", val); }catch(e){}
 }
-
-function renderMiniCal(){
-  const label = document.getElementById("mini-cal-label");
-  if(!label) return;
-  label.textContent = miniCalDate.toLocaleDateString("it-IT",{month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
-
-  const grid = document.getElementById("mini-cal-grid");
-  grid.innerHTML = "";
-  ["L","M","M","G","V","S","D"].forEach(dn=>{
-    const el = document.createElement("div");
-    el.className = "mini-cal-dow";
-    el.textContent = dn;
-    grid.appendChild(el);
-  });
-
-  const year = miniCalDate.getFullYear(), month = miniCalDate.getMonth();
-  const firstOfMonth = new Date(year, month, 1);
-  const startOffset = (firstOfMonth.getDay() || 7) - 1;
-  const gridStart = new Date(firstOfMonth);
-  gridStart.setDate(gridStart.getDate() - startOffset);
-
-  const today = todayDate();
-
-  for(let i=0;i<42;i++){
-    const d = new Date(gridStart);
-    d.setDate(d.getDate()+i);
-    const key = fmtDate(d);
-    const isOtherMonth = d.getMonth() !== month;
-    const isToday = sameDay(d, today);
-    const isSelected = sameDay(d, currentDate);
-    const hasEvents = (bookings[key]||[]).length > 0;
-
-    const cell = document.createElement("div");
-    cell.className = "mini-cal-cell"
-      + (isOtherMonth ? " other-month" : "")
-      + (isToday ? " today" : "")
-      + (isSelected && !isToday ? " selected" : "")
-      + (hasEvents ? " has-events" : "");
-    cell.textContent = d.getDate();
-    cell.onclick = ()=>{
-      currentDate = new Date(d);
-      switchView("day");
-    };
-    grid.appendChild(cell);
-  }
+function loadAgendaNotes(){
+  let val = "";
+  try{ val = localStorage.getItem("gestionale_agenda_notes") || ""; }catch(e){}
+  const inp = document.getElementById("agenda-notes-input");
+  if(inp) inp.value = val;
 }
 
 function renderAgendaView(){
+  loadAgendaNotes();
   const listEl = document.getElementById("agenda-list");
   listEl.innerHTML = "";
 
@@ -1159,7 +1122,9 @@ document.addEventListener("keydown", (e)=>{
 
   if(e.key === "/" && !isTyping){
     e.preventDefault();
-    document.getElementById("search-input").focus();
+    const bar = document.getElementById("search-bar");
+    if(bar.style.display === "none") toggleSearchBar();
+    else document.getElementById("search-input").focus();
     return;
   }
   if(isTyping) return;
@@ -1170,7 +1135,8 @@ document.addEventListener("keydown", (e)=>{
   else if(e.key === "Escape"){
     closeAddModal();
     closeEventDetail();
-    clearSearch();
+    const bar = document.getElementById("search-bar");
+    if(bar.style.display !== "none") toggleSearchBar();
     document.activeElement && document.activeElement.blur();
   }
 });
