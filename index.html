@@ -1144,5 +1144,53 @@ document.addEventListener("keydown", (e)=>{
 switchView("day");
 </script>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBC2PySOLSE2kXk3OmDgN4WVWFscJSWpOU",
+    authDomain: "gestionale-derweg.firebaseapp.com",
+    projectId: "gestionale-derweg",
+    databaseURL: "https://gestionale-derweg-default-rtdb.europe-west1.firebasedatabase.app",
+    storageBucket: "gestionale-derweg.firebasestorage.app",
+    messagingSenderId: "634308371177",
+    appId: "1:634308371177:web:c80d6ece78ca29f4b98678",
+    measurementId: "G-927DW1387K"
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  
+  // Override persist to save to Firebase instead of localStorage
+  window.persistToFirebase = async function() {
+    try {
+      await set(ref(db, "bookings"), window.bookings || {});
+    } catch (err) {
+      console.error("Firebase write error:", err);
+    }
+  };
+  
+  // Wrap original persist to call Firebase
+  const originalPersist = window.persist;
+  window.persist = function() {
+    if(originalPersist) originalPersist();
+    window.persistToFirebase();
+  };
+  
+  // Load data from Firebase on init
+  (async() => {
+    try {
+      const snapshot = await get(ref(db, "bookings"));
+      if(snapshot.exists()) {
+        window.bookings = snapshot.val() || {};
+        if(window.renderAll) window.renderAll();
+      }
+    } catch(err) {
+      console.error("Firebase read error:", err);
+    }
+  })();
+</script>
+
 </body>
 </html>
