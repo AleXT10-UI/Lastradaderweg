@@ -93,9 +93,9 @@
     padding-bottom:env(safe-area-inset-bottom);
   }
   .app{max-width:900px;width:100%;margin:0 auto;padding:10px;padding-bottom:80px;box-sizing:border-box;}
-  .main-layout{display:block;}
+  .main-layout{display:flex;flex-direction:column;}
   .main-col{width:100%;}
-  .side-col{display:none;}
+  .side-col{display:flex;flex-direction:column;gap:10px;order:-1;margin-bottom:4px;}
 
   .side-card{padding:14px;}
 
@@ -143,10 +143,26 @@
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
   header h1{flex:1;}
-  #theme-toggle, #search-toggle, #logout-toggle, #users-toggle, #announce-toggle{
+  #theme-toggle, #search-toggle, #users-toggle, #announce-toggle{
     border:none;background:var(--bg-soft);color:var(--head);width:38px;height:38px;border-radius:9px;
     font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:background .15s;position:relative;
+  }
+  #logout-toggle{
+    border:none;background:var(--bg-soft);color:var(--head);height:38px;padding:0 12px;border-radius:9px;
+    font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;transition:background .15s;white-space:nowrap;
+  }
+  .profile-badge{
+    display:flex;align-items:center;gap:7px;background:var(--bg-soft);border-radius:20px;
+    padding:4px 12px 4px 4px;flex-shrink:0;
+  }
+  .profile-pic{
+    width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--accent);
+  }
+  .profile-name{
+    font-size:12.5px;font-weight:700;color:var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    max-width:110px;
   }
   #theme-toggle:hover, #search-toggle:hover, #logout-toggle:hover, #users-toggle:hover, #announce-toggle:hover{background:var(--border);}
   #search-toggle.active{background:var(--accent);color:#fff;}
@@ -161,6 +177,8 @@
   }
   header img{height:40px;width:auto;border-radius:6px;}
   header h1{font-size:18px;color:var(--head);margin:0;}
+
+  .announce-banner{ display:none; }
 
   .search-bar{
     display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:11px;padding:9px 12px;
@@ -309,6 +327,13 @@
   .slot.busy .slot-icon{color:var(--danger);}
   .slot.free .slot-icon{color:var(--muted-free-label);}
 
+  .allday-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 10px;}
+  .allday-chip{
+    color:#fff;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:16px;cursor:pointer;
+    box-shadow:0 2px 5px rgba(0,0,0,.2);transition:transform .1s;
+  }
+  .allday-chip:hover{transform:translateY(-1px);}
+
   .day-countdown{
     margin:0 10px 8px;padding:10px 13px;border-radius:10px;font-size:12.5px;font-weight:700;text-align:center;
   }
@@ -403,6 +428,11 @@
     width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;font-size:16px;background:var(--surface);color:var(--text-main);
   }
   .modal select:focus, .modal input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
+  .allday-toggle{
+    display:flex !important;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--head);
+    cursor:pointer;margin:12px 0 5px;
+  }
+  .allday-toggle input{width:17px;height:17px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;}
   .modal-row{display:flex;gap:10px;}
   .modal-row > div{flex:1;}
   .modal-actions{display:flex;gap:10px;margin-top:20px;}
@@ -430,6 +460,8 @@
   .rm-color-picker::-webkit-color-swatch{border:none;border-radius:50%;}
   .rm-color-picker::-moz-color-swatch{border:none;border-radius:50%;}
   .res-manage-item .rm-name{flex:1;font-size:13.5px;font-weight:600;color:var(--text-main);}
+  .user-announce-toggle{display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;flex-shrink:0;color:var(--text-muted);}
+  .user-announce-toggle input{width:15px;height:15px;cursor:pointer;accent-color:var(--accent);}
   .rm-arrows{display:flex;flex-direction:column;gap:1px;flex-shrink:0;}
   .rm-arrows button{
     border:none;background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;padding:6px 8px;line-height:1;
@@ -459,14 +491,46 @@
 
   @media (max-width:600px){
     .app{padding:10px;padding-bottom:90px;}
-    header{padding:8px 12px;}
-    header h1{font-size:16px;}
-    header img{height:32px;}
+    header{padding:8px 10px;flex-wrap:wrap;gap:6px;row-gap:8px;}
+    header h1{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    header img{height:28px;}
+    #theme-toggle, #search-toggle, #users-toggle, #announce-toggle{width:32px;height:32px;font-size:14px;}
+    #logout-toggle{height:32px;padding:0 9px;font-size:11px;}
+    .profile-pic{width:24px;height:24px;}
+    .profile-name{font-size:11px;max-width:70px;}
+    .profile-badge{padding:3px 9px 3px 3px;gap:5px;}
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
     .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:54px;height:54px;font-size:24px;}
     .view-switch button{font-size:10.5px;padding:9px 3px;gap:3px;}
     .view-switch button i{font-size:14px;}
+
+    .announce-banner.visible{
+      display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--accent);
+      border-radius:10px;padding:9px 12px;margin-bottom:10px;box-shadow:0 2px 10px var(--shadow-soft);
+    }
+    .ab-icon{font-size:14px;flex-shrink:0;}
+    .ab-text{
+      flex:1;min-width:0;font-size:12px;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .ab-check{
+      border:none;background:var(--accent);color:#fff;width:26px;height:26px;border-radius:50%;
+      font-size:13px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    }
+
+    .side-col .day-detail{
+      padding:8px 12px;margin-top:0;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;
+      border-radius:10px;
+    }
+    .side-col .day-detail h4{margin:0;font-size:11.5px;flex-shrink:1;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+    .side-col .today-badge{font-size:9px;padding:2px 7px;}
+    .side-col .month-mini-timeline-wrap{display:none;}
+    .side-col .day-detail .dd-item{display:none;}
+    .side-col .day-detail .dd-empty{display:none;}
+    .side-col .day-detail::after{
+      content:attr(data-count);font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;margin-left:auto;
+    }
 
     .resource-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:8px;}
     .resource-tabs button{padding:8px 6px;font-size:11.5px;text-align:center;justify-content:center;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -503,8 +567,18 @@
     <button id="users-toggle" onclick="openUsersPanel()" title="Gestisci utenti" aria-label="Gestisci utenti" style="display:none;">👤</button>
     <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca">🔍</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
-    <button id="logout-toggle" onclick="doLogout()" title="Esci" aria-label="Esci">🚪</button>
+    <button id="logout-toggle" onclick="doLogout()" title="Esci" aria-label="Esci">Log Out</button>
+    <div class="profile-badge" id="profile-badge">
+      <img src="pfp.jpg" alt="Profilo" class="profile-pic">
+      <span class="profile-name" id="profile-name"></span>
+    </div>
   </header>
+
+  <div class="announce-banner" id="announce-banner" style="display:none;">
+    <span class="ab-icon" aria-hidden="true">📣</span>
+    <span class="ab-text" id="announce-banner-text"></span>
+    <button class="ab-check" id="announce-banner-check" onclick="toggleAnnouncementCheck()" title="Segna come letto">✓</button>
+  </div>
 
   <div class="search-bar" id="search-bar" style="display:none;">
     <span class="search-icon" aria-hidden="true">🔍</span>
@@ -548,6 +622,7 @@
           <div class="mini-timeline" id="mini-timeline"></div>
           <div class="mini-timeline-labels"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>
         </div>
+        <div class="allday-chips" id="allday-chips" style="display:none;"></div>
         <div class="day-countdown" id="day-countdown" style="display:none;"></div>
         <div class="slot-list" id="slot-list"></div>
       </div>
@@ -594,7 +669,11 @@
     <input type="date" id="modal-date">
     <label>Risorsa</label>
     <select id="modal-resource"></select>
-    <div class="modal-row">
+    <label class="allday-toggle">
+      <input type="checkbox" id="modal-allday" onchange="onAllDayToggle()">
+      Tutto il giorno
+    </label>
+    <div class="modal-row" id="modal-time-row">
       <div>
         <label>Dalle</label>
         <input type="time" id="modal-start" value="09:00" step="900">
@@ -751,6 +830,8 @@ function completeLogin(username){
 
   document.getElementById("users-toggle").style.display = isAdmin() ? "flex" : "none";
   document.getElementById("announce-toggle").style.display = "flex";
+  const profileNameEl = document.getElementById("profile-name");
+  if(profileNameEl) profileNameEl.textContent = username;
 
   refreshAnnouncementBadge();
   if(typeof switchView === "function") switchView("day");
@@ -803,11 +884,22 @@ function renderUsersManageList(){
     const item = document.createElement("div");
     item.className = "res-manage-item";
     const isSpecial = name === SPECIAL_VIEWER_EMAIL;
+    const canAnnounce = !!users[name].canAnnounce;
     item.innerHTML = `
       <span class="rm-dot" style="background:${isSpecial ? 'var(--accent)' : 'var(--text-muted)'};"></span>
       <span class="rm-name">${escapeHtml(name)}${isSpecial ? " <small>(vede i checkmark)</small>" : ""}</span>
+      <label class="user-announce-toggle" title="Può scrivere annunci">
+        <input type="checkbox" ${canAnnounce ? "checked" : ""}> 📣
+      </label>
       <span class="rm-delete" title="Elimina utente">🗑</span>
     `;
+    item.querySelector(".user-announce-toggle input").onchange = (e)=>{
+      const u = loadUsers();
+      if(u[name]){
+        u[name].canAnnounce = e.target.checked;
+        saveUsers(u);
+      }
+    };
     item.querySelector(".rm-delete").onclick = ()=>{
       if(confirm("Eliminare l'utente \""+name+"\"?")){
         const u = loadUsers();
@@ -1162,12 +1254,35 @@ function renderDayView(){
   const listEl = document.getElementById("slot-list");
   listEl.innerHTML = "";
   const key = fmtDate(currentDate);
-  const dayBookings = selectedResource === "__ALL__"
-    ? (bookings[key]||[]).slice().sort((a,b)=>a.start-b.start)
-    : (bookings[key]||[]).filter(b=>b.res===selectedResource).sort((a,b)=>a.start-b.start);
+  const allDayItemsAll = selectedResource === "__ALL__"
+    ? (bookings[key]||[]).filter(b=>b.allDay)
+    : (bookings[key]||[]).filter(b=>b.allDay && b.res===selectedResource);
+  const dayBookings = (selectedResource === "__ALL__"
+    ? (bookings[key]||[]).slice()
+    : (bookings[key]||[]).filter(b=>b.res===selectedResource))
+    .filter(b=>!b.allDay)
+    .sort((a,b)=>a.start-b.start);
 
   const mtEl = renderMiniTimeline(dayBookings, "mini-timeline");
   addNowLineToTimeline(mtEl, currentDate);
+
+  // Chip compatti per gli elementi "tutto il giorno" — non occupano slot orari
+  const alldayWrap = document.getElementById("allday-chips");
+  alldayWrap.innerHTML = "";
+  if(allDayItemsAll.length === 0){
+    alldayWrap.style.display = "none";
+  } else {
+    alldayWrap.style.display = "flex";
+    allDayItemsAll.forEach(it=>{
+      const colors = getResourceColor(it.res);
+      const chip = document.createElement("div");
+      chip.className = "allday-chip";
+      chip.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
+      chip.innerHTML = "<span>🗓 "+(selectedResource==="__ALL__" ? escapeHtml(it.res)+": " : "")+escapeHtml(it.label)+"</span>";
+      chip.onclick = ()=>{ showEventDetail(key, it.id); };
+      alldayWrap.appendChild(chip);
+    });
+  }
 
   const isToday = sameDay(currentDate, todayDate());
   let nowHourDecimal = null;
@@ -1298,7 +1413,8 @@ function renderWeekView(){
         row.className = "week-item";
         row.style.cursor = "pointer";
         const info = document.createElement("span");
-        info.innerHTML = "<span class='wi-res'>"+it.res+"</span> &nbsp; <span class='wi-time'>"+fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)+" · "+escapeHtml(it.label)+"</span>";
+        const timeLabel = it.allDay ? "Tutto il giorno" : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
+        info.innerHTML = "<span class='wi-res'>"+it.res+"</span> &nbsp; <span class='wi-time'>"+timeLabel+" · "+escapeHtml(it.label)+"</span>";
         const del = document.createElement("span");
         del.className = "wi-del";
         del.innerHTML = "🗑";
@@ -1510,7 +1626,7 @@ function showMonthDayDetail(d){
   const detailEl = document.getElementById("month-detail");
   const isToday = sameDay(d, todayDate());
 
-  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "'><h4>" +
+  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "' data-count='" + items.length + (items.length===1 ? " elemento" : " elementi") + "'><h4>" +
     (isToday ? "<span class='today-badge'>OGGI</span> " : "") +
     d.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase()) +
     "</h4><div class='month-mini-timeline-wrap'><div class='mini-timeline' id='month-mt'></div></div>";
@@ -1519,7 +1635,8 @@ function showMonthDayDetail(d){
     html += "<div class='dd-empty'>Nessun elemento. Usa il pulsante + per aggiungerne uno.</div>";
   } else {
     items.forEach(it=>{
-      html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='if(confirm(\"Eliminare questo elemento?\")){removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");}'>🗑</span></div>";
+      const timeLabel = it.allDay ? "Tutto il giorno" : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
+      html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+timeLabel+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='if(confirm(\"Eliminare questo elemento?\")){removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");}'>🗑</span></div>";
     });
   }
   html += "</div>";
@@ -1533,9 +1650,9 @@ function showMonthDayDetailByKey(key){
   showMonthDayDetail(new Date(parts[0], parts[1]-1, parts[2]));
 }
 
-function addBooking(dateKey, res, start, end, label){
+function addBooking(dateKey, res, start, end, label, isAllDay){
   if(!bookings[dateKey]) bookings[dateKey] = [];
-  bookings[dateKey].push({id: idCounter++, res, start:+start, end:+end, label: label || res});
+  bookings[dateKey].push({id: idCounter++, res, start:+start, end:+end, label: label || res, allDay: !!isAllDay});
   persist();
   renderAll();
   refreshSidePanel();
@@ -1719,6 +1836,7 @@ function showEventDetail(dateKey, id){
   const colors = getResourceColor(item.res);
   const dateObj = new Date(dateKey+"T00:00:00");
   const dateLabel = dateObj.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
+  const timeLabel = item.allDay ? "Tutto il giorno" : (fmtHourLabel(item.start) + " – " + fmtHourLabel(item.end));
 
   const content = document.getElementById("detail-modal-content");
   content.innerHTML = `
@@ -1729,7 +1847,7 @@ function showEventDetail(dateKey, id){
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px;">
       <div><b>Descrizione</b><br>${escapeHtml(item.label)}</div>
       <div><b>Giorno</b><br>${dateLabel}</div>
-      <div><b>Orario</b><br>${fmtHourLabel(item.start)} – ${fmtHourLabel(item.end)}</div>
+      <div><b>Orario</b><br>${timeLabel}</div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEventDetail()">Chiudi</button>
@@ -1771,18 +1889,24 @@ function openAddModal(prefDate, prefRes, prefStart, prefEnd){
 function closeAddModal(){
   document.getElementById("modal-overlay").classList.remove("open");
 }
+function onAllDayToggle(){
+  const isAllDay = document.getElementById("modal-allday").checked;
+  document.getElementById("modal-time-row").style.display = isAllDay ? "none" : "flex";
+}
+
 function confirmAddModal(){
   const date = document.getElementById("modal-date").value;
   const res = document.getElementById("modal-resource").value;
-  const start = timeStrToHour(document.getElementById("modal-start").value);
-  const end = timeStrToHour(document.getElementById("modal-end").value);
+  const isAllDay = document.getElementById("modal-allday").checked;
+  const start = isAllDay ? 0 : timeStrToHour(document.getElementById("modal-start").value);
+  const end = isAllDay ? 24 : timeStrToHour(document.getElementById("modal-end").value);
   const label = document.getElementById("modal-label").value.trim();
 
   if(!date){ alert("Seleziona una data."); return; }
-  if(end<=start){ alert("L'ora fine deve essere maggiore dell'ora inizio."); return; }
+  if(!isAllDay && end<=start){ alert("L'ora fine deve essere maggiore dell'ora inizio."); return; }
 
   closeAddModal();
-  addBooking(date, res, start, end, label);
+  addBooking(date, res, start, end, label, isAllDay);
 }
 
 document.getElementById("modal-overlay").addEventListener("click",(e)=>{
@@ -1850,19 +1974,42 @@ function saveAnnouncement(ann){
   try{ localStorage.setItem("gestionale_announcement", JSON.stringify(ann)); }catch(e){}
 }
 
-function canWriteAnnouncement(){ return isAdmin() || isSpecialViewer(); }
+function canWriteAnnouncement(){
+  if(isAdmin() || isSpecialViewer()) return true;
+  if(!currentUser) return false;
+  const users = loadUsers();
+  return !!(users[currentUser] && users[currentUser].canAnnounce);
+}
 
 function refreshAnnouncementBadge(){
   const badge = document.getElementById("announce-badge");
-  if(!badge) return;
+  const banner = document.getElementById("announce-banner");
+  const bannerText = document.getElementById("announce-banner-text");
+  const bannerCheck = document.getElementById("announce-banner-check");
   const ann = loadAnnouncement();
+
+  if(!badge) return;
+
   if(!ann || !currentUser){
     badge.style.display = "none";
+    if(banner) banner.classList.remove("visible");
     return;
   }
+
   const alreadyChecked = (ann.checkedBy || []).includes(currentUser);
   badge.style.display = alreadyChecked ? "none" : "flex";
   badge.textContent = "!";
+
+  if(banner && bannerText){
+    banner.classList.add("visible");
+    bannerText.textContent = ann.text;
+    bannerText.onclick = openAnnouncementsPanel;
+    if(bannerCheck){
+      bannerCheck.style.background = alreadyChecked ? "var(--btn-secondary-bg)" : "var(--accent)";
+      bannerCheck.textContent = alreadyChecked ? "✓" : "✓";
+      bannerCheck.title = alreadyChecked ? "Già letto" : "Segna come letto";
+    }
+  }
 }
 
 function openAnnouncementsPanel(){
@@ -1878,28 +2025,16 @@ function renderAnnouncementPanel(){
   const ann = loadAnnouncement();
   const canWrite = canWriteAnnouncement();
   const canSeeCounts = canSeeCheckmarkCounts();
+  const canManageThis = ann && (isAdmin() || ann.author === currentUser);
 
   let html = "<h3>📣 Annunci</h3>";
 
-  if(canWrite){
-    html += `
-      <label>Scrivi un nuovo annuncio (sostituisce il precedente)</label>
-      <textarea id="announce-input" placeholder="Scrivi qui l'annuncio per tutti..." style="width:100%;min-height:90px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;"></textarea>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button>
-        <button class="btn-confirm" onclick="publishAnnouncement()">Pubblica</button>
-      </div>
-    `;
-  }
-
-  html += "<div style='margin-top:16px;'>";
-
   if(!ann){
-    html += "<div class='todo-empty'>Nessun annuncio al momento.</div>";
+    html += "<div class='todo-empty' style='margin-bottom:14px;'>Nessun annuncio al momento.</div>";
   } else {
     const alreadyChecked = (ann.checkedBy || []).includes(currentUser);
     html += `
-      <div class="day-detail" style="margin-top:0;">
+      <div class="day-detail" style="margin-top:0;margin-bottom:16px;">
         <h4 style="display:block;">${escapeHtml(ann.date)}</h4>
         <p style="font-size:14px;color:var(--text-main);white-space:pre-wrap;margin:0 0 14px;">${escapeHtml(ann.text)}</p>
         <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
@@ -1911,25 +2046,67 @@ function renderAnnouncementPanel(){
       const count = (ann.checkedBy || []).length;
       html += `<p style="font-size:12.5px;color:var(--text-muted);margin-top:10px;">✔ ${count} ${count===1 ? "persona ha" : "persone hanno"} messo il segno di spunta</p>`;
     }
+    if(canManageThis){
+      html += `
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn-cancel" style="flex:1;padding:8px;font-size:12.5px;" onclick="startEditAnnouncement()">Modifica</button>
+          <button class="btn-cancel" style="flex:1;padding:8px;font-size:12.5px;color:var(--danger);" onclick="deleteAnnouncement()">Elimina</button>
+        </div>
+      `;
+    }
     html += "</div>";
   }
 
-  html += "</div>";
-
-  if(!canWrite){
+  if(canWrite){
+    html += `
+      <div id="announce-write-section" style="display:none;">
+        <label>Scrivi un annuncio</label>
+        <textarea id="announce-input" placeholder="Scrivi qui l'annuncio per tutti..." style="width:100%;min-height:90px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;"></textarea>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="cancelEditAnnouncement()">Annulla</button>
+          <button class="btn-confirm" onclick="publishAnnouncement()">Pubblica</button>
+        </div>
+      </div>
+    `;
+    if(!ann){
+      html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button><button class="btn-confirm" onclick="startEditAnnouncement()">Scrivi annuncio</button></div>`;
+    } else if(!canManageThis){
+      html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button></div>`;
+    }
+  } else {
     html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button></div>`;
   }
 
   content.innerHTML = html;
 }
 
+function startEditAnnouncement(){
+  const ann = loadAnnouncement();
+  const section = document.getElementById("announce-write-section");
+  const input = document.getElementById("announce-input");
+  if(section) section.style.display = "block";
+  if(input) input.value = ann ? ann.text : "";
+}
+function cancelEditAnnouncement(){
+  const section = document.getElementById("announce-write-section");
+  if(section) section.style.display = "none";
+}
+function deleteAnnouncement(){
+  if(!confirm("Eliminare questo annuncio?")) return;
+  try{ localStorage.removeItem("gestionale_announcement"); }catch(e){}
+  renderAnnouncementPanel();
+  refreshAnnouncementBadge();
+}
+
 function publishAnnouncement(){
   const text = document.getElementById("announce-input").value.trim();
   if(!text){ alert("Scrivi un testo per l'annuncio."); return; }
+  const existing = loadAnnouncement();
   const ann = {
     text,
+    author: currentUser,
     date: new Date().toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}),
-    checkedBy: []
+    checkedBy: (existing && existing.text === text) ? (existing.checkedBy || []) : []
   };
   saveAnnouncement(ann);
   renderAnnouncementPanel();
