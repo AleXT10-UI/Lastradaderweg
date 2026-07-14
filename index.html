@@ -2,7 +2,8 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="rgb(200,55,55)" id="meta-theme-color">
 <title>Gestionale</title>
 <style>
   :root{
@@ -80,20 +81,44 @@
   body{
     font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;
     background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 45%);
+    background-attachment:fixed;
     min-height:100vh;color:var(--text-main);
     overscroll-behavior-y:contain;
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
   }
   .app{max-width:900px;margin:0 auto;padding:10px;padding-bottom:80px;}
   .main-layout{display:block;}
   .main-col{width:100%;}
-  .side-col{width:100%;margin-top:14px;}
-  .side-col:empty{display:none;margin-top:0;}
+  .side-col{width:100%;margin-top:14px;display:flex;flex-direction:column;gap:14px;}
+
+  .side-card{padding:14px;}
+  .side-card-title{font-size:13px;font-weight:700;color:var(--head);margin-bottom:10px;}
+  .mini-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .mini-cal-nav button{border:none;background:var(--bg-soft);color:var(--accent-dark);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:12px;}
+  .mini-cal-nav button:hover{background:var(--border);}
+  .mini-cal-nav span{font-size:12.5px;font-weight:700;color:var(--head);}
+  .mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .mini-cal-dow{text-align:center;font-size:9.5px;font-weight:700;color:var(--text-muted);padding:2px 0;}
+  .mini-cal-cell{
+    aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;
+    font-size:11px;cursor:pointer;transition:background .12s;position:relative;color:var(--text-main);
+  }
+  .mini-cal-cell:hover{background:var(--bg-soft);}
+  .mini-cal-cell.other-month{opacity:.3;}
+  .mini-cal-cell.today{background:var(--accent);color:#fff;font-weight:700;}
+  .mini-cal-cell.selected:not(.today){background:var(--bg-soft);border:1.5px solid var(--accent);}
+  .mini-cal-cell.has-events::after{
+    content:"";position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:var(--accent);
+  }
+  .mini-cal-cell.today.has-events::after{background:#fff;}
 
   @media (min-width:900px){
     .app{max-width:1180px;}
-    .main-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start;}
+    .main-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
     .main-col{min-width:0;}
-    .side-col{position:sticky;top:14px;display:flex;flex-direction:column;gap:14px;}
+    .side-col{position:sticky;top:14px;margin-top:0;}
   }
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
@@ -112,6 +137,44 @@
   header img{height:40px;width:auto;border-radius:6px;}
   header h1{font-size:18px;color:var(--head);margin:0;}
 
+  .search-bar{
+    display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:11px;padding:9px 12px;
+    margin-bottom:10px;box-shadow:0 2px 10px var(--shadow-soft);
+  }
+  .search-icon{font-size:14px;flex-shrink:0;}
+  .search-bar input{
+    flex:1;border:none;background:transparent;font-size:14px;color:var(--text-main);outline:none;min-width:0;
+  }
+  .search-bar input::placeholder{color:var(--text-muted);}
+  #search-clear{border:none;background:var(--bg-soft);color:var(--head);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:12px;flex-shrink:0;}
+  .search-results{
+    background:var(--surface);border-radius:12px;box-shadow:0 4px 18px var(--shadow-soft);margin-bottom:10px;
+    max-height:320px;overflow-y:auto;
+  }
+  .search-result-item{
+    padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;gap:3px;
+  }
+  .search-result-item:last-child{border-bottom:none;}
+  .search-result-item:hover{background:var(--bg-soft);}
+  .search-result-item .sr-label{font-weight:700;color:var(--head);font-size:13.5px;}
+  .search-result-item .sr-meta{font-size:11.5px;color:var(--text-muted);}
+  .search-no-results{padding:16px;text-align:center;color:var(--text-muted);font-size:12.5px;}
+
+  .agenda-list{padding:8px 4px;}
+  .agenda-date-title{
+    font-size:12.5px;font-weight:700;color:var(--head);padding:10px 14px 6px;
+    text-transform:capitalize;
+  }
+  .agenda-date-title.today{color:var(--accent);}
+  .agenda-item{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;margin:0 8px 4px;border-radius:9px;
+    cursor:pointer;transition:background .12s;
+  }
+  .agenda-item:hover{background:var(--bg-soft);}
+  .agenda-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .agenda-time{font-size:12px;font-weight:700;color:var(--text-muted);flex-shrink:0;width:88px;}
+  .agenda-info{font-size:13px;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
   .view-switch{display:flex;background:var(--surface);border-radius:11px;padding:4px;gap:3px;box-shadow:0 3px 14px var(--shadow-soft);margin-bottom:10px;border:1px solid var(--border);}
   .view-switch button{
     flex:1;border:none;background:transparent;color:var(--head);padding:10px 8px;border-radius:9px;
@@ -121,19 +184,19 @@
   .view-switch button i{font-size:17px;}
   .view-switch button.active{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 2px 8px var(--accent-shadow);}
 
-  .date-nav{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:11px;padding:6px 9px;margin-bottom:10px;box-shadow:0 2px 10px var(--shadow-soft);}
-  .date-nav button{
-    border:none;background:var(--bg-soft);color:var(--accent-dark);width:42px;height:42px;border-radius:10px;
-    font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;
+  .date-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);border-radius:11px;padding:6px 9px;margin-bottom:10px;box-shadow:0 2px 10px var(--shadow-soft);}
+  .date-nav-arrows{display:flex;gap:6px;flex-shrink:0;}
+  .date-nav-arrows button{
+    border:none;background:var(--bg-soft);color:var(--accent-dark);width:38px;height:38px;border-radius:10px;
+    font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;
   }
-  .date-nav button:hover{background:var(--border);}
-  .date-nav .date-label{font-weight:700;font-size:15px;color:var(--head);text-align:center;flex:1;}
-  .today-inline-btn{
-    width:36px;height:36px;font-size:10px;flex-shrink:0;
-    background:var(--accent) !important;color:#fff !important;
-    box-shadow:0 2px 6px var(--accent-shadow);
+  .date-nav-arrows button:hover{background:var(--border);}
+  .date-nav .date-label{font-weight:700;font-size:14.5px;color:var(--head);text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .today-text-btn{
+    border:none;background:var(--bg-soft);color:var(--head);padding:0 14px;height:38px;border-radius:10px;
+    font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;transition:background .15s;
   }
-  .today-inline-btn:hover{background:var(--accent-dark) !important;}
+  .today-text-btn:hover{background:var(--border);}
 
   .card{background:var(--surface);border-radius:14px;box-shadow:0 4px 18px var(--shadow-soft);overflow:hidden;margin-bottom:12px;}
 
@@ -274,8 +337,13 @@
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
     .fab{right:16px;bottom:16px;width:54px;height:54px;font-size:24px;}
-    .resource-tabs{gap:4px;padding:7px 8px;}
-    .resource-tabs button{padding:6px 9px;font-size:11px;}
+
+    .resource-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:8px;}
+    .resource-tabs button{padding:8px 6px;font-size:11.5px;text-align:center;justify-content:center;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    .modal{width:92vw;padding:18px;}
+    .modal-row{flex-direction:column;gap:12px;}
+    .modal-row > div{width:100%;}
   }
 </style>
 </head>
@@ -288,21 +356,31 @@
     <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
   </header>
 
-  <div class="view-switch">
-    <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true">☀️</span>Giorno</button>
-    <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true">📅</span>Settimana</button>
-    <button id="tab-month" onclick="switchView('month')"><span aria-hidden="true">🗓️</span>Mese</button>
+  <div class="search-bar">
+    <span class="search-icon" aria-hidden="true">🔍</span>
+    <input type="text" id="search-input" placeholder="Cerca per descrizione o risorsa..." oninput="onSearchInput()">
+    <button id="search-clear" onclick="clearSearch()" style="display:none;" aria-label="Cancella ricerca">✕</button>
   </div>
-
-  <div class="date-nav">
-    <button onclick="navPrev()" aria-label="Precedente"><span aria-hidden="true">&#10094;</span></button>
-    <div class="date-label" id="date-label"></div>
-    <button onclick="goToday()" class="today-inline-btn" aria-label="Vai a oggi" title="Vai a oggi"><span aria-hidden="true">●</span></button>
-    <button onclick="navNext()" aria-label="Successivo"><span aria-hidden="true">&#10095;</span></button>
-  </div>
+  <div class="search-results" id="search-results" style="display:none;"></div>
 
   <div class="main-layout">
     <div class="main-col">
+      <div class="view-switch">
+        <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true">☀️</span>Giorno</button>
+        <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true">📅</span>Settimana</button>
+        <button id="tab-agenda" onclick="switchView('agenda')"><span aria-hidden="true">📋</span>Agenda</button>
+        <button id="tab-month" onclick="switchView('month')"><span aria-hidden="true">🗓️</span>Mese</button>
+      </div>
+
+      <div class="date-nav">
+        <button onclick="goToday()" class="today-text-btn" aria-label="Vai a oggi">Oggi</button>
+        <div class="date-label" id="date-label"></div>
+        <div class="date-nav-arrows">
+          <button onclick="navPrev()" aria-label="Precedente"><span aria-hidden="true">&#10094;</span></button>
+          <button onclick="navNext()" aria-label="Successivo"><span aria-hidden="true">&#10095;</span></button>
+        </div>
+      </div>
+
       <div class="card" id="view-day-el">
         <div class="resource-tabs" id="resource-tabs"></div>
         <div class="mini-timeline-wrap">
@@ -320,10 +398,25 @@
       <div class="card" id="view-month-el" style="display:none;">
         <div class="month-grid" id="month-grid"></div>
       </div>
+
+      <div class="card" id="view-agenda-el" style="display:none;">
+        <div class="agenda-list" id="agenda-list"></div>
+      </div>
     </div>
 
     <div class="side-col">
-      <div id="month-detail"></div>
+      <div class="card side-card">
+        <div class="side-card-title">Panoramica mese</div>
+        <div class="mini-cal-nav">
+          <button onclick="miniCalNav(-1)" aria-label="Mese precedente"><span aria-hidden="true">&#10094;</span></button>
+          <span id="mini-cal-label"></span>
+          <button onclick="miniCalNav(1)" aria-label="Mese successivo"><span aria-hidden="true">&#10095;</span></button>
+        </div>
+        <div class="mini-cal-grid" id="mini-cal-grid"></div>
+      </div>
+      <div class="card side-card" id="side-detail-card" style="display:none;">
+        <div id="month-detail"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -406,15 +499,67 @@ let currentDate = todayDate();
 let selectedResource = RESOURCES[0];
 let openWeekDayKey = null;
 
+function onSearchInput(){
+  const q = document.getElementById("search-input").value.trim().toLowerCase();
+  const clearBtn = document.getElementById("search-clear");
+  const resultsEl = document.getElementById("search-results");
+
+  clearBtn.style.display = q ? "flex" : "none";
+
+  if(!q){
+    resultsEl.style.display = "none";
+    return;
+  }
+
+  const matches = [];
+  Object.keys(bookings).forEach(key=>{
+    (bookings[key]||[]).forEach(it=>{
+      if(it.label.toLowerCase().includes(q) || it.res.toLowerCase().includes(q)){
+        matches.push({key, item:it});
+      }
+    });
+  });
+  matches.sort((a,b)=> a.key.localeCompare(b.key) || a.item.start-b.item.start);
+
+  resultsEl.innerHTML = "";
+  resultsEl.style.display = "block";
+
+  if(matches.length === 0){
+    resultsEl.innerHTML = "<div class='search-no-results'>Nessun risultato per \""+escapeHtml(document.getElementById("search-input").value)+"\"</div>";
+    return;
+  }
+
+  matches.slice(0,30).forEach(m=>{
+    const d = new Date(m.key+"T00:00:00");
+    const dateStr = d.toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"numeric"});
+    const row = document.createElement("div");
+    row.className = "search-result-item";
+    row.innerHTML = "<span class='sr-label'>"+escapeHtml(m.item.label)+"</span><span class='sr-meta'>"+escapeHtml(m.item.res)+" · "+dateStr+" · "+fmtHourLabel(m.item.start)+"–"+fmtHourLabel(m.item.end)+"</span>";
+    row.onclick = ()=>{ showEventDetail(m.key, m.item.id); };
+    resultsEl.appendChild(row);
+  });
+}
+
+function clearSearch(){
+  document.getElementById("search-input").value = "";
+  document.getElementById("search-clear").style.display = "none";
+  document.getElementById("search-results").style.display = "none";
+}
+
 function switchView(view){
   currentView = view;
   document.getElementById("tab-day").classList.toggle("active", view==="day");
   document.getElementById("tab-week").classList.toggle("active", view==="week");
   document.getElementById("tab-month").classList.toggle("active", view==="month");
+  document.getElementById("tab-agenda").classList.toggle("active", view==="agenda");
   document.getElementById("view-day-el").style.display = view==="day" ? "" : "none";
   document.getElementById("view-week-el").style.display = view==="week" ? "" : "none";
   document.getElementById("view-month-el").style.display = view==="month" ? "" : "none";
+  document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
+  document.querySelector(".date-nav").style.display = view==="agenda" ? "none" : "flex";
   document.getElementById("month-detail").innerHTML = "";
+  const sideCard = document.getElementById("side-detail-card");
+  if(sideCard) sideCard.style.display = "none";
   renderAll();
 }
 
@@ -439,7 +584,9 @@ function renderAll(){
   updateDateLabel();
   if(currentView==="day") renderDayView();
   else if(currentView==="week") renderWeekView();
+  else if(currentView==="agenda") renderAgendaView();
   else renderMonthView();
+  renderMiniCal();
 }
 
 function updateDateLabel(){
@@ -710,6 +857,102 @@ function escapeHtml(s){
   return div.innerHTML;
 }
 
+let miniCalDate = todayDate();
+
+function miniCalNav(delta){
+  miniCalDate.setMonth(miniCalDate.getMonth()+delta);
+  renderMiniCal();
+}
+
+function renderMiniCal(){
+  const label = document.getElementById("mini-cal-label");
+  if(!label) return;
+  label.textContent = miniCalDate.toLocaleDateString("it-IT",{month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
+
+  const grid = document.getElementById("mini-cal-grid");
+  grid.innerHTML = "";
+  ["L","M","M","G","V","S","D"].forEach(dn=>{
+    const el = document.createElement("div");
+    el.className = "mini-cal-dow";
+    el.textContent = dn;
+    grid.appendChild(el);
+  });
+
+  const year = miniCalDate.getFullYear(), month = miniCalDate.getMonth();
+  const firstOfMonth = new Date(year, month, 1);
+  const startOffset = (firstOfMonth.getDay() || 7) - 1;
+  const gridStart = new Date(firstOfMonth);
+  gridStart.setDate(gridStart.getDate() - startOffset);
+
+  const today = todayDate();
+
+  for(let i=0;i<42;i++){
+    const d = new Date(gridStart);
+    d.setDate(d.getDate()+i);
+    const key = fmtDate(d);
+    const isOtherMonth = d.getMonth() !== month;
+    const isToday = sameDay(d, today);
+    const isSelected = sameDay(d, currentDate);
+    const hasEvents = (bookings[key]||[]).length > 0;
+
+    const cell = document.createElement("div");
+    cell.className = "mini-cal-cell"
+      + (isOtherMonth ? " other-month" : "")
+      + (isToday ? " today" : "")
+      + (isSelected && !isToday ? " selected" : "")
+      + (hasEvents ? " has-events" : "");
+    cell.textContent = d.getDate();
+    cell.onclick = ()=>{
+      currentDate = new Date(d);
+      switchView("day");
+    };
+    grid.appendChild(cell);
+  }
+}
+
+function renderAgendaView(){
+  const listEl = document.getElementById("agenda-list");
+  listEl.innerHTML = "";
+
+  const today = todayDate();
+  const allDates = Object.keys(bookings)
+    .filter(k => (bookings[k]||[]).length > 0)
+    .filter(k => {
+      const d = new Date(k+"T00:00:00");
+      return d >= today || sameDay(d, today);
+    })
+    .sort();
+
+  if(allDates.length === 0){
+    listEl.innerHTML = "<div class='week-empty' style='padding:24px 0;'>Nessun evento in programma. Usa il pulsante + per aggiungerne uno.</div>";
+    return;
+  }
+
+  allDates.forEach(key=>{
+    const d = new Date(key+"T00:00:00");
+    const items = (bookings[key]||[]).sort((a,b)=>a.start-b.start);
+    const isToday = sameDay(d, today);
+
+    const groupTitle = document.createElement("div");
+    groupTitle.className = "agenda-date-title" + (isToday ? " today" : "");
+    groupTitle.textContent = (isToday ? "Oggi — " : "") + d.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
+    listEl.appendChild(groupTitle);
+
+    items.forEach(it=>{
+      const colors = getResourceColor(it.res);
+      const row = document.createElement("div");
+      row.className = "agenda-item";
+      row.onclick = ()=>{ showEventDetail(key, it.id); };
+      row.innerHTML = `
+        <span class="agenda-dot" style="background:${colors[0]};"></span>
+        <span class="agenda-time">${fmtHourLabel(it.start)}–${fmtHourLabel(it.end)}</span>
+        <span class="agenda-info"><b>${escapeHtml(it.res)}</b> · ${escapeHtml(it.label)}</span>
+      `;
+      listEl.appendChild(row);
+    });
+  });
+}
+
 function renderMonthView(){
   const grid = document.getElementById("month-grid");
   grid.innerHTML = "";
@@ -780,6 +1023,8 @@ function showMonthDayDetail(d){
   }
   html += "</div>";
   detailEl.innerHTML = html;
+  const sideCard = document.getElementById("side-detail-card");
+  if(sideCard) sideCard.style.display = "block";
 
   const mtEl = renderMiniTimeline(items, "month-mt");
   addNowLineToTimeline(mtEl, d);
@@ -894,6 +1139,8 @@ document.getElementById("modal-overlay").addEventListener("click",(e)=>{
 function applyTheme(isDark){
   document.body.classList.toggle("dark-mode", isDark);
   document.getElementById("theme-toggle").textContent = isDark ? "☀️" : "🌙";
+  const metaTheme = document.getElementById("meta-theme-color");
+  if(metaTheme) metaTheme.setAttribute("content", isDark ? "#0d1a30" : "rgb(200,55,55)");
   try{ localStorage.setItem("gestionale_theme", isDark ? "dark" : "light"); }catch(e){}
 }
 function toggleTheme(){
@@ -905,6 +1152,28 @@ function initTheme(){
   applyTheme(saved === "dark");
 }
 initTheme();
+
+document.addEventListener("keydown", (e)=>{
+  const tag = (document.activeElement && document.activeElement.tagName) || "";
+  const isTyping = tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA";
+
+  if(e.key === "/" && !isTyping){
+    e.preventDefault();
+    document.getElementById("search-input").focus();
+    return;
+  }
+  if(isTyping) return;
+
+  if(e.key === "t" || e.key === "T"){ goToday(); }
+  else if(e.key === "ArrowLeft"){ navPrev(); }
+  else if(e.key === "ArrowRight"){ navNext(); }
+  else if(e.key === "Escape"){
+    closeAddModal();
+    closeEventDetail();
+    clearSearch();
+    document.activeElement && document.activeElement.blur();
+  }
+});
 
 switchView("day");
 </script>
