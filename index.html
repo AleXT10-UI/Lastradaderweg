@@ -78,12 +78,15 @@
     --warn-border:#5a4a20;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html{overflow-x:hidden;}
+  html{
+    overflow-x:hidden;
+    background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 45%);
+    min-height:100%;
+  }
   body{
     font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;
-    background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 45%);
-    background-attachment:fixed;
-    min-height:100vh;color:var(--text-main);
+    background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
+    min-height:100vh;min-height:100dvh;color:var(--text-main);
     overscroll-behavior-y:contain;
     overflow-x:hidden;
     padding-top:env(safe-area-inset-top);
@@ -92,15 +95,50 @@
   .app{max-width:900px;width:100%;margin:0 auto;padding:10px;padding-bottom:80px;box-sizing:border-box;}
   .main-layout{display:block;}
   .main-col{width:100%;}
-  .side-col{width:100%;margin-top:14px;display:flex;flex-direction:column;gap:14px;}
+  .side-col{display:none;}
 
   .side-card{padding:14px;}
 
   @media (min-width:900px){
-    .app{max-width:1180px;}
-    .main-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
+    .app{max-width:1200px;padding:20px;}
+
+    header{padding:14px 20px;border-radius:14px;}
+    header h1{font-size:21px;}
+    header img{height:44px;}
+
+    .search-bar{padding:12px 16px;border-radius:12px;}
+    .search-bar input{font-size:16px;}
+
+    .view-switch{padding:5px;border-radius:13px;max-width:480px;}
+    .view-switch button{font-size:14.5px;padding:11px 14px;}
+
+    .date-nav{padding:8px 12px;border-radius:12px;}
+    .date-nav .date-label{font-size:16px;}
+
+    .main-layout{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;}
     .main-col{min-width:0;}
-    .side-col{position:sticky;top:14px;margin-top:0;}
+    .side-col{position:sticky;top:20px;display:flex !important;flex-direction:column;gap:14px;}
+
+    .card{border-radius:16px;}
+    .resource-tabs{padding:14px 18px;gap:8px;}
+    .resource-tabs button{padding:9px 16px;font-size:13px;}
+    .duplicate-day-btn, .manage-res-btn{padding:9px 16px;font-size:13px;}
+    .toolbar-actions{margin-right:18px;}
+
+    .mini-timeline-wrap{padding:16px 20px 10px;}
+    .mini-timeline{height:40px;}
+    .day-countdown{margin:0 18px 12px;padding:12px 16px;font-size:13.5px;}
+
+    .slot-list{padding:14px 18px;max-height:none;}
+    .slot{padding:14px 18px;border-radius:12px;}
+    .slot-time{font-size:14.5px;}
+
+    .week-list{padding:16px;}
+    .month-grid{padding:18px;gap:6px;}
+    .month-cell{border-radius:12px;}
+
+    .fab{width:64px;height:64px;font-size:28px;bottom:28px;right:28px;box-shadow:0 8px 22px var(--accent-shadow);}
+    .fab:hover{transform:scale(1.06);}
   }
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
@@ -108,7 +146,7 @@
   #theme-toggle, #search-toggle{
     border:none;background:var(--bg-soft);color:var(--head);width:38px;height:38px;border-radius:9px;
     font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    transition:background .15s;
+    transition:background .15s;position:relative;
   }
   #theme-toggle:hover, #search-toggle:hover{background:var(--border);}
   #search-toggle.active{background:var(--accent);color:#fff;}
@@ -126,10 +164,14 @@
   }
   .search-icon{font-size:14px;flex-shrink:0;}
   .search-bar input{
-    flex:1;border:none;background:transparent;font-size:14px;color:var(--text-main);outline:none;min-width:0;
+    flex:1;border:none;background:transparent;font-size:16px;color:var(--text-main);outline:none;min-width:0;
   }
   .search-bar input::placeholder{color:var(--text-muted);}
   #search-clear{border:none;background:var(--bg-soft);color:var(--head);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:12px;flex-shrink:0;}
+  #search-resource-filter{
+    border:1px solid var(--border);background:var(--bg-soft);color:var(--text-main);border-radius:8px;
+    padding:5px 8px;font-size:12px;flex-shrink:0;max-width:110px;
+  }
   .search-results{
     background:var(--surface);border-radius:12px;box-shadow:0 4px 18px var(--shadow-soft);margin-bottom:10px;
     max-height:320px;overflow-y:auto;
@@ -151,6 +193,29 @@
   }
   .agenda-notes textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
   .agenda-notes textarea::placeholder{color:var(--text-muted);}
+
+  .todo-section{padding:14px;border-bottom:1px solid var(--border);}
+  .todo-add-row{display:flex;gap:8px;margin-bottom:10px;}
+  .todo-add-row input{
+    flex:1;border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:16px;
+    background:var(--bg-soft);color:var(--text-main);
+  }
+  .todo-add-row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
+  .todo-add-row input::placeholder{color:var(--text-muted);}
+  .todo-add-row button{
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;
+    padding:0 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+  .todo-list{display:flex;flex-direction:column;gap:6px;}
+  .todo-item{
+    display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:var(--bg-soft);
+    font-size:13.5px;
+  }
+  .todo-item input[type="checkbox"]{width:17px;height:17px;flex-shrink:0;cursor:pointer;accent-color:var(--accent);}
+  .todo-item .todo-text{flex:1;color:var(--text-main);word-break:break-word;}
+  .todo-item.done .todo-text{text-decoration:line-through;color:var(--text-muted);}
+  .todo-item .todo-del{color:var(--danger);cursor:pointer;flex-shrink:0;font-size:14px;padding:6px 9px;}
+  .todo-empty{color:var(--text-muted);font-size:12.5px;text-align:center;padding:8px 0;}
 
   .agenda-list{padding:8px 4px;}
   .agenda-date-title{
@@ -192,7 +257,15 @@
 
   .card{background:var(--surface);border-radius:14px;box-shadow:0 4px 18px var(--shadow-soft);overflow:hidden;margin-bottom:12px;}
 
-  .resource-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;border-bottom:1px solid var(--border);}
+  .day-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border);}
+  .resource-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;flex:1;}
+  .toolbar-actions{display:flex;gap:8px;flex-shrink:0;margin-right:10px;}
+  .duplicate-day-btn, .manage-res-btn{
+    flex-shrink:0;border:1px solid var(--border);background:var(--bg-soft);color:var(--head);
+    padding:7px 12px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;
+    transition:background .15s;white-space:nowrap;
+  }
+  .duplicate-day-btn:hover, .manage-res-btn:hover{background:var(--border);}
   .resource-tabs button{
     border:1px solid var(--border);background:var(--surface);color:var(--head);padding:7px 11px;border-radius:18px;
     font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;
@@ -267,7 +340,7 @@
   }
   .week-item .wi-res{font-weight:700;color:var(--head);}
   .week-item .wi-time{color:var(--muted-week-time);}
-  .week-item .wi-del{color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;}
+  .week-item .wi-del{color:var(--danger);cursor:pointer;font-size:16px;padding:6px 9px;}
   .week-empty{padding:10px 0;text-align:center;color:var(--muted-empty);font-size:12.5px;}
 
   .month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:12px;}
@@ -302,7 +375,7 @@
   .modal h3{margin:0 0 16px;color:var(--head);font-size:17px;}
   .modal label{display:block;font-size:12.5px;font-weight:600;color:var(--head);margin:12px 0 5px;}
   .modal select, .modal input{
-    width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;font-size:14px;background:var(--surface);color:var(--text-main);
+    width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;font-size:16px;background:var(--surface);color:var(--text-main);
   }
   .modal select:focus, .modal input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
   .modal-row{display:flex;gap:10px;}
@@ -314,11 +387,49 @@
   .modal-actions .btn-cancel{background:var(--btn-secondary-bg);color:var(--btn-secondary-text);}
   .modal-actions .btn-confirm{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 3px 10px var(--accent-shadow);}
 
+  .manage-res-modal{max-width:420px;}
+  .res-manage-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;margin-bottom:14px;}
+  .res-manage-item{
+    display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:var(--bg-soft);
+    border:1px solid var(--border);cursor:grab;
+  }
+  .res-manage-item.dragging{opacity:.4;}
+  .res-manage-item .rm-handle{color:var(--text-muted);font-size:15px;flex-shrink:0;cursor:grab;}
+  .rm-color-picker{
+    -webkit-appearance:none;appearance:none;
+    width:26px !important;min-width:26px;max-width:26px;height:26px;min-height:26px;max-height:26px;
+    flex-shrink:0;border:2px solid var(--border);border-radius:50%;
+    padding:0 !important;cursor:pointer;background:none;overflow:hidden;box-sizing:border-box;
+  }
+  .rm-color-picker::-webkit-color-swatch-wrapper{padding:0;border-radius:50%;width:100%;height:100%;}
+  .rm-color-picker::-webkit-color-swatch{border:none;border-radius:50%;}
+  .rm-color-picker::-moz-color-swatch{border:none;border-radius:50%;}
+  .res-manage-item .rm-name{flex:1;font-size:13.5px;font-weight:600;color:var(--text-main);}
+  .rm-arrows{display:flex;flex-direction:column;gap:1px;flex-shrink:0;}
+  .rm-arrows button{
+    border:none;background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;padding:6px 8px;line-height:1;
+    min-width:28px;min-height:20px;
+  }
+  .rm-arrows button:hover:not(:disabled){color:var(--accent);}
+  .rm-arrows button:disabled{opacity:.25;cursor:default;}
+  .res-manage-item .rm-delete{color:var(--danger);cursor:pointer;font-size:15px;padding:6px 9px;flex-shrink:0;}
+  .res-add-row{display:flex;gap:8px;}
+  .res-add-row input{flex:1;}
+  .res-add-row button{
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;
+    padding:0 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+
   .day-detail{background:var(--surface);border-radius:14px;padding:16px;margin-top:6px;box-shadow:0 3px 14px var(--shadow-soft);}
-  .day-detail h4{margin:0 0 10px;color:var(--head);font-size:14px;}
+  .day-detail.is-today{border:1.5px solid var(--accent);}
+  .day-detail h4{margin:0 0 10px;color:var(--head);font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .today-badge{
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:10.5px;font-weight:800;
+    padding:3px 9px;border-radius:20px;letter-spacing:.5px;box-shadow:0 2px 6px var(--accent-shadow);
+  }
   .month-mini-timeline-wrap{margin-bottom:12px;}
   .day-detail .dd-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-soft);border-radius:8px;margin-bottom:6px;font-size:12.5px;}
-  .day-detail .dd-item .dd-del{color:var(--danger);cursor:pointer;}
+  .day-detail .dd-item .dd-del{color:var(--danger);cursor:pointer;padding:6px 9px;}
   .day-detail .dd-empty{color:var(--muted-empty);font-size:12.5px;text-align:center;padding:8px 0;}
 
   @media (max-width:600px){
@@ -328,12 +439,17 @@
     header img{height:32px;}
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
-    .fab{right:16px;bottom:16px;width:54px;height:54px;font-size:24px;}
+    .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:54px;height:54px;font-size:24px;}
     .view-switch button{font-size:10.5px;padding:9px 3px;gap:3px;}
     .view-switch button i{font-size:14px;}
 
     .resource-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:8px;}
     .resource-tabs button{padding:8px 6px;font-size:11.5px;text-align:center;justify-content:center;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    .day-toolbar{flex-direction:column;align-items:stretch;}
+    .toolbar-actions{margin:8px 8px 0;order:-1;display:flex;gap:8px;}
+    .duplicate-day-btn, .manage-res-btn{flex:1;justify-content:center;}
+    .duplicate-day-btn .dup-txt{display:inline;}
 
     .modal{width:92vw;padding:18px;}
     .modal-row{flex-direction:column;gap:12px;}
@@ -354,6 +470,7 @@
   <div class="search-bar" id="search-bar" style="display:none;">
     <span class="search-icon" aria-hidden="true">🔍</span>
     <input type="text" id="search-input" placeholder="Cerca per descrizione o risorsa..." oninput="onSearchInput()">
+    <select id="search-resource-filter" onchange="onSearchInput()"></select>
     <button id="search-clear" onclick="clearSearch()" style="display:none;" aria-label="Cancella ricerca">✕</button>
   </div>
   <div class="search-results" id="search-results" style="display:none;"></div>
@@ -377,7 +494,17 @@
       </div>
 
       <div class="card" id="view-day-el">
-        <div class="resource-tabs" id="resource-tabs"></div>
+        <div class="day-toolbar">
+          <div class="resource-tabs" id="resource-tabs"></div>
+          <div class="toolbar-actions">
+            <button class="manage-res-btn" onclick="openManageResourcesModal()" title="Gestisci risorse">
+              <span aria-hidden="true">⚙</span><span class="dup-txt">Risorse</span>
+            </button>
+            <button class="duplicate-day-btn" onclick="openDuplicateModal()" title="Duplica tutti gli eventi di questo giorno">
+              <span aria-hidden="true">⧉</span><span class="dup-txt">Duplica giorno</span>
+            </button>
+          </div>
+        </div>
         <div class="mini-timeline-wrap">
           <div class="mini-timeline" id="mini-timeline"></div>
           <div class="mini-timeline-labels"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>
@@ -399,12 +526,20 @@
           <div class="agenda-notes-title">📝 Appunti</div>
           <textarea id="agenda-notes-input" placeholder="Scrivi qui appunti generali, promemoria, cose da ricordare..." oninput="saveAgendaNotes()"></textarea>
         </div>
+        <div class="todo-section">
+          <div class="agenda-notes-title">☑ Da fare</div>
+          <div class="todo-add-row">
+            <input type="text" id="todo-input" placeholder="Nuovo elemento..." onkeydown="if(event.key==='Enter') addTodo()">
+            <button onclick="addTodo()">Aggiungi</button>
+          </div>
+          <div class="todo-list" id="todo-list"></div>
+        </div>
         <div class="agenda-list" id="agenda-list"></div>
       </div>
     </div>
 
     <div class="side-col">
-      <div class="card side-card" id="side-detail-card" style="display:none;">
+      <div class="card side-card" id="side-detail-card">
         <div id="month-detail"></div>
       </div>
     </div>
@@ -444,8 +579,38 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="duplicate-overlay">
+  <div class="modal">
+    <h3>Duplica giorno</h3>
+    <p id="duplicate-source-info" style="font-size:13px;color:var(--text-muted);margin:0 0 4px;"></p>
+    <label>Copia tutti gli eventi al giorno:</label>
+    <input type="date" id="duplicate-target-date">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDuplicateModal()">Annulla</button>
+      <button class="btn-confirm" onclick="confirmDuplicate()">Duplica</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="manage-res-overlay">
+  <div class="modal manage-res-modal">
+    <h3>Gestisci risorse</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin:-10px 0 12px;">Trascina <span aria-hidden="true">⠿</span> per riordinare</p>
+    <div class="res-manage-list" id="res-manage-list"></div>
+    <div class="res-add-row">
+      <input type="text" id="new-resource-input" placeholder="Nome nuova risorsa...">
+      <button onclick="addNewResource()">Aggiungi</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeManageResourcesModal()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const RESOURCES = ["Sala C","Furgone","Gazebo","Impianto audio","Tavoli"];
+const DEFAULT_RESOURCES = ["Sala C","Furgone","Gazebo","Impianto audio","Tavoli"];
+let RESOURCES = loadResources();
+
 const RESOURCE_COLORS = {
   "Sala C": ["#e0a800","#b88700"],
   "Furgone": ["#6c757d","#495157"],
@@ -453,8 +618,54 @@ const RESOURCE_COLORS = {
   "Impianto audio": ["#8a4fd6","#6a35ab"],
   "Tavoli": ["#2ca86b","#1f8253"]
 };
+const AUTO_PALETTE = [
+  ["#d6486f","#a8355a"], ["#3ba8a0","#297f78"], ["#c98a2b","#a06d1e"],
+  ["#5b7fd6","#3f5cab"], ["#9a5bd6","#7440ab"], ["#5bb85b","#3f8f3f"]
+];
+
+let customResourceColors = loadCustomColors();
+
+function loadCustomColors(){
+  try{
+    const raw = localStorage.getItem("gestionale_resource_colors");
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {};
+}
+function saveCustomColors(){
+  try{ localStorage.setItem("gestionale_resource_colors", JSON.stringify(customResourceColors)); }catch(e){}
+}
+function darkenColor(hex, amount){
+  hex = hex.replace("#","");
+  const r = Math.max(0, parseInt(hex.substring(0,2),16) - amount);
+  const g = Math.max(0, parseInt(hex.substring(2,4),16) - amount);
+  const b = Math.max(0, parseInt(hex.substring(4,6),16) - amount);
+  return "#" + [r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");
+}
+function setResourceColor(res, hex){
+  customResourceColors[res] = [hex, darkenColor(hex, 35)];
+  saveCustomColors();
+}
 function getResourceColor(res){
-  return RESOURCE_COLORS[res] || ["rgb(200,55,55)","rgb(160,35,35)"];
+  if(customResourceColors[res]) return customResourceColors[res];
+  if(RESOURCE_COLORS[res]) return RESOURCE_COLORS[res];
+  let hash = 0;
+  for(let i=0;i<res.length;i++) hash = (hash*31 + res.charCodeAt(i)) >>> 0;
+  return AUTO_PALETTE[hash % AUTO_PALETTE.length];
+}
+
+function loadResources(){
+  try{
+    const raw = localStorage.getItem("gestionale_resources");
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  }catch(e){}
+  return DEFAULT_RESOURCES.slice();
+}
+function saveResources(){
+  try{ localStorage.setItem("gestionale_resources", JSON.stringify(RESOURCES)); }catch(e){}
 }
 
 function safeGetInit(){
@@ -491,12 +702,13 @@ let openWeekDayKey = null;
 
 function onSearchInput(){
   const q = document.getElementById("search-input").value.trim().toLowerCase();
+  const resFilter = document.getElementById("search-resource-filter").value;
   const clearBtn = document.getElementById("search-clear");
   const resultsEl = document.getElementById("search-results");
 
   clearBtn.style.display = q ? "flex" : "none";
 
-  if(!q){
+  if(!q && !resFilter){
     resultsEl.style.display = "none";
     return;
   }
@@ -504,7 +716,9 @@ function onSearchInput(){
   const matches = [];
   Object.keys(bookings).forEach(key=>{
     (bookings[key]||[]).forEach(it=>{
-      if(it.label.toLowerCase().includes(q) || it.res.toLowerCase().includes(q)){
+      const matchesText = !q || it.label.toLowerCase().includes(q) || it.res.toLowerCase().includes(q);
+      const matchesRes = !resFilter || it.res === resFilter;
+      if(matchesText && matchesRes){
         matches.push({key, item:it});
       }
     });
@@ -515,7 +729,7 @@ function onSearchInput(){
   resultsEl.style.display = "block";
 
   if(matches.length === 0){
-    resultsEl.innerHTML = "<div class='search-no-results'>Nessun risultato per \""+escapeHtml(document.getElementById("search-input").value)+"\"</div>";
+    resultsEl.innerHTML = "<div class='search-no-results'>Nessun risultato</div>";
     return;
   }
 
@@ -532,6 +746,7 @@ function onSearchInput(){
 
 function clearSearch(){
   document.getElementById("search-input").value = "";
+  document.getElementById("search-resource-filter").value = "";
   document.getElementById("search-clear").style.display = "none";
   document.getElementById("search-results").style.display = "none";
 }
@@ -547,8 +762,20 @@ function toggleSearchBar(){
   } else {
     bar.style.display = "flex";
     btn.classList.add("active");
+    populateSearchResourceFilter();
     document.getElementById("search-input").focus();
   }
+}
+function populateSearchResourceFilter(){
+  const sel = document.getElementById("search-resource-filter");
+  const current = sel.value;
+  sel.innerHTML = "<option value=''>Tutte le risorse</option>";
+  RESOURCES.forEach(r=>{
+    const o = document.createElement("option");
+    o.value = r; o.textContent = r;
+    sel.appendChild(o);
+  });
+  sel.value = current;
 }
 
 function switchView(view){
@@ -562,10 +789,13 @@ function switchView(view){
   document.getElementById("view-month-el").style.display = view==="month" ? "" : "none";
   document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
   document.querySelector(".date-nav").style.display = view==="agenda" ? "none" : "flex";
-  document.getElementById("month-detail").innerHTML = "";
-  const sideCard = document.getElementById("side-detail-card");
-  if(sideCard) sideCard.style.display = "none";
   renderAll();
+  refreshSidePanel();
+}
+
+function refreshSidePanel(){
+  const dateToShow = (currentView === "day") ? currentDate : todayDate();
+  showMonthDayDetail(dateToShow);
 }
 
 function navPrev(){
@@ -573,16 +803,19 @@ function navPrev(){
   else if(currentView==="week"){ currentDate.setDate(currentDate.getDate()-7); }
   else { currentDate.setMonth(currentDate.getMonth()-1); }
   renderAll();
+  refreshSidePanel();
 }
 function navNext(){
   if(currentView==="day"){ currentDate.setDate(currentDate.getDate()+1); }
   else if(currentView==="week"){ currentDate.setDate(currentDate.getDate()+7); }
   else { currentDate.setMonth(currentDate.getMonth()+1); }
   renderAll();
+  refreshSidePanel();
 }
 function goToday(){
   currentDate = todayDate();
   renderAll();
+  refreshSidePanel();
 }
 
 function renderAll(){
@@ -872,8 +1105,73 @@ function loadAgendaNotes(){
   if(inp) inp.value = val;
 }
 
+let todoIdCounter = 1;
+let todos = loadTodos();
+
+function loadTodos(){
+  try{
+    const raw = localStorage.getItem("gestionale_todos");
+    if(raw){
+      const parsed = JSON.parse(raw);
+      todoIdCounter = (parsed.reduce((max,t)=>Math.max(max,t.id),0)) + 1;
+      return parsed;
+    }
+  }catch(e){}
+  return [];
+}
+function saveTodos(){
+  try{ localStorage.setItem("gestionale_todos", JSON.stringify(todos)); }catch(e){}
+}
+function addTodo(){
+  const inp = document.getElementById("todo-input");
+  const text = inp.value.trim();
+  if(!text) return;
+  todos.push({id: todoIdCounter++, text, done:false});
+  saveTodos();
+  inp.value = "";
+  renderTodos();
+}
+function toggleTodo(id){
+  const t = todos.find(x=>x.id===id);
+  if(t){ t.done = !t.done; saveTodos(); renderTodos(); }
+}
+function deleteTodo(id){
+  todos = todos.filter(x=>x.id!==id);
+  saveTodos();
+  renderTodos();
+}
+function renderTodos(){
+  const listEl = document.getElementById("todo-list");
+  if(!listEl) return;
+  listEl.innerHTML = "";
+  if(todos.length === 0){
+    listEl.innerHTML = "<div class='todo-empty'>Nessun elemento da fare.</div>";
+    return;
+  }
+  todos.forEach(t=>{
+    const row = document.createElement("div");
+    row.className = "todo-item" + (t.done ? " done" : "");
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = t.done;
+    cb.onchange = ()=>toggleTodo(t.id);
+    const txt = document.createElement("span");
+    txt.className = "todo-text";
+    txt.textContent = t.text;
+    const del = document.createElement("span");
+    del.className = "todo-del";
+    del.textContent = "🗑";
+    del.onclick = ()=>{ if(confirm("Eliminare questo elemento?")) deleteTodo(t.id); };
+    row.appendChild(cb);
+    row.appendChild(txt);
+    row.appendChild(del);
+    listEl.appendChild(row);
+  });
+}
+
 function renderAgendaView(){
   loadAgendaNotes();
+  renderTodos();
   const listEl = document.getElementById("agenda-list");
   listEl.innerHTML = "";
 
@@ -919,7 +1217,6 @@ function renderAgendaView(){
 function renderMonthView(){
   const grid = document.getElementById("month-grid");
   grid.innerHTML = "";
-  document.getElementById("month-detail").innerHTML = "";
 
   ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"].forEach(dn=>{
     const el = document.createElement("div");
@@ -966,14 +1263,18 @@ function renderMonthView(){
     cell.onclick = ()=>{ showMonthDayDetail(d); };
     grid.appendChild(cell);
   }
+
+  showMonthDayDetail(today);
 }
 
 function showMonthDayDetail(d){
   const key = fmtDate(d);
   const items = (bookings[key]||[]).sort((a,b)=>a.start-b.start);
   const detailEl = document.getElementById("month-detail");
+  const isToday = sameDay(d, todayDate());
 
-  let html = "<div class='day-detail'><h4>" +
+  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "'><h4>" +
+    (isToday ? "<span class='today-badge'>OGGI</span> " : "") +
     d.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase()) +
     "</h4><div class='month-mini-timeline-wrap'><div class='mini-timeline' id='month-mt'></div></div>";
 
@@ -986,8 +1287,6 @@ function showMonthDayDetail(d){
   }
   html += "</div>";
   detailEl.innerHTML = html;
-  const sideCard = document.getElementById("side-detail-card");
-  if(sideCard) sideCard.style.display = "block";
 
   const mtEl = renderMiniTimeline(items, "month-mt");
   addNowLineToTimeline(mtEl, d);
@@ -1002,12 +1301,14 @@ function addBooking(dateKey, res, start, end, label){
   bookings[dateKey].push({id: idCounter++, res, start:+start, end:+end, label: label || res});
   persist();
   renderAll();
+  refreshSidePanel();
 }
 function removeBooking(dateKey, id){
   if(!bookings[dateKey]) return;
   bookings[dateKey] = bookings[dateKey].filter(b=>b.id!==id);
   persist();
   renderAll();
+  refreshSidePanel();
 }
 
 function hourToTimeStr(h){
@@ -1022,6 +1323,158 @@ function timeStrToHour(s){
 function fmtHourLabel(h){
   return hourToTimeStr(h);
 }
+
+function openManageResourcesModal(){
+  renderManageResourcesList();
+  document.getElementById("manage-res-overlay").classList.add("open");
+}
+function closeManageResourcesModal(){
+  document.getElementById("manage-res-overlay").classList.remove("open");
+  renderDayView();
+}
+
+let dragSrcIndex = null;
+
+function renderManageResourcesList(){
+  const listEl = document.getElementById("res-manage-list");
+  listEl.innerHTML = "";
+
+  RESOURCES.forEach((res, idx)=>{
+    const colors = getResourceColor(res);
+    const item = document.createElement("div");
+    item.className = "res-manage-item";
+    item.draggable = true;
+    item.dataset.index = idx;
+
+    item.innerHTML = `
+      <span class="rm-handle" aria-hidden="true">⠿</span>
+      <input type="color" class="rm-color-picker" value="${colors[0]}" title="Cambia colore">
+      <span class="rm-name">${escapeHtml(res)}</span>
+      <span class="rm-arrows">
+        <button class="rm-arrow-up" title="Sposta su" ${idx===0 ? "disabled" : ""}>&#9650;</button>
+        <button class="rm-arrow-down" title="Sposta giù" ${idx===RESOURCES.length-1 ? "disabled" : ""}>&#9660;</button>
+      </span>
+      <span class="rm-delete" title="Elimina risorsa">🗑</span>
+    `;
+
+    item.querySelector(".rm-color-picker").addEventListener("input",(e)=>{
+      setResourceColor(res, e.target.value);
+      renderDayView();
+    });
+
+    item.querySelector(".rm-arrow-up").onclick = ()=>{
+      if(idx===0) return;
+      [RESOURCES[idx-1], RESOURCES[idx]] = [RESOURCES[idx], RESOURCES[idx-1]];
+      saveResources();
+      renderManageResourcesList();
+    };
+    item.querySelector(".rm-arrow-down").onclick = ()=>{
+      if(idx===RESOURCES.length-1) return;
+      [RESOURCES[idx+1], RESOURCES[idx]] = [RESOURCES[idx], RESOURCES[idx+1]];
+      saveResources();
+      renderManageResourcesList();
+    };
+
+    item.querySelector(".rm-delete").onclick = ()=>{
+      if(RESOURCES.length <= 1){
+        alert("Deve rimanere almeno una risorsa.");
+        return;
+      }
+      const hasEvents = Object.values(bookings).some(arr => arr.some(b=>b.res===res));
+      const msg = hasEvents
+        ? "Ci sono elementi salvati per \""+res+"\". Eliminando la risorsa, quegli elementi resteranno visibili ma la risorsa non sarà più selezionabile per nuovi elementi. Continuare?"
+        : "Eliminare la risorsa \""+res+"\"?";
+      if(confirm(msg)){
+        RESOURCES = RESOURCES.filter(r=>r!==res);
+        saveResources();
+        if(selectedResource === res) selectedResource = RESOURCES[0];
+        renderManageResourcesList();
+      }
+    };
+
+    item.addEventListener("dragstart",(e)=>{
+      dragSrcIndex = idx;
+      item.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    item.addEventListener("dragend",()=>{
+      item.classList.remove("dragging");
+    });
+    item.addEventListener("dragover",(e)=>{ e.preventDefault(); });
+    item.addEventListener("drop",(e)=>{
+      e.preventDefault();
+      const targetIndex = idx;
+      if(dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+      const moved = RESOURCES.splice(dragSrcIndex, 1)[0];
+      RESOURCES.splice(targetIndex, 0, moved);
+      saveResources();
+      renderManageResourcesList();
+    });
+
+    listEl.appendChild(item);
+  });
+}
+
+function addNewResource(){
+  const input = document.getElementById("new-resource-input");
+  const name = input.value.trim();
+  if(!name){ return; }
+  if(RESOURCES.includes(name)){
+    alert("Esiste già una risorsa con questo nome.");
+    return;
+  }
+  RESOURCES.push(name);
+  saveResources();
+  input.value = "";
+  renderManageResourcesList();
+}
+
+document.getElementById("manage-res-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="manage-res-overlay") closeManageResourcesModal();
+});
+
+function openDuplicateModal(){
+  const key = fmtDate(currentDate);
+  const items = bookings[key]||[];
+  if(items.length === 0){
+    alert("Non ci sono elementi da duplicare in questo giorno.");
+    return;
+  }
+  const sourceLabel = currentDate.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
+  document.getElementById("duplicate-source-info").textContent =
+    "Da " + sourceLabel + " (" + items.length + (items.length===1 ? " elemento" : " elementi") + ")";
+
+  const targetInp = document.getElementById("duplicate-target-date");
+  const nextDay = new Date(currentDate); nextDay.setDate(nextDay.getDate()+1);
+  targetInp.value = fmtDate(nextDay);
+
+  document.getElementById("duplicate-overlay").classList.add("open");
+}
+function closeDuplicateModal(){
+  document.getElementById("duplicate-overlay").classList.remove("open");
+}
+function confirmDuplicate(){
+  const sourceKey = fmtDate(currentDate);
+  const targetKey = document.getElementById("duplicate-target-date").value;
+
+  if(!targetKey){ alert("Scegli una data di destinazione."); return; }
+  if(targetKey === sourceKey){ alert("Scegli un giorno diverso da quello di origine."); return; }
+
+  const items = bookings[sourceKey]||[];
+  if(items.length === 0){ closeDuplicateModal(); return; }
+
+  if(!bookings[targetKey]) bookings[targetKey] = [];
+  items.forEach(it=>{
+    bookings[targetKey].push({id: idCounter++, res: it.res, start: it.start, end: it.end, label: it.label});
+  });
+
+  persist();
+  closeDuplicateModal();
+  renderAll();
+}
+document.getElementById("duplicate-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="duplicate-overlay") closeDuplicateModal();
+});
 
 function showEventDetail(dateKey, id){
   const item = (bookings[dateKey]||[]).find(b=>b.id===id);
@@ -1116,6 +1569,7 @@ function initTheme(){
 }
 initTheme();
 
+
 document.addEventListener("keydown", (e)=>{
   const tag = (document.activeElement && document.activeElement.tagName) || "";
   const isTyping = tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA";
@@ -1142,54 +1596,6 @@ document.addEventListener("keydown", (e)=>{
 });
 
 switchView("day");
-</script>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
-  
-  const firebaseConfig = {
-    apiKey: "AIzaSyBC2PySOLSE2kXk3OmDgN4WVWFscJSWpOU",
-    authDomain: "gestionale-derweg.firebaseapp.com",
-    projectId: "gestionale-derweg",
-    databaseURL: "https://gestionale-derweg-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket: "gestionale-derweg.firebasestorage.app",
-    messagingSenderId: "634308371177",
-    appId: "1:634308371177:web:c80d6ece78ca29f4b98678",
-    measurementId: "G-927DW1387K"
-  };
-  
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  
-  // Override persist to save to Firebase instead of localStorage
-  window.persistToFirebase = async function() {
-    try {
-      await set(ref(db, "bookings"), window.bookings || {});
-    } catch (err) {
-      console.error("Firebase write error:", err);
-    }
-  };
-  
-  // Wrap original persist to call Firebase
-  const originalPersist = window.persist;
-  window.persist = function() {
-    if(originalPersist) originalPersist();
-    window.persistToFirebase();
-  };
-  
-  // Load data from Firebase on init
-  (async() => {
-    try {
-      const snapshot = await get(ref(db, "bookings"));
-      if(snapshot.exists()) {
-        window.bookings = snapshot.val() || {};
-        if(window.renderAll) window.renderAll();
-      }
-    } catch(err) {
-      console.error("Firebase read error:", err);
-    }
-  })();
 </script>
 
 </body>
