@@ -143,13 +143,17 @@
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
   header h1{flex:1;}
-  #theme-toggle, #search-toggle{
+  #theme-toggle, #search-toggle, #logout-toggle, #users-toggle, #announce-toggle{
     border:none;background:var(--bg-soft);color:var(--head);width:38px;height:38px;border-radius:9px;
     font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:background .15s;position:relative;
   }
-  #theme-toggle:hover, #search-toggle:hover{background:var(--border);}
+  #theme-toggle:hover, #search-toggle:hover, #logout-toggle:hover, #users-toggle:hover, #announce-toggle:hover{background:var(--border);}
   #search-toggle.active{background:var(--accent);color:#fff;}
+  .announce-badge{
+    position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;
+    min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;
+  }
   #logo-img{ transition:filter .2s, mix-blend-mode .2s; }
   body.dark-mode #logo-img{
     filter:invert(1) hue-rotate(210deg) saturate(3);
@@ -371,6 +375,27 @@
     z-index:100;padding:16px;backdrop-filter:blur(2px);
   }
   .modal-overlay.open{display:flex;}
+
+  #login-overlay{
+    position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
+    background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
+  }
+  .login-card{
+    background:var(--surface);border-radius:18px;padding:32px 26px;width:100%;max-width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center;
+  }
+  .login-logo{height:52px;margin-bottom:14px;}
+  .login-card h2{margin:0 0 18px;color:var(--head);font-size:20px;}
+  .login-card input{
+    width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;
+    font-size:16px;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;
+  }
+  .login-card input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
+  .login-error{color:var(--danger);font-size:12.5px;min-height:16px;margin-bottom:8px;}
+  .login-btn{
+    width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 4px 14px var(--accent-shadow);
+  }
   .modal{background:var(--surface);border-radius:16px;padding:22px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
   .modal h3{margin:0 0 16px;color:var(--head);font-size:17px;}
   .modal label{display:block;font-size:12.5px;font-weight:600;color:var(--head);margin:12px 0 5px;}
@@ -459,12 +484,26 @@
 </head>
 <body>
 
+<div id="login-overlay">
+  <div class="login-card">
+    <img src="L.jpg" alt="Logo" class="login-logo">
+    <h2>Accedi</h2>
+    <input type="text" id="login-username" placeholder="Nome utente" autocomplete="username">
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter') attemptLogin()">
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="attemptLogin()">Accedi</button>
+  </div>
+</div>
+
 <div class="app">
   <header>
     <img src="L.jpg" alt="Logo" id="logo-img">
     <h1>Gestionale</h1>
+    <button id="announce-toggle" onclick="openAnnouncementsPanel()" title="Annunci" aria-label="Annunci" style="display:none;">📣<span class="announce-badge" id="announce-badge" style="display:none;"></span></button>
+    <button id="users-toggle" onclick="openUsersPanel()" title="Gestisci utenti" aria-label="Gestisci utenti" style="display:none;">👤</button>
     <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca">🔍</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+    <button id="logout-toggle" onclick="doLogout()" title="Esci" aria-label="Esci">🚪</button>
   </header>
 
   <div class="search-bar" id="search-bar" style="display:none;">
@@ -607,8 +646,206 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="users-overlay">
+  <div class="modal manage-res-modal">
+    <h3>Gestisci utenti</h3>
+    <div class="res-manage-list" id="users-manage-list"></div>
+    <div class="res-add-row" style="flex-wrap:wrap;">
+      <input type="text" id="new-user-name" placeholder="Nome utente" style="flex:1 1 100%;margin-bottom:8px;">
+      <input type="password" id="new-user-pass" placeholder="Password" style="flex:1;">
+      <button onclick="addNewUser()">Crea</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeUsersPanel()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="announce-overlay">
+  <div class="modal manage-res-modal" id="announce-modal-content">
+  </div>
+</div>
+
 <script>
+/* =========================================================================
+   SISTEMA DI AUTENTICAZIONE
+   ATTENZIONE — nota di sicurezza onesta: questo sito gira interamente nel
+   browser senza un server dietro. Le password vengono trasformate con SHA-256
+   prima di essere salvate (quindi non sono leggibili in chiaro), ma chiunque
+   apra gli strumenti sviluppatore del browser può comunque vedere il codice
+   sorgente e i dati salvati in locale. Non è equivalente alla sicurezza di un
+   vero sistema server-side con database. Ogni account creato/loggato resta
+   solo sul dispositivo/browser dove viene creato, finché non verrà collegato
+   un backend condiviso (Firebase, come discusso).
+   ========================================================================= */
+
+const ADMIN_USERNAME = "Admin";
+const ADMIN_PASSWORD = "derwegadmin";
+const SPECIAL_VIEWER_EMAIL = "dario.volani@lastrada-derweg.org";
+
+async function sha256(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+function loadUsers(){
+  try{
+    const raw = localStorage.getItem("gestionale_users");
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {};
+}
+function saveUsers(users){
+  try{ localStorage.setItem("gestionale_users", JSON.stringify(users)); }catch(e){}
+}
+
+let currentUser = null;
+
+function isAdmin(){ return currentUser === ADMIN_USERNAME; }
+function isSpecialViewer(){ return currentUser === SPECIAL_VIEWER_EMAIL; }
+function canSeeCheckmarkCounts(){ return isAdmin() || isSpecialViewer(); }
+
+async function attemptLogin(){
+  const nameInp = document.getElementById("login-username");
+  const passInp = document.getElementById("login-password");
+  const errEl = document.getElementById("login-error");
+  const name = nameInp.value.trim();
+  const pass = passInp.value;
+
+  if(!name || !pass){
+    errEl.textContent = "Inserisci nome utente e password.";
+    return;
+  }
+
+  if(name === ADMIN_USERNAME){
+    if(pass === ADMIN_PASSWORD){
+      completeLogin(ADMIN_USERNAME);
+    } else {
+      errEl.textContent = "Password errata.";
+    }
+    return;
+  }
+
+  const users = loadUsers();
+  const user = users[name];
+  if(!user){
+    errEl.textContent = "Utente non trovato.";
+    return;
+  }
+  const hashed = await sha256(pass);
+  if(hashed !== user.passwordHash){
+    errEl.textContent = "Password errata.";
+    return;
+  }
+  completeLogin(name);
+}
+
+function completeLogin(username){
+  currentUser = username;
+  try{ sessionStorage.setItem("gestionale_current_user", username); }catch(e){}
+  document.getElementById("login-overlay").style.display = "none";
+  document.getElementById("login-error").textContent = "";
+  document.getElementById("login-username").value = "";
+  document.getElementById("login-password").value = "";
+
+  document.getElementById("users-toggle").style.display = isAdmin() ? "flex" : "none";
+  document.getElementById("announce-toggle").style.display = "flex";
+
+  refreshAnnouncementBadge();
+  if(typeof switchView === "function") switchView("day");
+}
+
+function doLogout(){
+  currentUser = null;
+  try{ sessionStorage.removeItem("gestionale_current_user"); }catch(e){}
+  document.getElementById("login-overlay").style.display = "flex";
+}
+
+function tryRestoreSession(){
+  let saved = null;
+  try{ saved = sessionStorage.getItem("gestionale_current_user"); }catch(e){}
+  if(saved === ADMIN_USERNAME){
+    completeLogin(ADMIN_USERNAME);
+    return true;
+  }
+  if(saved){
+    const users = loadUsers();
+    if(users[saved]){
+      completeLogin(saved);
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ---- Gestione utenti (solo Admin) ---- */
+function openUsersPanel(){
+  if(!isAdmin()) return;
+  renderUsersManageList();
+  document.getElementById("users-overlay").classList.add("open");
+}
+function closeUsersPanel(){
+  document.getElementById("users-overlay").classList.remove("open");
+}
+function renderUsersManageList(){
+  const listEl = document.getElementById("users-manage-list");
+  listEl.innerHTML = "";
+  const users = loadUsers();
+  const names = Object.keys(users);
+
+  if(names.length === 0){
+    listEl.innerHTML = "<div class='todo-empty'>Nessun utente creato oltre ad Admin.</div>";
+    return;
+  }
+
+  names.forEach(name=>{
+    const item = document.createElement("div");
+    item.className = "res-manage-item";
+    const isSpecial = name === SPECIAL_VIEWER_EMAIL;
+    item.innerHTML = `
+      <span class="rm-dot" style="background:${isSpecial ? 'var(--accent)' : 'var(--text-muted)'};"></span>
+      <span class="rm-name">${escapeHtml(name)}${isSpecial ? " <small>(vede i checkmark)</small>" : ""}</span>
+      <span class="rm-delete" title="Elimina utente">🗑</span>
+    `;
+    item.querySelector(".rm-delete").onclick = ()=>{
+      if(confirm("Eliminare l'utente \""+name+"\"?")){
+        const u = loadUsers();
+        delete u[name];
+        saveUsers(u);
+        renderUsersManageList();
+      }
+    };
+    listEl.appendChild(item);
+  });
+}
+async function addNewUser(){
+  const nameInp = document.getElementById("new-user-name");
+  const passInp = document.getElementById("new-user-pass");
+  const name = nameInp.value.trim();
+  const pass = passInp.value;
+
+  if(!name || !pass){ alert("Inserisci nome utente e password."); return; }
+  if(name === ADMIN_USERNAME){ alert("Questo nome è riservato."); return; }
+
+  const users = loadUsers();
+  if(users[name]){ alert("Esiste già un utente con questo nome."); return; }
+
+  const passwordHash = await sha256(pass);
+  users[name] = { passwordHash };
+  saveUsers(users);
+
+  nameInp.value = "";
+  passInp.value = "";
+  renderUsersManageList();
+}
+document.getElementById("users-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="users-overlay") closeUsersPanel();
+});
+
 const DEFAULT_RESOURCES = ["Sala C","Furgone","Gazebo","Impianto audio","Tavoli"];
+
+
 let RESOURCES = loadResources();
 
 const RESOURCE_COLORS = {
@@ -1594,6 +1831,131 @@ document.addEventListener("keydown", (e)=>{
     document.activeElement && document.activeElement.blur();
   }
 });
+
+/* =========================================================================
+   SISTEMA ANNUNCI
+   Solo Admin (o Dario) può scrivere un annuncio. Tutti gli utenti loggati lo
+   vedono e possono mettere un segno di spunta "letto". Solo Admin e Dario
+   vedono quante persone hanno messo il segno di spunta.
+   ========================================================================= */
+
+function loadAnnouncement(){
+  try{
+    const raw = localStorage.getItem("gestionale_announcement");
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveAnnouncement(ann){
+  try{ localStorage.setItem("gestionale_announcement", JSON.stringify(ann)); }catch(e){}
+}
+
+function canWriteAnnouncement(){ return isAdmin() || isSpecialViewer(); }
+
+function refreshAnnouncementBadge(){
+  const badge = document.getElementById("announce-badge");
+  if(!badge) return;
+  const ann = loadAnnouncement();
+  if(!ann || !currentUser){
+    badge.style.display = "none";
+    return;
+  }
+  const alreadyChecked = (ann.checkedBy || []).includes(currentUser);
+  badge.style.display = alreadyChecked ? "none" : "flex";
+  badge.textContent = "!";
+}
+
+function openAnnouncementsPanel(){
+  renderAnnouncementPanel();
+  document.getElementById("announce-overlay").classList.add("open");
+}
+function closeAnnouncementsPanel(){
+  document.getElementById("announce-overlay").classList.remove("open");
+}
+
+function renderAnnouncementPanel(){
+  const content = document.getElementById("announce-modal-content");
+  const ann = loadAnnouncement();
+  const canWrite = canWriteAnnouncement();
+  const canSeeCounts = canSeeCheckmarkCounts();
+
+  let html = "<h3>📣 Annunci</h3>";
+
+  if(canWrite){
+    html += `
+      <label>Scrivi un nuovo annuncio (sostituisce il precedente)</label>
+      <textarea id="announce-input" placeholder="Scrivi qui l'annuncio per tutti..." style="width:100%;min-height:90px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;"></textarea>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button>
+        <button class="btn-confirm" onclick="publishAnnouncement()">Pubblica</button>
+      </div>
+    `;
+  }
+
+  html += "<div style='margin-top:16px;'>";
+
+  if(!ann){
+    html += "<div class='todo-empty'>Nessun annuncio al momento.</div>";
+  } else {
+    const alreadyChecked = (ann.checkedBy || []).includes(currentUser);
+    html += `
+      <div class="day-detail" style="margin-top:0;">
+        <h4 style="display:block;">${escapeHtml(ann.date)}</h4>
+        <p style="font-size:14px;color:var(--text-main);white-space:pre-wrap;margin:0 0 14px;">${escapeHtml(ann.text)}</p>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" ${alreadyChecked ? "checked" : ""} onchange="toggleAnnouncementCheck()" style="width:18px;height:18px;accent-color:var(--accent);">
+          Ho letto
+        </label>
+    `;
+    if(canSeeCounts){
+      const count = (ann.checkedBy || []).length;
+      html += `<p style="font-size:12.5px;color:var(--text-muted);margin-top:10px;">✔ ${count} ${count===1 ? "persona ha" : "persone hanno"} messo il segno di spunta</p>`;
+    }
+    html += "</div>";
+  }
+
+  html += "</div>";
+
+  if(!canWrite){
+    html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button></div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+function publishAnnouncement(){
+  const text = document.getElementById("announce-input").value.trim();
+  if(!text){ alert("Scrivi un testo per l'annuncio."); return; }
+  const ann = {
+    text,
+    date: new Date().toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}),
+    checkedBy: []
+  };
+  saveAnnouncement(ann);
+  renderAnnouncementPanel();
+  refreshAnnouncementBadge();
+}
+
+function toggleAnnouncementCheck(){
+  const ann = loadAnnouncement();
+  if(!ann || !currentUser) return;
+  ann.checkedBy = ann.checkedBy || [];
+  const idx = ann.checkedBy.indexOf(currentUser);
+  if(idx === -1) ann.checkedBy.push(currentUser);
+  else ann.checkedBy.splice(idx,1);
+  saveAnnouncement(ann);
+  renderAnnouncementPanel();
+  refreshAnnouncementBadge();
+}
+
+document.getElementById("announce-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="announce-overlay") closeAnnouncementsPanel();
+});
+
+/* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
+if(!tryRestoreSession()){
+  document.getElementById("login-overlay").style.display = "flex";
+}
 
 switchView("day");
 </script>
