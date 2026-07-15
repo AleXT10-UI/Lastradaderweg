@@ -95,9 +95,33 @@
   .app{max-width:900px;width:100%;margin:0 auto;padding:10px;padding-bottom:80px;box-sizing:border-box;}
   .main-layout{display:flex;flex-direction:column;}
   .main-col{width:100%;}
-  .side-col{display:flex;flex-direction:column;gap:10px;order:-1;margin-bottom:4px;}
+  #side-detail-card{margin-bottom:4px;}
 
   .side-card{padding:14px;}
+
+  .day-view-toggle-mobile{
+    display:flex;gap:6px;background:var(--surface);border-radius:11px;padding:4px;margin-bottom:10px;
+    box-shadow:0 2px 10px var(--shadow-soft);
+  }
+  .day-view-toggle-mobile button{
+    flex:1;border:none;background:transparent;color:var(--head);padding:9px 8px;border-radius:8px;
+    font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;
+  }
+  .day-view-toggle-mobile button.active{
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;
+  }
+  .day-view-split{display:block;}
+  .day-view-split .mega-timeline-card.mobile-hidden,
+  .day-view-split #view-day-el.mobile-hidden{ display:none; }
+
+  @media (min-width:900px){
+    .day-view-toggle-mobile{ display:none; }
+    .day-view-split{
+      display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start;
+    }
+    .day-view-split .mega-timeline-card.mobile-hidden,
+    .day-view-split #view-day-el.mobile-hidden{ display:block; }
+  }
 
   @media (min-width:900px){
     .app{max-width:1200px;padding:20px;}
@@ -115,9 +139,8 @@
     .date-nav{padding:8px 12px;border-radius:12px;}
     .date-nav .date-label{font-size:16px;}
 
-    .main-layout{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;}
+    .main-layout{display:block;}
     .main-col{min-width:0;}
-    .side-col{position:sticky;top:20px;display:flex !important;flex-direction:column;gap:14px;}
 
     .card{border-radius:16px;}
     .resource-tabs{padding:14px 18px;gap:8px;}
@@ -128,6 +151,48 @@
     .mini-timeline-wrap{padding:16px 20px 10px;}
     .mini-timeline{height:40px;}
     .day-countdown{margin:0 18px 12px;padding:12px 16px;font-size:13.5px;}
+
+    .mega-timeline-card{ display:block; }
+    .mega-timeline-header{
+      padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;
+    }
+    .mega-timeline-title{font-size:14px;font-weight:700;color:var(--head);}
+    .mega-timeline-scroll{overflow-x:auto;overflow-y:hidden;}
+    .mega-timeline-grid{
+      display:grid;grid-template-columns:140px repeat(48, minmax(24px, 1fr));min-width:max-content;position:relative;
+    }
+    .mtl-corner{
+      position:sticky;left:0;z-index:3;background:var(--surface);border-right:2px solid var(--border);
+      border-bottom:1px solid var(--border);
+    }
+    .mtl-hour-label{
+      text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);padding:6px 0;
+      border-bottom:1px solid var(--border);border-right:1px solid var(--border);background:var(--bg-soft);
+      grid-column:span 2;
+    }
+    .mtl-res-label{
+      position:sticky;left:0;z-index:2;background:var(--surface);border-right:2px solid var(--border);
+      border-top:1px solid var(--border);padding:10px 14px;font-size:12.5px;font-weight:700;color:var(--head);
+      display:flex;align-items:center;gap:8px;
+    }
+    .mtl-res-label .mtl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .mtl-track{
+      position:relative;grid-column:span 48;border-top:1px solid var(--border);height:52px;
+      background-image:repeating-linear-gradient(to right, var(--bg-soft) 0, var(--bg-soft) calc(2 * (100% / 48)), var(--surface) calc(2 * (100% / 48)), var(--surface) calc(4 * (100% / 48)));
+    }
+    .mtl-block{
+      position:absolute;top:6px;height:40px;border-radius:7px;color:#fff;font-size:11px;font-weight:600;
+      padding:4px 8px;box-sizing:border-box;overflow:hidden;white-space:nowrap;cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;flex-direction:column;justify-content:center;gap:1px;
+      transition:transform .1s, box-shadow .1s;
+    }
+    .mtl-block:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.35);z-index:5;}
+    .mtl-block .mtl-block-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .mtl-block .mtl-block-time{font-size:9.5px;opacity:.9;}
+    .mtl-now-line{
+      position:absolute;top:0;bottom:0;width:2px;background:var(--now-line);z-index:4;pointer-events:none;
+    }
+    .mtl-empty{padding:24px;text-align:center;color:var(--text-muted);font-size:13px;}
 
     .slot-list{padding:14px 18px;max-height:none;}
     .slot{padding:14px 18px;border-radius:12px;}
@@ -404,23 +469,47 @@
   #login-overlay{
     position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
     background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
+    background-size:200% 200%;
+    animation:loginGradientShift 12s ease infinite;
+  }
+  @keyframes loginGradientShift{
+    0%{ background-position:0% 0%; }
+    50%{ background-position:100% 100%; }
+    100%{ background-position:0% 0%; }
   }
   .login-card{
-    background:var(--surface);border-radius:18px;padding:32px 26px;width:100%;max-width:360px;
-    box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center;
+    background:var(--surface);border-radius:22px;padding:38px 30px;width:100%;max-width:380px;
+    box-shadow:0 25px 70px rgba(0,0,0,.4), 0 0 0 1px var(--border);text-align:center;
+    animation:loginCardIn .45s cubic-bezier(.2,.8,.3,1);
   }
-  .login-logo{height:52px;margin-bottom:14px;}
-  .login-card h2{margin:0 0 18px;color:var(--head);font-size:20px;}
+  @keyframes loginCardIn{
+    from{ opacity:0; transform:translateY(14px) scale(.97); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .login-logo{
+    height:58px;margin-bottom:16px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.15));
+  }
+  .login-card h2{
+    margin:0 0 6px;color:var(--head);font-size:22px;font-weight:800;letter-spacing:-.3px;
+  }
+  .login-subtitle{margin:0 0 22px;color:var(--text-muted);font-size:12.5px;}
   .login-card input{
-    width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;
+    width:100%;padding:13px 14px;margin-bottom:12px;border:1.5px solid var(--border);border-radius:11px;
     font-size:16px;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;
+    transition:border-color .15s, box-shadow .15s, transform .1s;
   }
-  .login-card input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
-  .login-error{color:var(--danger);font-size:12.5px;min-height:16px;margin-bottom:8px;}
+  .login-card input:focus{
+    outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--focus-shadow);transform:translateY(-1px);
+  }
+  .login-error{color:var(--danger);font-size:12.5px;min-height:16px;margin-bottom:8px;font-weight:600;}
   .login-btn{
-    width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
-    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 4px 14px var(--accent-shadow);
+    width:100%;padding:14px;border:none;border-radius:11px;font-size:15.5px;font-weight:700;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;
+    box-shadow:0 6px 18px var(--accent-shadow);letter-spacing:.2px;
+    transition:transform .12s, box-shadow .12s;
   }
+  .login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px var(--accent-shadow);}
+  .login-btn:active{transform:translateY(0);}
 
   .captcha-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
   .captcha-box{
@@ -543,16 +632,16 @@
       font-size:13px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
     }
 
-    .side-col .day-detail{
+    #side-detail-card .day-detail{
       padding:8px 12px;margin-top:0;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;
       border-radius:10px;
     }
-    .side-col .day-detail h4{margin:0;font-size:11.5px;flex-shrink:1;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-    .side-col .today-badge{font-size:9px;padding:2px 7px;}
-    .side-col .month-mini-timeline-wrap{display:none;}
-    .side-col .day-detail .dd-item{display:none;}
-    .side-col .day-detail .dd-empty{display:none;}
-    .side-col .day-detail::after{
+    #side-detail-card .day-detail h4{margin:0;font-size:11.5px;flex-shrink:1;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+    #side-detail-card .today-badge{font-size:9px;padding:2px 7px;}
+    #side-detail-card .month-mini-timeline-wrap{display:none;}
+    #side-detail-card .day-detail .dd-item{display:none;}
+    #side-detail-card .day-detail .dd-empty{display:none;}
+    #side-detail-card .day-detail::after{
       content:attr(data-count);font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;margin-left:auto;
     }
 
@@ -576,6 +665,7 @@
   <div class="login-card">
     <img src="L.jpg" alt="Logo" class="login-logo">
     <h2>Accedi</h2>
+    <p class="login-subtitle">Gestionale La Strada der Weg</p>
     <input type="text" id="login-username" placeholder="Nome utente" autocomplete="username">
     <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
     <div class="captcha-row">
@@ -640,25 +730,47 @@
         </div>
       </div>
 
-      <div class="card" id="view-day-el">
-        <div class="day-toolbar">
-          <div class="resource-tabs" id="resource-tabs"></div>
-          <div class="toolbar-actions">
-            <button class="manage-res-btn" onclick="openManageResourcesModal()" title="Gestisci risorse">
-              <span aria-hidden="true">⚙</span><span class="dup-txt">Risorse</span>
-            </button>
-            <button class="duplicate-day-btn" onclick="openDuplicateModal()" title="Duplica tutti gli eventi di questo giorno">
-              <span aria-hidden="true">⧉</span><span class="dup-txt">Duplica giorno</span>
-            </button>
+      <div class="card side-card" id="side-detail-card">
+        <div id="month-detail"></div>
+      </div>
+
+      <div id="day-view-wrapper">
+        <div class="day-view-toggle-mobile">
+          <button id="dvt-timeline" class="active" onclick="switchDayPanel('timeline')">📊 Timeline</button>
+          <button id="dvt-list" onclick="switchDayPanel('list')">📋 Lista orari</button>
+        </div>
+
+        <div class="day-view-split">
+          <div class="card mega-timeline-card" id="mega-timeline-card">
+            <div class="mega-timeline-header">
+              <span class="mega-timeline-title">Timeline giornaliera</span>
+            </div>
+            <div class="mega-timeline-scroll">
+              <div class="mega-timeline-grid" id="mega-timeline-grid"></div>
+            </div>
+          </div>
+
+          <div class="card mobile-hidden" id="view-day-el">
+            <div class="day-toolbar">
+              <div class="resource-tabs" id="resource-tabs"></div>
+              <div class="toolbar-actions">
+                <button class="manage-res-btn" onclick="openManageResourcesModal()" title="Gestisci risorse">
+                  <span aria-hidden="true">⚙</span><span class="dup-txt">Risorse</span>
+                </button>
+                <button class="duplicate-day-btn" onclick="openDuplicateModal()" title="Duplica tutti gli eventi di questo giorno">
+                  <span aria-hidden="true">⧉</span><span class="dup-txt">Duplica giorno</span>
+                </button>
+              </div>
+            </div>
+            <div class="mini-timeline-wrap">
+              <div class="mini-timeline" id="mini-timeline"></div>
+              <div class="mini-timeline-labels"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>
+            </div>
+            <div class="allday-chips" id="allday-chips" style="display:none;"></div>
+            <div class="day-countdown" id="day-countdown" style="display:none;"></div>
+            <div class="slot-list" id="slot-list"></div>
           </div>
         </div>
-        <div class="mini-timeline-wrap">
-          <div class="mini-timeline" id="mini-timeline"></div>
-          <div class="mini-timeline-labels"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>
-        </div>
-        <div class="allday-chips" id="allday-chips" style="display:none;"></div>
-        <div class="day-countdown" id="day-countdown" style="display:none;"></div>
-        <div class="slot-list" id="slot-list"></div>
       </div>
 
       <div class="card" id="view-week-el" style="display:none;">
@@ -683,12 +795,6 @@
           <div class="todo-list" id="todo-list"></div>
         </div>
         <div class="agenda-list" id="agenda-list"></div>
-      </div>
-    </div>
-
-    <div class="side-col">
-      <div class="card side-card" id="side-detail-card">
-        <div id="month-detail"></div>
       </div>
     </div>
   </div>
@@ -1181,13 +1287,33 @@ function populateSearchResourceFilter(){
   sel.value = current;
 }
 
+function switchDayPanel(panel){
+  const timelineCard = document.getElementById("mega-timeline-card");
+  const listCard = document.getElementById("view-day-el");
+  const btnTimeline = document.getElementById("dvt-timeline");
+  const btnList = document.getElementById("dvt-list");
+  if(!timelineCard || !listCard) return;
+
+  if(panel === "timeline"){
+    timelineCard.classList.remove("mobile-hidden");
+    listCard.classList.add("mobile-hidden");
+    btnTimeline.classList.add("active");
+    btnList.classList.remove("active");
+  } else {
+    timelineCard.classList.add("mobile-hidden");
+    listCard.classList.remove("mobile-hidden");
+    btnTimeline.classList.remove("active");
+    btnList.classList.add("active");
+  }
+}
+
 function switchView(view){
   currentView = view;
   document.getElementById("tab-day").classList.toggle("active", view==="day");
   document.getElementById("tab-week").classList.toggle("active", view==="week");
   document.getElementById("tab-month").classList.toggle("active", view==="month");
   document.getElementById("tab-agenda").classList.toggle("active", view==="agenda");
-  document.getElementById("view-day-el").style.display = view==="day" ? "" : "none";
+  document.getElementById("day-view-wrapper").style.display = view==="day" ? "" : "none";
   document.getElementById("view-week-el").style.display = view==="week" ? "" : "none";
   document.getElementById("view-month-el").style.display = view==="month" ? "" : "none";
   document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
@@ -1438,6 +1564,83 @@ function renderDayView(){
     slot.appendChild(left);
     slot.appendChild(iconSpan);
     listEl.appendChild(slot);
+  }
+
+  renderMegaTimeline(key);
+}
+
+function renderMegaTimeline(key){
+  const grid = document.getElementById("mega-timeline-grid");
+  if(!grid) return;
+  grid.innerHTML = "";
+
+  const corner = document.createElement("div");
+  corner.className = "mtl-corner";
+  grid.appendChild(corner);
+
+  for(let h=0; h<24; h++){
+    const label = document.createElement("div");
+    label.className = "mtl-hour-label";
+    label.textContent = String(h).padStart(2,"0");
+    grid.appendChild(label);
+  }
+
+  if(RESOURCES.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "mtl-empty";
+    empty.textContent = "Nessuna risorsa. Aggiungine una dal pannello Risorse.";
+    grid.appendChild(empty);
+    return;
+  }
+
+  const allItems = bookings[key] || [];
+
+  RESOURCES.forEach(res=>{
+    const label = document.createElement("div");
+    label.className = "mtl-res-label";
+    const colors = getResourceColor(res);
+    label.innerHTML = "<span class='mtl-dot' style='background:"+colors[0]+";'></span>"+escapeHtml(res);
+    grid.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "mtl-track";
+
+    const items = allItems.filter(b=>b.res===res);
+    items.forEach(it=>{
+      const block = document.createElement("div");
+      block.className = "mtl-block";
+      const startPct = (it.allDay ? 0 : it.start) / 24 * 100;
+      const endPct = (it.allDay ? 24 : it.end) / 24 * 100;
+      block.style.left = startPct + "%";
+      block.style.width = (endPct - startPct) + "%";
+      block.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
+      block.onclick = ()=>{ showEventDetail(key, it.id); };
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "mtl-block-name";
+      nameEl.textContent = it.label;
+      const timeEl = document.createElement("div");
+      timeEl.className = "mtl-block-time";
+      timeEl.textContent = it.allDay ? "Tutto il giorno" : (fmtHourLabel(it.start)+"–"+fmtHourLabel(it.end));
+
+      block.appendChild(nameEl);
+      block.appendChild(timeEl);
+      block.title = res + " — " + it.label + " (" + timeEl.textContent + ")";
+      track.appendChild(block);
+    });
+
+    grid.appendChild(track);
+  });
+
+  if(sameDay(currentDate, todayDate())){
+    const now = new Date();
+    const pct = (now.getHours() + now.getMinutes()/60) / 24 * 100;
+    const nowLine = document.createElement("div");
+    nowLine.className = "mtl-now-line";
+    nowLine.style.left = "calc(140px + (100% - 140px) * " + (pct/100) + ")";
+    nowLine.style.top = "0";
+    nowLine.style.bottom = "0";
+    grid.appendChild(nowLine);
   }
 }
 
@@ -2210,6 +2413,38 @@ if(!tryRestoreSession()){
 }
 
 switchView("day");
+
+/* Swipe orizzontale su mobile per cambiare giorno/settimana/mese */
+(function(){
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  const SWIPE_MIN_DIST = 60;
+  const SWIPE_MAX_OFF_AXIS = 60;
+  const SWIPE_MAX_TIME = 600;
+
+  document.addEventListener("touchstart", (e)=>{
+    if(e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, {passive:true});
+
+  document.addEventListener("touchend", (e)=>{
+    if(!e.changedTouches || e.changedTouches.length !== 1) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    if(dt > SWIPE_MAX_TIME) return;
+    if(Math.abs(dy) > SWIPE_MAX_OFF_AXIS) return;
+    if(Math.abs(dx) < SWIPE_MIN_DIST) return;
+
+    const target = e.target;
+    if(target.closest(".mega-timeline-scroll, .timeline-scroll")) return;
+
+    if(dx > 0) navPrev();
+    else navNext();
+  }, {passive:true});
+})();
 </script>
 
 </body>
