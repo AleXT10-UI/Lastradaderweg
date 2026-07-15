@@ -40,6 +40,15 @@
     --warn-bg:#fff4e0;
     --warn-text:#a15c00;
     --warn-border:#f0d08a;
+
+    /* --- Sistema di spaziatura (scala 4px), solo per il layout desktop --- */
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+    /* --- Scala tipografica desktop --- */
+    --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-md:15px; --fs-lg:17px; --fs-xl:20px; --fs-2xl:26px;
+    /* --- Raggi e ombre coerenti --- */
+    --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
+    --shadow-card:0 1px 2px rgba(90,10,10,.06), 0 8px 24px -8px rgba(90,10,10,.16);
+    --shadow-card-hover:0 2px 4px rgba(90,10,10,.08), 0 14px 32px -10px rgba(90,10,10,.22);
   }
 
   body.dark-mode{
@@ -84,7 +93,9 @@
     min-height:100%;
   }
   body{
-    font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-feature-settings:"tnum" 1;
+    margin:0;
     background:linear-gradient(160deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
     min-height:100vh;min-height:100dvh;color:var(--text-main);
     overscroll-behavior-y:contain;
@@ -158,93 +169,111 @@
   @media (min-width:900px){
     .day-view-toggle-mobile{ display:none; }
     .day-view-split{
-      display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start;
+      display:grid;grid-template-columns:1.6fr 1fr;gap:var(--sp-5);align-items:start;
     }
     .day-view-split .mega-timeline-card.mobile-hidden,
     .day-view-split #view-day-el.mobile-hidden{ display:block; }
+    #side-detail-card{ width:calc((100% - 20px) * 1.6 / 2.6); margin-bottom:var(--sp-4); }
+    .date-nav{ width:calc((100% - 20px) * 1.6 / 2.6); padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-sm);margin-bottom:var(--sp-4);box-shadow:var(--shadow-card); }
   }
 
   @media (min-width:900px){
-    .app{max-width:1200px;padding:20px;}
+    .app{max-width:1280px;padding:var(--sp-6) var(--sp-8);}
 
-    header{padding:14px 20px;border-radius:14px;}
-    header h1{font-size:21px;}
-    header img{height:44px;}
+    header{padding:var(--sp-3) var(--sp-5);border-radius:var(--radius-md);margin-bottom:var(--sp-4);box-shadow:var(--shadow-card);}
+    header h1{font-size:var(--fs-xl);font-weight:700;letter-spacing:-.2px;}
+    header img{height:38px;}
 
-    .search-bar{padding:12px 16px;border-radius:12px;}
-    .search-bar input{font-size:16px;}
+    .search-bar{padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-sm);}
+    .search-bar input{font-size:var(--fs-base);}
 
-    .view-switch{padding:5px;border-radius:13px;max-width:480px;}
-    .view-switch button{font-size:14.5px;padding:11px 14px;}
+    .view-switch{padding:var(--sp-1);border-radius:var(--radius-sm);max-width:420px;margin-bottom:var(--sp-4);box-shadow:var(--shadow-card);}
+    .view-switch button{font-size:var(--fs-sm);padding:var(--sp-2) var(--sp-4);font-weight:600;}
 
-    .date-nav{padding:8px 12px;border-radius:12px;}
-    .date-nav .date-label{font-size:16px;}
+    .date-nav .date-label{font-size:var(--fs-md);font-weight:600;}
 
     .main-layout{display:block;}
     .main-col{min-width:0;}
 
-    .card{border-radius:16px;}
-    .resource-tabs{padding:14px 18px;gap:8px;}
-    .resource-tabs button{padding:9px 16px;font-size:13px;}
-    .duplicate-day-btn, .manage-res-btn{padding:9px 16px;font-size:13px;}
-    .toolbar-actions{margin-right:18px;}
+    .week-month-split{
+      display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:start;
+    }
+    .week-month-split .card{margin-bottom:0;}
+    .week-list{max-height:640px;overflow-y:auto;}
 
-    .mini-timeline-wrap{padding:16px 20px 10px;}
-    .mini-timeline{height:40px;}
-    .day-countdown{margin:0 18px 12px;padding:12px 16px;font-size:13.5px;}
+    .agenda-top-split{
+      display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);
+    }
+    .agenda-top-split .agenda-notes, .agenda-top-split .todo-section{
+      border-bottom:none;border-right:1px solid var(--border);
+    }
+    .agenda-top-split .todo-section{border-right:none;}
+
+    .card{border-radius:var(--radius-md);box-shadow:var(--shadow-card);border:1px solid rgba(0,0,0,.03);}
+    .resource-tabs{padding:var(--sp-4) var(--sp-5);gap:var(--sp-2);}
+    .resource-tabs button{padding:var(--sp-2) var(--sp-4);font-size:var(--fs-sm);font-weight:600;}
+    .duplicate-day-btn, .manage-res-btn{padding:var(--sp-2) var(--sp-4);font-size:var(--fs-sm);}
+    .toolbar-actions{margin-right:var(--sp-5);}
+
+    .mini-timeline-wrap{padding:var(--sp-4) var(--sp-5) var(--sp-2);}
+    .mini-timeline{height:36px;}
+    .day-countdown{margin:0 var(--sp-5) var(--sp-3);padding:var(--sp-3) var(--sp-4);font-size:var(--fs-sm);}
 
     .mega-timeline-card{ display:block; }
     .mega-timeline-header{
-      padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;
+      padding:var(--sp-4) var(--sp-5);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;
     }
-    .mega-timeline-title{font-size:14px;font-weight:700;color:var(--head);}
+    .mega-timeline-title{font-size:var(--fs-base);font-weight:700;color:var(--head);letter-spacing:-.1px;}
     .mega-timeline-scroll{overflow-x:auto;overflow-y:hidden;}
     .mega-timeline-grid{
-      display:grid;grid-template-columns:140px repeat(48, minmax(24px, 1fr));min-width:max-content;position:relative;
+      display:grid;grid-template-columns:130px repeat(48, minmax(22px, 1fr));min-width:max-content;position:relative;
     }
     .mtl-corner{
       position:sticky;left:0;z-index:3;background:var(--surface);border-right:2px solid var(--border);
       border-bottom:1px solid var(--border);
     }
     .mtl-hour-label{
-      text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);padding:6px 0;
+      text-align:center;font-size:var(--fs-xs);font-weight:600;color:var(--text-muted);padding:var(--sp-2) 0;
       border-bottom:1px solid var(--border);border-right:1px solid var(--border);background:var(--bg-soft);
       grid-column:span 2;
     }
     .mtl-res-label{
       position:sticky;left:0;z-index:2;background:var(--surface);border-right:2px solid var(--border);
-      border-top:1px solid var(--border);padding:10px 14px;font-size:12.5px;font-weight:700;color:var(--head);
-      display:flex;align-items:center;gap:8px;
+      border-top:1px solid var(--border);padding:var(--sp-3) var(--sp-4);font-size:var(--fs-sm);font-weight:700;color:var(--head);
+      display:flex;align-items:center;gap:var(--sp-2);
     }
-    .mtl-res-label .mtl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .mtl-res-label .mtl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
     .mtl-track{
-      position:relative;grid-column:span 48;border-top:1px solid var(--border);height:52px;
+      position:relative;grid-column:span 48;border-top:1px solid var(--border);height:50px;
       background-image:repeating-linear-gradient(to right, var(--bg-soft) 0, var(--bg-soft) calc(2 * (100% / 48)), var(--surface) calc(2 * (100% / 48)), var(--surface) calc(4 * (100% / 48)));
     }
     .mtl-block{
-      position:absolute;top:6px;height:40px;border-radius:7px;color:#fff;font-size:11px;font-weight:600;
+      position:absolute;top:6px;height:38px;border-radius:7px;color:#fff;font-size:var(--fs-xs);font-weight:600;
       padding:4px 8px;box-sizing:border-box;overflow:hidden;white-space:nowrap;cursor:pointer;
-      box-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;flex-direction:column;justify-content:center;gap:1px;
-      transition:transform .1s, box-shadow .1s;
+      box-shadow:0 2px 6px rgba(0,0,0,.22);display:flex;flex-direction:column;justify-content:center;gap:1px;
+      transition:transform .12s ease, box-shadow .12s ease;
     }
-    .mtl-block:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.35);z-index:5;}
+    .mtl-block:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:5;}
     .mtl-block .mtl-block-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .mtl-block .mtl-block-time{font-size:9.5px;opacity:.9;}
+    .mtl-block .mtl-block-time{font-size:10px;opacity:.9;}
     .mtl-now-line{
       position:absolute;top:0;bottom:0;width:2px;background:var(--now-line);z-index:4;pointer-events:none;
     }
-    .mtl-empty{padding:24px;text-align:center;color:var(--text-muted);font-size:13px;}
+    .mtl-empty{padding:var(--sp-6);text-align:center;color:var(--text-muted);font-size:var(--fs-sm);}
 
-    .slot-list{padding:14px 18px;max-height:none;}
-    .slot{padding:14px 18px;border-radius:12px;}
-    .slot-time{font-size:14.5px;}
+    .slot-list{padding:var(--sp-3) var(--sp-5);max-height:none;}
+    .slot{padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-sm);}
+    .slot-time{font-size:var(--fs-md);font-weight:600;}
 
-    .week-list{padding:16px;}
-    .month-grid{padding:18px;gap:6px;}
-    .month-cell{border-radius:12px;}
+    .week-list{padding:var(--sp-4);}
+    .month-grid{padding:var(--sp-5);gap:var(--sp-1);}
+    .month-cell{border-radius:var(--radius-sm);}
 
-    .fab{width:64px;height:64px;font-size:28px;bottom:28px;right:28px;box-shadow:0 8px 22px var(--accent-shadow);}
-    .fab:hover{transform:scale(1.06);}
+    .fab{
+      width:56px;height:56px;font-size:24px;bottom:var(--sp-6);right:var(--sp-6);
+      box-shadow:0 4px 14px var(--accent-shadow), 0 1px 3px rgba(0,0,0,.1);
+    }
+    .fab:hover{transform:translateY(-2px);box-shadow:0 8px 22px var(--accent-shadow), 0 2px 5px rgba(0,0,0,.12);}
   }
 
   header{display:flex;align-items:center;gap:10px;background:var(--surface);padding:8px 12px;border-radius:11px;box-shadow:0 3px 14px var(--shadow-strong);margin-bottom:10px;}
@@ -759,7 +788,6 @@
         <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true">☀️</span>Giorno</button>
         <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true">📅</span>Settimana</button>
         <button id="tab-agenda" onclick="switchView('agenda')"><span aria-hidden="true">📋</span>Agenda</button>
-        <button id="tab-month" onclick="switchView('month')"><span aria-hidden="true">🗓️</span>Mese</button>
       </div>
 
       <div class="date-nav">
@@ -814,26 +842,30 @@
         </div>
       </div>
 
-      <div class="card" id="view-week-el" style="display:none;">
-        <div class="week-list" id="week-list"></div>
-      </div>
+      <div class="week-month-split" id="week-month-split">
+        <div class="card" id="view-week-el" style="display:none;">
+          <div class="week-list" id="week-list"></div>
+        </div>
 
-      <div class="card" id="view-month-el" style="display:none;">
-        <div class="month-grid" id="month-grid"></div>
+        <div class="card" id="view-month-el" style="display:none;">
+          <div class="month-grid" id="month-grid"></div>
+        </div>
       </div>
 
       <div class="card" id="view-agenda-el" style="display:none;">
-        <div class="agenda-notes">
-          <div class="agenda-notes-title">📝 Appunti</div>
-          <textarea id="agenda-notes-input" placeholder="Scrivi qui appunti generali, promemoria, cose da ricordare..." oninput="saveAgendaNotes()"></textarea>
-        </div>
-        <div class="todo-section">
-          <div class="agenda-notes-title">☑ Da fare</div>
-          <div class="todo-add-row">
-            <input type="text" id="todo-input" placeholder="Nuovo elemento..." onkeydown="if(event.key==='Enter') addTodo()">
-            <button onclick="addTodo()">Aggiungi</button>
+        <div class="agenda-top-split">
+          <div class="agenda-notes">
+            <div class="agenda-notes-title">📝 Appunti</div>
+            <textarea id="agenda-notes-input" placeholder="Scrivi qui appunti generali, promemoria, cose da ricordare..." oninput="saveAgendaNotes()"></textarea>
           </div>
-          <div class="todo-list" id="todo-list"></div>
+          <div class="todo-section">
+            <div class="agenda-notes-title">☑ Da fare</div>
+            <div class="todo-add-row">
+              <input type="text" id="todo-input" placeholder="Nuovo elemento..." onkeydown="if(event.key==='Enter') addTodo()">
+              <button onclick="addTodo()">Aggiungi</button>
+            </div>
+            <div class="todo-list" id="todo-list"></div>
+          </div>
         </div>
         <div class="agenda-list" id="agenda-list"></div>
       </div>
@@ -1352,11 +1384,14 @@ function switchView(view){
   currentView = view;
   document.getElementById("tab-day").classList.toggle("active", view==="day");
   document.getElementById("tab-week").classList.toggle("active", view==="week");
-  document.getElementById("tab-month").classList.toggle("active", view==="month");
   document.getElementById("tab-agenda").classList.toggle("active", view==="agenda");
   document.getElementById("day-view-wrapper").style.display = view==="day" ? "" : "none";
+
+  const isDesktop = window.matchMedia("(min-width:900px)").matches;
+  const showMonthAlongsideWeek = isDesktop && view==="week";
+
   document.getElementById("view-week-el").style.display = view==="week" ? "" : "none";
-  document.getElementById("view-month-el").style.display = view==="month" ? "" : "none";
+  document.getElementById("view-month-el").style.display = showMonthAlongsideWeek ? "" : "none";
   document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
   document.querySelector(".date-nav").style.display = view==="agenda" ? "none" : "flex";
   renderAll();
@@ -1391,9 +1426,11 @@ function goToday(){
 function renderAll(){
   updateDateLabel();
   if(currentView==="day") renderDayView();
-  else if(currentView==="week") renderWeekView();
+  else if(currentView==="week"){
+    renderWeekView();
+    if(window.matchMedia("(min-width:900px)").matches) renderMonthView();
+  }
   else if(currentView==="agenda") renderAgendaView();
-  else renderMonthView();
 }
 
 function updateDateLabel(){
@@ -2454,6 +2491,14 @@ if(!tryRestoreSession()){
 }
 
 switchView("day");
+
+let resizeDebounceTimer = null;
+window.addEventListener("resize", ()=>{
+  clearTimeout(resizeDebounceTimer);
+  resizeDebounceTimer = setTimeout(()=>{
+    if(currentUser) switchView(currentView);
+  }, 200);
+});
 
 /* Swipe orizzontale su mobile per cambiare giorno/settimana/mese */
 (function(){
