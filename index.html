@@ -118,13 +118,19 @@
     --shadow-card-hover:0 2px 4px rgba(0,0,0,.45), 0 14px 32px -10px rgba(0,0,0,.6);
     --shadow-pop:0 24px 60px -12px rgba(0,0,0,.7);
   }
+  body.dark-mode{ background:var(--bg); }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{overflow-x:hidden;background:var(--bg);min-height:100%;}
   body{
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     font-feature-settings:"tnum" 1;
-    margin:0;background:var(--bg);
+    margin:0;
+    background:
+      radial-gradient(1100px 700px at 12% -8%, rgba(192,57,47,.07), transparent 55%),
+      radial-gradient(900px 700px at 105% 15%, rgba(192,57,47,.05), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;
     min-height:100vh;min-height:100dvh;color:var(--text-main);
     overscroll-behavior-y:contain;overflow-x:hidden;
     padding-top:env(safe-area-inset-top);
@@ -327,7 +333,7 @@
   .day-view-split #view-day-el.mobile-hidden{display:none;}
 
   /* ---------- Layout desktop ---------- */
-  @media (min-width:900px){
+  @media (min-width:1100px){
     .day-view-toggle-mobile{display:none;}
     .day-view-split{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--sp-5);align-items:start;}
     .day-view-split .mega-timeline-card.mobile-hidden,
@@ -336,7 +342,7 @@
     .date-nav{width:calc((100% - 20px) * 1.6 / 2.6);margin-bottom:var(--sp-4);}
   }
 
-  @media (min-width:900px){
+  @media (min-width:1100px){
     .app{max-width:1280px;padding:var(--sp-6) var(--sp-8);}
 
     header{padding:var(--sp-3) var(--sp-5);margin-bottom:var(--sp-4);}
@@ -353,6 +359,13 @@
 
     .week-month-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:start;}
     .week-month-split .card{margin-bottom:0;}
+
+    /* In vista Settimana, allinea intestazione e navigazione data alla larghezza
+       della colonna sinistra (settimana) invece di estendersi su tutta l'area */
+    body.view-is-week .view-switch,
+    body.view-is-week .date-nav{
+      width:calc((100% - var(--sp-5)) / 2);
+    }
     .week-list{max-height:640px;overflow-y:auto;}
 
     .agenda-top-split{display:grid;grid-template-columns:1fr 1fr;gap:0;}
@@ -518,11 +531,11 @@
   .day-countdown.upcoming{background:var(--warn-bg);color:var(--warn-text);border:1px solid var(--warn-border);}
   .day-countdown.ongoing{background:var(--busy-bg);color:var(--busy-text);border:1px solid var(--busy-border);}
 
-  .slot-now-line{position:relative;display:flex;align-items:center;gap:8px;margin:2px 0;}
-  .slot-now-line::before, .slot-now-line::after{content:"";flex:1;height:2px;background:var(--now-line);border-radius:2px;}
+  .slot-now-line{position:relative;display:flex;align-items:center;gap:8px;margin:6px 2px;}
+  .slot-now-line::before, .slot-now-line::after{content:"";flex:1;height:1.5px;background:var(--now-line);border-radius:2px;opacity:.55;}
   .slot-now-line span{
-    font-size:10.5px;font-weight:700;color:#fff;background:var(--now-line);padding:3px 10px;
-    border-radius:999px;white-space:nowrap;box-shadow:0 2px 5px rgba(225,29,72,.35);
+    font-size:10px;font-weight:700;color:#fff;background:var(--now-line);padding:3px 9px;
+    border-radius:999px;white-space:nowrap;box-shadow:0 2px 5px rgba(225,29,72,.3);letter-spacing:.02em;
   }
 
   /* ---------- Vista settimana ---------- */
@@ -1447,8 +1460,9 @@ function switchView(view){
   document.getElementById("tab-week").classList.toggle("active", view==="week");
   document.getElementById("tab-agenda").classList.toggle("active", view==="agenda");
   document.getElementById("day-view-wrapper").style.display = view==="day" ? "" : "none";
+  document.body.classList.toggle("view-is-week", view==="week");
 
-  const isDesktop = window.matchMedia("(min-width:900px)").matches;
+  const isDesktop = window.matchMedia("(min-width:1100px)").matches;
   const showMonthAlongsideWeek = isDesktop && view==="week";
 
   document.getElementById("view-week-el").style.display = view==="week" ? "" : "none";
@@ -1489,7 +1503,7 @@ function renderAll(){
   if(currentView==="day") renderDayView();
   else if(currentView==="week"){
     renderWeekView();
-    if(window.matchMedia("(min-width:900px)").matches) renderMonthView();
+    if(window.matchMedia("(min-width:1100px)").matches) renderMonthView();
   }
   else if(currentView==="agenda") renderAgendaView();
 }
@@ -2569,7 +2583,12 @@ window.addEventListener("resize", ()=>{
   const SWIPE_MAX_OFF_AXIS = 60;
   const SWIPE_MAX_TIME = 600;
 
+  function anyModalOpen(){
+    return !!document.querySelector(".modal-overlay.open");
+  }
+
   document.addEventListener("touchstart", (e)=>{
+    if(anyModalOpen()) return;
     if(e.touches.length !== 1) return;
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
@@ -2577,6 +2596,7 @@ window.addEventListener("resize", ()=>{
   }, {passive:true});
 
   document.addEventListener("touchend", (e)=>{
+    if(anyModalOpen()) return;
     if(!e.changedTouches || e.changedTouches.length !== 1) return;
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = e.changedTouches[0].clientY - touchStartY;
@@ -2593,6 +2613,13 @@ window.addEventListener("resize", ()=>{
     else navNext();
   }, {passive:true});
 })();
+
+/* Impedisce che un tap che chiude un modal "passi attraverso" e attivi un
+   elemento sottostante (problema noto su mobile con overlay + touch events) */
+document.querySelectorAll(".modal-overlay").forEach(overlay=>{
+  overlay.addEventListener("touchstart", (e)=>{ e.stopPropagation(); }, {passive:true});
+  overlay.addEventListener("touchend", (e)=>{ e.stopPropagation(); }, {passive:false});
+});
 </script>
 
 </body>
