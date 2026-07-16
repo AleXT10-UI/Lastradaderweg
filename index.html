@@ -70,6 +70,7 @@
     --shadow-card:0 1px 2px rgba(30,25,20,.05), 0 6px 20px -8px rgba(30,25,20,.10);
     --shadow-card-hover:0 2px 4px rgba(30,25,20,.06), 0 12px 28px -10px rgba(30,25,20,.14);
     --shadow-pop:0 24px 60px -12px rgba(30,25,20,.30);
+    --neon-glow:none;
   }
 
   body.dark-mode{
@@ -83,8 +84,9 @@
     --accent:#ff0084;
     --accent-dark:#c8006a;
     --accent-soft:#3a1029;
-    --accent-shadow:rgba(255,0,132,.35);
-    --focus-shadow:rgba(255,0,132,.20);
+    --accent-shadow:rgba(255,0,132,.55);
+    --focus-shadow:rgba(255,0,132,.35);
+    --neon-glow:0 0 8px rgba(255,0,132,.7), 0 0 20px rgba(255,0,132,.45), 0 0 40px rgba(255,0,132,.25);
 
     --head:#f2efe9;
     --text-main:#dcd8d0;
@@ -121,6 +123,17 @@
   body.dark-mode{ background:var(--bg); }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+  /* Tutte le icone/emoji dell'app in bianco e nero (desaturate).
+     Esclusi i pallini colorati delle risorse (.mtl-dot, .rm-dot), che
+     servono a distinguere le risorse per colore, non sono decorazioni. */
+  span[aria-hidden="true"], .ab-icon, .search-icon,
+  #theme-toggle, #search-toggle, #users-toggle, #announce-toggle, #logout-toggle,
+  .todo-del, .wi-del, .dd-del, .rm-delete, .rm-handle{
+    filter:grayscale(1);
+  }
+  #search-toggle.active{filter:none;}
+
   html{overflow-x:hidden;background:var(--bg);min-height:100%;}
   body{
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -290,7 +303,7 @@
     overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
   }
   .view-switch button i{font-size:16px;flex-shrink:0;}
-  .view-switch button.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-shadow);}
+  .view-switch button.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-shadow), var(--neon-glow);}
 
   /* ---------- Navigazione data ---------- */
   .date-nav{
@@ -539,7 +552,7 @@
   }
   .resource-tabs button:hover{border-color:var(--border-strong);}
   .resource-tabs button.active{
-    background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px var(--accent-shadow);
+    background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px var(--accent-shadow), var(--neon-glow);
   }
 
   /* ---------- Mini timeline ---------- */
@@ -669,7 +682,7 @@
   .fab{
     position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;
     background:var(--accent);color:#fff;border:none;font-size:26px;
-    box-shadow:0 6px 18px var(--accent-shadow);cursor:pointer;z-index:60;
+    box-shadow:0 6px 18px var(--accent-shadow), var(--neon-glow);cursor:pointer;z-index:60;
     display:flex;align-items:center;justify-content:center;transition:transform .12s,background .15s,box-shadow .15s;
   }
   .fab:hover{background:var(--accent-dark);}
@@ -713,8 +726,14 @@
   #login-overlay{
     position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
     background:
-      radial-gradient(900px 600px at 15% -10%, rgba(192,57,47,.20), transparent 60%),
-      radial-gradient(800px 600px at 110% 110%, rgba(192,57,47,.14), transparent 60%),
+      radial-gradient(1100px 800px at 15% -10%, rgba(192,57,47,.75), transparent 65%),
+      radial-gradient(1000px 800px at 110% 110%, rgba(192,57,47,.6), transparent 65%),
+      var(--bg);
+  }
+  body.dark-mode #login-overlay{
+    background:
+      radial-gradient(1100px 800px at 15% -10%, rgba(255,0,132,.55), transparent 65%),
+      radial-gradient(1000px 800px at 110% 110%, rgba(255,0,132,.42), transparent 65%),
       var(--bg);
   }
   .login-card{
@@ -726,7 +745,35 @@
     from{opacity:0;transform:translateY(14px) scale(.97);}
     to{opacity:1;transform:translateY(0) scale(1);}
   }
-  .login-logo{height:56px;margin-bottom:var(--sp-4);border-radius:var(--radius-md);}
+  #login-theme-toggle{
+    position:fixed;top:20px;right:20px;z-index:501;
+    border:1px solid var(--border);background:var(--surface);color:var(--head);
+    width:38px;height:38px;border-radius:var(--radius-sm);font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s,border-color .15s;
+    filter:grayscale(1);
+  }
+  #login-theme-toggle:hover{background:var(--bg-soft);}
+  .login-lang-switch{
+    display:flex;justify-content:center;gap:6px;margin-bottom:var(--sp-4);
+  }
+  .login-lang-switch .lang-btn{
+    border:1px solid var(--border);background:var(--surface);color:var(--text-muted);
+    padding:5px 12px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+    cursor:pointer;transition:background .15s,color .15s,border-color .15s;
+  }
+  .login-lang-switch .lang-btn:hover{background:var(--bg-soft);}
+  .login-lang-switch .lang-btn.active{
+    background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--neon-glow);
+  }
+  .login-logo{
+    height:56px;margin-bottom:var(--sp-4);border-radius:var(--radius-md);
+    mix-blend-mode:multiply;transition:filter .2s, mix-blend-mode .2s;
+  }
+  body.dark-mode .login-logo{
+    filter:invert(1) hue-rotate(160deg) saturate(2.4);
+    mix-blend-mode:screen;
+  }
   .login-card h2{margin:0 0 4px;color:var(--head);font-size:22px;font-weight:800;letter-spacing:-.02em;}
   .login-subtitle{margin:0 0 var(--sp-6);color:var(--text-muted);font-size:var(--fs-sm);}
   .login-card input{
@@ -738,7 +785,7 @@
   .login-error{color:var(--danger);font-size:var(--fs-xs);min-height:16px;margin-bottom:8px;font-weight:600;}
   .login-btn{
     width:100%;padding:14px;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;
-    background:var(--accent);color:#fff;box-shadow:0 6px 18px var(--accent-shadow);letter-spacing:.01em;
+    background:var(--accent);color:#fff;box-shadow:0 6px 18px var(--accent-shadow), var(--neon-glow);letter-spacing:.01em;
     transition:transform .12s, background .15s, box-shadow .15s;
   }
   .login-btn:hover{background:var(--accent-dark);transform:translateY(-1px);}
@@ -753,9 +800,12 @@
   .captcha-refresh{
     border:1px solid var(--border);background:var(--surface);color:var(--head);
     border-radius:var(--radius-sm);padding:11px 14px;cursor:pointer;font-size:16px;flex-shrink:0;
-    transition:background .15s,transform .2s;
+    transition:background .15s;
+    display:flex;align-items:center;justify-content:center;
   }
-  .captcha-refresh:hover{background:var(--bg-soft);transform:rotate(90deg);}
+  .captcha-refresh-icon{display:inline-block;transition:transform .35s cubic-bezier(.2,.8,.3,1);}
+  .captcha-refresh:hover{background:var(--bg-soft);}
+  .captcha-refresh:hover .captcha-refresh-icon{transform:rotate(180deg);}
 
   #loading-overlay{
     display:none;position:fixed;inset:0;z-index:600;flex-direction:column;align-items:center;justify-content:center;gap:16px;
@@ -767,6 +817,23 @@
   }
   .loading-text{color:var(--head);font-size:var(--fs-base);font-weight:700;}
   @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- Onda di transizione tema (giorno/notte) ----------
+     Un cerchio parte dal punto in cui è stato premuto il bottone tema e si
+     espande fino a coprire tutto lo schermo in modo fluido, poi svanisce.
+     Il colore dell'onda anticipa il tema verso cui si sta passando. */
+  #theme-wave-overlay{
+    position:fixed;inset:0;z-index:550;pointer-events:none;
+    opacity:0;
+    background:radial-gradient(circle at var(--wave-x,50%) var(--wave-y,50%),
+      var(--wave-color,#151412) 0%, var(--wave-color,#151412) 70%, transparent 71%);
+    clip-path:circle(0% at var(--wave-x,50%) var(--wave-y,50%));
+  }
+  #theme-wave-overlay.animating{
+    opacity:1;
+    transition:clip-path 4.2s cubic-bezier(.4,0,.2,1), opacity .8s ease 4.2s;
+    clip-path:circle(150% at var(--wave-x,50%) var(--wave-y,50%));
+  }
 
   /* ---------- Gestione risorse / utenti ---------- */
   .manage-res-modal{max-width:440px;}
@@ -820,6 +887,7 @@
   .today-badge{
     background:var(--accent);color:#fff;font-size:10px;font-weight:800;
     padding:3px 9px;border-radius:999px;letter-spacing:.06em;
+    box-shadow:var(--neon-glow);
   }
   .month-mini-timeline-wrap{margin-bottom:var(--sp-3);}
   .day-detail .dd-item{
@@ -888,35 +956,43 @@
 <body>
 
 <div id="login-overlay">
+  <button id="login-theme-toggle" onclick="toggleTheme(event)" title="Cambia tema" aria-label="Cambia tema">🌙</button>
   <div class="login-card">
+    <div class="login-lang-switch" id="login-lang-switch">
+      <button class="lang-btn" data-lang="it" onclick="setLanguage('it')">IT</button>
+      <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">DE</button>
+      <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+    </div>
     <img src="L.jpg" alt="Logo" class="login-logo">
-    <h2>Accedi</h2>
-    <p class="login-subtitle">Gestionale La Strada der Weg</p>
-    <input type="text" id="login-username" placeholder="Nome utente" autocomplete="username">
-    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+    <h2 data-i18n="login.title">Accedi</h2>
+    <p class="login-subtitle" data-i18n="login.subtitle">Gestionale La Strada der Weg</p>
+    <input type="text" id="login-username" data-i18n-placeholder="login.username" placeholder="Nome utente" autocomplete="username">
+    <input type="password" id="login-password" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password">
     <div class="captcha-row">
       <div class="captcha-box" id="captcha-text"></div>
-      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice">&#8635;</div>
+      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice"><span class="captcha-refresh-icon">&#8635;</span></div>
     </div>
-    <input type="text" id="login-captcha" placeholder="Inserisci il codice mostrato" onkeydown="if(event.key==='Enter') attemptLogin()">
+    <input type="text" id="login-captcha" data-i18n-placeholder="login.captchaPlaceholder" placeholder="Inserisci il codice mostrato" onkeydown="if(event.key==='Enter') attemptLogin()">
     <div class="login-error" id="login-error"></div>
-    <button class="login-btn" onclick="attemptLogin()">Accedi</button>
+    <button class="login-btn" onclick="attemptLogin()" data-i18n="login.submit">Accedi</button>
   </div>
 </div>
 
 <div id="loading-overlay">
   <div class="loading-spinner"></div>
-  <div class="loading-text">Caricamento...</div>
+  <div class="loading-text" data-i18n="loading.text">Caricamento...</div>
 </div>
+
+<div id="theme-wave-overlay"></div>
 
 <div class="app">
   <header>
     <img src="L.jpg" alt="Logo" id="logo-img">
-    <h1>Gestionale</h1>
+    <h1 data-i18n="app.title">Gestionale</h1>
     <button id="announce-toggle" onclick="openAnnouncementsPanel()" title="Annunci" aria-label="Annunci" style="display:none;">📣<span class="announce-badge" id="announce-badge" style="display:none;"></span></button>
     <button id="users-toggle" onclick="openUsersPanel()" title="Gestisci utenti" aria-label="Gestisci utenti" style="display:none;">👤</button>
     <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca">🔍</button>
-    <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+    <button id="theme-toggle" onclick="toggleTheme(event)" title="Cambia tema" aria-label="Cambia tema">🌙</button>
     <button id="logout-toggle" onclick="doLogout()" title="Esci" aria-label="Esci">Log Out</button>
     <div class="profile-badge" id="profile-badge">
       <img src="pfp.jpg" alt="Profilo" class="profile-pic">
@@ -1035,30 +1111,30 @@
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
-    <h3>Nuovo elemento</h3>
-    <label>Giorno</label>
+    <h3 data-i18n="modal.newItem">Nuovo elemento</h3>
+    <label data-i18n="modal.day">Giorno</label>
     <input type="date" id="modal-date">
-    <label>Risorsa</label>
+    <label data-i18n="modal.resource">Risorsa</label>
     <select id="modal-resource"></select>
     <label class="allday-toggle">
       <input type="checkbox" id="modal-allday" onchange="onAllDayToggle()">
-      Tutto il giorno
+      <span data-i18n="modal.allDay">Tutto il giorno</span>
     </label>
     <div class="modal-row" id="modal-time-row">
       <div>
-        <label>Dalle</label>
+        <label data-i18n="modal.from">Dalle</label>
         <input type="time" id="modal-start" value="09:00" step="900">
       </div>
       <div>
-        <label>Alle</label>
+        <label data-i18n="modal.to">Alle</label>
         <input type="time" id="modal-end" value="11:00" step="900">
       </div>
     </div>
-    <label>Descrizione</label>
-    <input type="text" id="modal-label" placeholder="Es. Evento, cliente...">
+    <label data-i18n="modal.description">Descrizione</label>
+    <input type="text" id="modal-label" data-i18n-placeholder="modal.descriptionPlaceholder" placeholder="Es. Evento, cliente...">
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeAddModal()">Annulla</button>
-      <button class="btn-confirm" onclick="confirmAddModal()">Salva</button>
+      <button class="btn-cancel" onclick="closeAddModal()" data-i18n="modal.cancel">Annulla</button>
+      <button class="btn-confirm" onclick="confirmAddModal()" data-i18n="modal.save">Salva</button>
     </div>
   </div>
 </div>
@@ -1070,43 +1146,43 @@
 
 <div class="modal-overlay" id="duplicate-overlay">
   <div class="modal">
-    <h3>Duplica giorno</h3>
+    <h3 data-i18n="duplicate.title">Duplica giorno</h3>
     <p id="duplicate-source-info" style="font-size:13px;color:var(--text-muted);margin:0 0 4px;"></p>
-    <label>Copia tutti gli eventi al giorno:</label>
+    <label data-i18n="duplicate.label">Copia tutti gli eventi al giorno:</label>
     <input type="date" id="duplicate-target-date">
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeDuplicateModal()">Annulla</button>
-      <button class="btn-confirm" onclick="confirmDuplicate()">Duplica</button>
+      <button class="btn-cancel" onclick="closeDuplicateModal()" data-i18n="modal.cancel">Annulla</button>
+      <button class="btn-confirm" onclick="confirmDuplicate()" data-i18n="duplicate.confirm">Duplica</button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="manage-res-overlay">
   <div class="modal manage-res-modal">
-    <h3>Gestisci risorse</h3>
-    <p style="font-size:12px;color:var(--text-muted);margin:-10px 0 12px;">Trascina <span aria-hidden="true">⠿</span> per riordinare</p>
+    <h3 data-i18n="resources.title">Gestisci risorse</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin:-10px 0 12px;"><span data-i18n="resources.dragHint">Trascina ⠿ per riordinare</span></p>
     <div class="res-manage-list" id="res-manage-list"></div>
     <div class="res-add-row">
-      <input type="text" id="new-resource-input" placeholder="Nome nuova risorsa...">
-      <button onclick="addNewResource()">Aggiungi</button>
+      <input type="text" id="new-resource-input" data-i18n-placeholder="resources.newPlaceholder" placeholder="Nome nuova risorsa...">
+      <button onclick="addNewResource()" data-i18n="resources.add">Aggiungi</button>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeManageResourcesModal()">Chiudi</button>
+      <button class="btn-cancel" onclick="closeManageResourcesModal()" data-i18n="resources.close">Chiudi</button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="users-overlay">
   <div class="modal manage-res-modal">
-    <h3>Gestisci utenti</h3>
+    <h3 data-i18n="users.title">Gestisci utenti</h3>
     <div class="res-manage-list" id="users-manage-list"></div>
     <div class="res-add-row" style="flex-wrap:wrap;">
-      <input type="text" id="new-user-name" placeholder="Nome utente" style="flex:1 1 100%;margin-bottom:8px;">
-      <input type="password" id="new-user-pass" placeholder="Password" style="flex:1;">
-      <button onclick="addNewUser()">Crea</button>
+      <input type="text" id="new-user-name" data-i18n-placeholder="users.namePlaceholder" placeholder="Nome utente" style="flex:1 1 100%;margin-bottom:8px;">
+      <input type="password" id="new-user-pass" data-i18n-placeholder="users.passPlaceholder" placeholder="Password" style="flex:1;">
+      <button onclick="addNewUser()" data-i18n="users.create">Crea</button>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeUsersPanel()">Chiudi</button>
+      <button class="btn-cancel" onclick="closeUsersPanel()" data-i18n="users.close">Chiudi</button>
     </div>
   </div>
 </div>
@@ -1128,6 +1204,433 @@
    solo sul dispositivo/browser dove viene creato, finché non verrà collegato
    un backend condiviso (Firebase, come discusso).
    ========================================================================= */
+
+/* =========================================================================
+   SISTEMA DI INTERNAZIONALIZZAZIONE (i18n)
+   Tre lingue supportate: italiano (it, default), tedesco (de), inglese (en).
+   t(key) restituisce la stringa tradotta nella lingua corrente; tWeekday/
+   tMonth gestiscono nomi di giorni/mesi per il rendering di date, dato che
+   toLocaleDateString dipende dalla lingua del browser e non da questa scelta.
+   ========================================================================= */
+const I18N = {
+  it: {
+    "app.title": "Gestionale",
+    "login.title": "Accedi",
+    "login.subtitle": "Gestionale La Strada der Weg",
+    "login.username": "Nome utente",
+    "login.password": "Password",
+    "login.captchaPlaceholder": "Inserisci il codice mostrato",
+    "login.submit": "Accedi",
+    "login.errNeedBoth": "Inserisci nome utente e password.",
+    "login.errCaptcha": "Codice di verifica non corretto.",
+    "login.errPassword": "Password errata.",
+    "login.errUserNotFound": "Utente non trovato.",
+    "loading.text": "Caricamento...",
+    "logout": "Log Out",
+    "nav.today": "Oggi",
+    "nav.prev": "Precedente",
+    "nav.next": "Successivo",
+    "view.day": "Giorno",
+    "view.week": "Settimana",
+    "view.agenda": "Agenda",
+    "day.timelineTitle": "Timeline giornaliera",
+    "day.timelineTab": "Timeline",
+    "day.listTab": "Lista orari",
+    "day.all": "Tutti",
+    "day.manageResources": "Risorse",
+    "day.duplicateDay": "Duplica giorno",
+    "day.free": "Libero — tocca per aggiungere",
+    "day.noResources": "Nessuna risorsa. Aggiungine una dal pannello Risorse.",
+    "day.ongoing": "In corso: ",
+    "day.ongoingEnds": " — finisce tra ",
+    "day.minutes": " minuti",
+    "day.upcomingIn": "Mancano ",
+    "day.upcomingTo": " minuti a ",
+    "day.now": "Ora — ",
+    "week.item": " elemento",
+    "week.items": " elementi",
+    "week.empty": "Nessun elemento",
+    "week.confirmDelete": "Eliminare questo elemento?",
+    "month.dow.mon": "Lun", "month.dow.tue": "Mar", "month.dow.wed": "Mer",
+    "month.dow.thu": "Gio", "month.dow.fri": "Ven", "month.dow.sat": "Sab", "month.dow.sun": "Dom",
+    "detail.today": "OGGI",
+    "detail.empty": "Nessun elemento. Usa il pulsante + per aggiungerne uno.",
+    "detail.description": "Descrizione",
+    "detail.day": "Giorno",
+    "detail.time": "Orario",
+    "detail.allDay": "Tutto il giorno",
+    "detail.close": "Chiudi",
+    "detail.delete": "Elimina",
+    "agenda.notesTitle": "📝 Appunti",
+    "agenda.notesPlaceholder": "Scrivi qui appunti generali, promemoria, cose da ricordare...",
+    "agenda.todoTitle": "☑ Da fare",
+    "agenda.todoPlaceholder": "Nuovo elemento...",
+    "agenda.todoAdd": "Aggiungi",
+    "agenda.todoEmpty": "Nessun elemento da fare.",
+    "agenda.today": "Oggi — ",
+    "agenda.empty": "Nessun evento in programma. Usa il pulsante + per aggiungerne uno.",
+    "modal.newItem": "Nuovo elemento",
+    "modal.day": "Giorno",
+    "modal.resource": "Risorsa",
+    "modal.allDay": "Tutto il giorno",
+    "modal.from": "Dalle",
+    "modal.to": "Alle",
+    "modal.description": "Descrizione",
+    "modal.descriptionPlaceholder": "Es. Evento, cliente...",
+    "modal.cancel": "Annulla",
+    "modal.save": "Salva",
+    "modal.selectDate": "Seleziona una data.",
+    "modal.endAfterStart": "L'ora fine deve essere maggiore dell'ora inizio.",
+    "duplicate.title": "Duplica giorno",
+    "duplicate.from": "Da ",
+    "duplicate.label": "Copia tutti gli eventi al giorno:",
+    "duplicate.confirm": "Duplica",
+    "duplicate.noItems": "Non ci sono elementi da duplicare in questo giorno.",
+    "duplicate.selectTarget": "Scegli una data di destinazione.",
+    "duplicate.differentDay": "Scegli un giorno diverso da quello di origine.",
+    "resources.title": "Gestisci risorse",
+    "resources.dragHint": "Trascina ⠿ per riordinare",
+    "resources.newPlaceholder": "Nome nuova risorsa...",
+    "resources.add": "Aggiungi",
+    "resources.close": "Chiudi",
+    "resources.onlyOne": "Deve rimanere almeno una risorsa.",
+    "resources.confirmDeleteWithEvents": "Ci sono elementi salvati per \"{name}\". Eliminando la risorsa, quegli elementi resteranno visibili ma la risorsa non sarà più selezionabile per nuovi elementi. Continuare?",
+    "resources.confirmDelete": "Eliminare la risorsa \"{name}\"?",
+    "resources.duplicateName": "Esiste già una risorsa con questo nome.",
+    "users.title": "Gestisci utenti",
+    "users.namePlaceholder": "Nome utente",
+    "users.passPlaceholder": "Password",
+    "users.create": "Crea",
+    "users.close": "Chiudi",
+    "users.none": "Nessun utente creato oltre ad Admin.",
+    "users.seesCheckmarks": " (vede i checkmark)",
+    "users.confirmDelete": "Eliminare l'utente \"{name}\"?",
+    "users.needBoth": "Inserisci nome utente e password.",
+    "users.reserved": "Questo nome è riservato.",
+    "users.exists": "Esiste già un utente con questo nome.",
+    "announce.title": "📣 Annunci",
+    "announce.none": "Nessun annuncio al momento.",
+    "announce.markRead": "Ho letto",
+    "announce.count1": " persona ha messo il segno di spunta",
+    "announce.countMany": " persone hanno messo il segno di spunta",
+    "announce.edit": "Modifica",
+    "announce.delete": "Elimina",
+    "announce.writeLabel": "Scrivi un annuncio",
+    "announce.placeholder": "Scrivi qui l'annuncio per tutti...",
+    "announce.publish": "Pubblica",
+    "announce.writeNew": "Scrivi annuncio",
+    "announce.close": "Chiudi",
+    "announce.needText": "Scrivi un testo per l'annuncio.",
+    "announce.confirmDelete": "Eliminare questo annuncio?",
+    "search.placeholder": "Cerca per descrizione o risorsa...",
+    "search.allResources": "Tutte le risorse",
+    "search.noResults": "Nessun risultato",
+  },
+  de: {
+    "app.title": "Verwaltung",
+    "login.title": "Anmelden",
+    "login.subtitle": "Verwaltung La Strada der Weg",
+    "login.username": "Benutzername",
+    "login.password": "Passwort",
+    "login.captchaPlaceholder": "Angezeigten Code eingeben",
+    "login.submit": "Anmelden",
+    "login.errNeedBoth": "Bitte Benutzername und Passwort eingeben.",
+    "login.errCaptcha": "Der Sicherheitscode ist falsch.",
+    "login.errPassword": "Falsches Passwort.",
+    "login.errUserNotFound": "Benutzer nicht gefunden.",
+    "loading.text": "Wird geladen...",
+    "logout": "Abmelden",
+    "nav.today": "Heute",
+    "nav.prev": "Zurück",
+    "nav.next": "Weiter",
+    "view.day": "Tag",
+    "view.week": "Woche",
+    "view.agenda": "Agenda",
+    "day.timelineTitle": "Tagesübersicht",
+    "day.timelineTab": "Zeitleiste",
+    "day.listTab": "Zeitliste",
+    "day.all": "Alle",
+    "day.manageResources": "Ressourcen",
+    "day.duplicateDay": "Tag duplizieren",
+    "day.free": "Frei — zum Hinzufügen tippen",
+    "day.noResources": "Keine Ressourcen. Füge eine im Ressourcen-Panel hinzu.",
+    "day.ongoing": "Läuft: ",
+    "day.ongoingEnds": " — endet in ",
+    "day.minutes": " Minuten",
+    "day.upcomingIn": "Noch ",
+    "day.upcomingTo": " Minuten bis ",
+    "day.now": "Jetzt — ",
+    "week.item": " Eintrag",
+    "week.items": " Einträge",
+    "week.empty": "Keine Einträge",
+    "week.confirmDelete": "Diesen Eintrag löschen?",
+    "month.dow.mon": "Mo", "month.dow.tue": "Di", "month.dow.wed": "Mi",
+    "month.dow.thu": "Do", "month.dow.fri": "Fr", "month.dow.sat": "Sa", "month.dow.sun": "So",
+    "detail.today": "HEUTE",
+    "detail.empty": "Keine Einträge. Verwende die Schaltfläche +, um einen hinzuzufügen.",
+    "detail.description": "Beschreibung",
+    "detail.day": "Tag",
+    "detail.time": "Uhrzeit",
+    "detail.allDay": "Ganztägig",
+    "detail.close": "Schließen",
+    "detail.delete": "Löschen",
+    "agenda.notesTitle": "📝 Notizen",
+    "agenda.notesPlaceholder": "Notiere hier allgemeine Hinweise, Erinnerungen, Dinge zum Merken...",
+    "agenda.todoTitle": "☑ Aufgaben",
+    "agenda.todoPlaceholder": "Neuer Eintrag...",
+    "agenda.todoAdd": "Hinzufügen",
+    "agenda.todoEmpty": "Keine Aufgaben vorhanden.",
+    "agenda.today": "Heute — ",
+    "agenda.empty": "Keine geplanten Termine. Verwende die Schaltfläche +, um einen hinzuzufügen.",
+    "modal.newItem": "Neuer Eintrag",
+    "modal.day": "Tag",
+    "modal.resource": "Ressource",
+    "modal.allDay": "Ganztägig",
+    "modal.from": "Von",
+    "modal.to": "Bis",
+    "modal.description": "Beschreibung",
+    "modal.descriptionPlaceholder": "z.B. Termin, Kunde...",
+    "modal.cancel": "Abbrechen",
+    "modal.save": "Speichern",
+    "modal.selectDate": "Bitte ein Datum auswählen.",
+    "modal.endAfterStart": "Die Endzeit muss nach der Startzeit liegen.",
+    "duplicate.title": "Tag duplizieren",
+    "duplicate.from": "Von ",
+    "duplicate.label": "Alle Termine kopieren nach:",
+    "duplicate.confirm": "Duplizieren",
+    "duplicate.noItems": "Für diesen Tag gibt es keine Einträge zum Duplizieren.",
+    "duplicate.selectTarget": "Bitte ein Zieldatum auswählen.",
+    "duplicate.differentDay": "Bitte einen anderen Tag als den Ausgangstag wählen.",
+    "resources.title": "Ressourcen verwalten",
+    "resources.dragHint": "⠿ ziehen, um neu zu ordnen",
+    "resources.newPlaceholder": "Name der neuen Ressource...",
+    "resources.add": "Hinzufügen",
+    "resources.close": "Schließen",
+    "resources.onlyOne": "Es muss mindestens eine Ressource verbleiben.",
+    "resources.confirmDeleteWithEvents": "Für \"{name}\" sind Einträge gespeichert. Beim Löschen der Ressource bleiben diese Einträge sichtbar, die Ressource ist aber für neue Einträge nicht mehr wählbar. Fortfahren?",
+    "resources.confirmDelete": "Ressource \"{name}\" löschen?",
+    "resources.duplicateName": "Es gibt bereits eine Ressource mit diesem Namen.",
+    "users.title": "Benutzer verwalten",
+    "users.namePlaceholder": "Benutzername",
+    "users.passPlaceholder": "Passwort",
+    "users.create": "Erstellen",
+    "users.close": "Schließen",
+    "users.none": "Außer Admin wurden keine Benutzer erstellt.",
+    "users.seesCheckmarks": " (sieht die Häkchen)",
+    "users.confirmDelete": "Benutzer \"{name}\" löschen?",
+    "users.needBoth": "Bitte Benutzername und Passwort eingeben.",
+    "users.reserved": "Dieser Name ist reserviert.",
+    "users.exists": "Es gibt bereits einen Benutzer mit diesem Namen.",
+    "announce.title": "📣 Ankündigungen",
+    "announce.none": "Derzeit keine Ankündigung.",
+    "announce.markRead": "Gelesen",
+    "announce.count1": " Person hat das Häkchen gesetzt",
+    "announce.countMany": " Personen haben das Häkchen gesetzt",
+    "announce.edit": "Bearbeiten",
+    "announce.delete": "Löschen",
+    "announce.writeLabel": "Ankündigung schreiben",
+    "announce.placeholder": "Schreibe hier die Ankündigung für alle...",
+    "announce.publish": "Veröffentlichen",
+    "announce.writeNew": "Ankündigung schreiben",
+    "announce.close": "Schließen",
+    "announce.needText": "Bitte einen Text für die Ankündigung schreiben.",
+    "announce.confirmDelete": "Diese Ankündigung löschen?",
+    "search.placeholder": "Nach Beschreibung oder Ressource suchen...",
+    "search.allResources": "Alle Ressourcen",
+    "search.noResults": "Keine Ergebnisse",
+  },
+  en: {
+    "app.title": "Manager",
+    "login.title": "Sign in",
+    "login.subtitle": "La Strada der Weg Manager",
+    "login.username": "Username",
+    "login.password": "Password",
+    "login.captchaPlaceholder": "Enter the code shown above",
+    "login.submit": "Sign in",
+    "login.errNeedBoth": "Please enter a username and password.",
+    "login.errCaptcha": "The verification code is incorrect.",
+    "login.errPassword": "Incorrect password.",
+    "login.errUserNotFound": "User not found.",
+    "loading.text": "Loading...",
+    "logout": "Log Out",
+    "nav.today": "Today",
+    "nav.prev": "Previous",
+    "nav.next": "Next",
+    "view.day": "Day",
+    "view.week": "Week",
+    "view.agenda": "Agenda",
+    "day.timelineTitle": "Daily timeline",
+    "day.timelineTab": "Timeline",
+    "day.listTab": "Time list",
+    "day.all": "All",
+    "day.manageResources": "Resources",
+    "day.duplicateDay": "Duplicate day",
+    "day.free": "Free — tap to add",
+    "day.noResources": "No resources. Add one from the Resources panel.",
+    "day.ongoing": "Ongoing: ",
+    "day.ongoingEnds": " — ends in ",
+    "day.minutes": " minutes",
+    "day.upcomingIn": "Starts in ",
+    "day.upcomingTo": " minutes: ",
+    "day.now": "Now — ",
+    "week.item": " item",
+    "week.items": " items",
+    "week.empty": "No items",
+    "week.confirmDelete": "Delete this item?",
+    "month.dow.mon": "Mon", "month.dow.tue": "Tue", "month.dow.wed": "Wed",
+    "month.dow.thu": "Thu", "month.dow.fri": "Fri", "month.dow.sat": "Sat", "month.dow.sun": "Sun",
+    "detail.today": "TODAY",
+    "detail.empty": "No items. Use the + button to add one.",
+    "detail.description": "Description",
+    "detail.day": "Day",
+    "detail.time": "Time",
+    "detail.allDay": "All day",
+    "detail.close": "Close",
+    "detail.delete": "Delete",
+    "agenda.notesTitle": "📝 Notes",
+    "agenda.notesPlaceholder": "Write general notes, reminders, things to remember here...",
+    "agenda.todoTitle": "☑ To-do",
+    "agenda.todoPlaceholder": "New item...",
+    "agenda.todoAdd": "Add",
+    "agenda.todoEmpty": "No to-do items.",
+    "agenda.today": "Today — ",
+    "agenda.empty": "No events scheduled. Use the + button to add one.",
+    "modal.newItem": "New item",
+    "modal.day": "Day",
+    "modal.resource": "Resource",
+    "modal.allDay": "All day",
+    "modal.from": "From",
+    "modal.to": "To",
+    "modal.description": "Description",
+    "modal.descriptionPlaceholder": "E.g. Event, client...",
+    "modal.cancel": "Cancel",
+    "modal.save": "Save",
+    "modal.selectDate": "Please select a date.",
+    "modal.endAfterStart": "The end time must be after the start time.",
+    "duplicate.title": "Duplicate day",
+    "duplicate.from": "From ",
+    "duplicate.label": "Copy all events to day:",
+    "duplicate.confirm": "Duplicate",
+    "duplicate.noItems": "There are no items to duplicate on this day.",
+    "duplicate.selectTarget": "Please choose a target date.",
+    "duplicate.differentDay": "Please choose a different day than the source day.",
+    "resources.title": "Manage resources",
+    "resources.dragHint": "Drag ⠿ to reorder",
+    "resources.newPlaceholder": "New resource name...",
+    "resources.add": "Add",
+    "resources.close": "Close",
+    "resources.onlyOne": "At least one resource must remain.",
+    "resources.confirmDeleteWithEvents": "There are saved items for \"{name}\". Deleting the resource will keep those items visible, but the resource will no longer be selectable for new items. Continue?",
+    "resources.confirmDelete": "Delete resource \"{name}\"?",
+    "resources.duplicateName": "A resource with this name already exists.",
+    "users.title": "Manage users",
+    "users.namePlaceholder": "Username",
+    "users.passPlaceholder": "Password",
+    "users.create": "Create",
+    "users.close": "Close",
+    "users.none": "No users created besides Admin.",
+    "users.seesCheckmarks": " (sees checkmarks)",
+    "users.confirmDelete": "Delete user \"{name}\"?",
+    "users.needBoth": "Please enter a username and password.",
+    "users.reserved": "This name is reserved.",
+    "users.exists": "A user with this name already exists.",
+    "announce.title": "📣 Announcements",
+    "announce.none": "No announcement at the moment.",
+    "announce.markRead": "Read",
+    "announce.count1": " person has checked this",
+    "announce.countMany": " people have checked this",
+    "announce.edit": "Edit",
+    "announce.delete": "Delete",
+    "announce.writeLabel": "Write an announcement",
+    "announce.placeholder": "Write the announcement for everyone here...",
+    "announce.publish": "Publish",
+    "announce.writeNew": "Write announcement",
+    "announce.close": "Close",
+    "announce.needText": "Please write some text for the announcement.",
+    "announce.confirmDelete": "Delete this announcement?",
+    "search.placeholder": "Search by description or resource...",
+    "search.allResources": "All resources",
+    "search.noResults": "No results",
+  }
+};
+
+const LOCALE_MAP = { it: "it-IT", de: "de-DE", en: "en-GB" };
+
+function getCurrentLanguage(){
+  try{
+    const saved = localStorage.getItem("gestionale_lang");
+    if(saved && I18N[saved]) return saved;
+  }catch(e){}
+  return "it";
+}
+let currentLang = getCurrentLanguage();
+
+function t(key, vars){
+  let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N.it[key] || key;
+  if(vars){
+    Object.keys(vars).forEach(k=>{ str = str.replace("{"+k+"}", vars[k]); });
+  }
+  return str;
+}
+function currentLocale(){ return LOCALE_MAP[currentLang] || "it-IT"; }
+
+function setLanguage(lang){
+  if(!I18N[lang]) return;
+  currentLang = lang;
+  try{ localStorage.setItem("gestionale_lang", lang); }catch(e){}
+  applyTranslations();
+  if(typeof renderAll === "function" && typeof currentUser !== "undefined" && currentUser){
+    renderAll();
+    refreshSidePanel();
+  }
+}
+
+/* Applica le traduzioni a tutti gli elementi statici marcati con
+   data-i18n (testo) o data-i18n-placeholder (placeholder input), e
+   aggiorna lo stato attivo del selettore lingua nel login. */
+function applyTranslations(){
+  document.title = t("app.title");
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+    el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
+  });
+  document.querySelectorAll(".login-lang-switch .lang-btn").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
+  const logoutBtn = document.getElementById("logout-toggle");
+  if(logoutBtn) logoutBtn.textContent = t("logout");
+  const dvtTimeline = document.getElementById("dvt-timeline");
+  const dvtList = document.getElementById("dvt-list");
+  if(dvtTimeline) dvtTimeline.textContent = "📊 " + t("day.timelineTab");
+  if(dvtList) dvtList.textContent = "📋 " + t("day.listTab");
+  const megaTitle = document.querySelector(".mega-timeline-title");
+  if(megaTitle) megaTitle.textContent = t("day.timelineTitle");
+  const tabDay = document.getElementById("tab-day");
+  const tabWeek = document.getElementById("tab-week");
+  const tabAgenda = document.getElementById("tab-agenda");
+  if(tabDay) tabDay.innerHTML = "<span aria-hidden=\"true\">☀️</span>" + t("view.day");
+  if(tabWeek) tabWeek.innerHTML = "<span aria-hidden=\"true\">📅</span>" + t("view.week");
+  if(tabAgenda) tabAgenda.innerHTML = "<span aria-hidden=\"true\">📋</span>" + t("view.agenda");
+  const todayBtn = document.querySelector(".today-text-btn");
+  if(todayBtn) todayBtn.textContent = t("nav.today");
+  const searchInput = document.getElementById("search-input");
+  if(searchInput) searchInput.placeholder = t("search.placeholder");
+  const notesTitle = document.querySelector(".agenda-notes-title");
+  if(notesTitle) notesTitle.textContent = t("agenda.notesTitle");
+  const todoTitleEls = document.querySelectorAll(".todo-section .agenda-notes-title");
+  if(todoTitleEls[0]) todoTitleEls[0].textContent = t("agenda.todoTitle");
+  const notesTextarea = document.getElementById("agenda-notes-input");
+  if(notesTextarea) notesTextarea.placeholder = t("agenda.notesPlaceholder");
+  const todoInput = document.getElementById("todo-input");
+  if(todoInput) todoInput.placeholder = t("agenda.todoPlaceholder");
+  const todoAddBtn = document.querySelector(".todo-add-row button");
+  if(todoAddBtn) todoAddBtn.textContent = t("agenda.todoAdd");
+  const dupTxts = document.querySelectorAll(".dup-txt");
+  if(dupTxts[0]) dupTxts[0].textContent = t("day.manageResources");
+  if(dupTxts[1]) dupTxts[1].textContent = t("day.duplicateDay");
+}
 
 const ADMIN_USERNAME = "Admin";
 const ADMIN_PASSWORD = "derwegadmin";
@@ -1181,12 +1684,12 @@ async function attemptLogin(){
   const captchaValue = captchaInp.value.trim().toUpperCase();
 
   if(!name || !pass){
-    errEl.textContent = "Inserisci nome utente e password.";
+    errEl.textContent = t("login.errNeedBoth");
     return;
   }
 
   if(captchaValue !== currentCaptcha){
-    errEl.textContent = "Codice di verifica non corretto.";
+    errEl.textContent = t("login.errCaptcha");
     newCaptcha();
     return;
   }
@@ -1195,7 +1698,7 @@ async function attemptLogin(){
     if(pass === ADMIN_PASSWORD){
       completeLogin(ADMIN_USERNAME, true);
     } else {
-      errEl.textContent = "Password errata.";
+      errEl.textContent = t("login.errPassword");
       newCaptcha();
     }
     return;
@@ -1204,13 +1707,13 @@ async function attemptLogin(){
   const users = loadUsers();
   const user = users[name];
   if(!user){
-    errEl.textContent = "Utente non trovato.";
+    errEl.textContent = t("login.errUserNotFound");
     newCaptcha();
     return;
   }
   const hashed = await sha256(pass);
   if(hashed !== user.passwordHash){
-    errEl.textContent = "Password errata.";
+    errEl.textContent = t("login.errPassword");
     newCaptcha();
     return;
   }
@@ -1287,7 +1790,7 @@ function renderUsersManageList(){
   const names = Object.keys(users);
 
   if(names.length === 0){
-    listEl.innerHTML = "<div class='todo-empty'>Nessun utente creato oltre ad Admin.</div>";
+    listEl.innerHTML = "<div class='todo-empty'>"+t("users.none")+"</div>";
     return;
   }
 
@@ -1298,11 +1801,11 @@ function renderUsersManageList(){
     const canAnnounce = !!users[name].canAnnounce;
     item.innerHTML = `
       <span class="rm-dot" style="background:${isSpecial ? 'var(--accent)' : 'var(--text-muted)'};"></span>
-      <span class="rm-name">${escapeHtml(name)}${isSpecial ? " <small>(vede i checkmark)</small>" : ""}</span>
-      <label class="user-announce-toggle" title="Può scrivere annunci">
+      <span class="rm-name">${escapeHtml(name)}${isSpecial ? " <small>"+t("users.seesCheckmarks")+"</small>" : ""}</span>
+      <label class="user-announce-toggle" title="📣">
         <input type="checkbox" ${canAnnounce ? "checked" : ""}> 📣
       </label>
-      <span class="rm-delete" title="Elimina utente">🗑</span>
+      <span class="rm-delete" title="${t('detail.delete')}">🗑</span>
     `;
     item.querySelector(".user-announce-toggle input").onchange = (e)=>{
       const u = loadUsers();
@@ -1312,7 +1815,7 @@ function renderUsersManageList(){
       }
     };
     item.querySelector(".rm-delete").onclick = ()=>{
-      if(confirm("Eliminare l'utente \""+name+"\"?")){
+      if(confirm(t("users.confirmDelete", {name:name}))){
         const u = loadUsers();
         delete u[name];
         saveUsers(u);
@@ -1328,11 +1831,11 @@ async function addNewUser(){
   const name = nameInp.value.trim();
   const pass = passInp.value;
 
-  if(!name || !pass){ alert("Inserisci nome utente e password."); return; }
-  if(name === ADMIN_USERNAME){ alert("Questo nome è riservato."); return; }
+  if(!name || !pass){ alert(t("users.needBoth")); return; }
+  if(name === ADMIN_USERNAME){ alert(t("users.reserved")); return; }
 
   const users = loadUsers();
-  if(users[name]){ alert("Esiste già un utente con questo nome."); return; }
+  if(users[name]){ alert(t("users.exists")); return; }
 
   const passwordHash = await sha256(pass);
   users[name] = { passwordHash };
@@ -1469,13 +1972,13 @@ function onSearchInput(){
   resultsEl.style.display = "block";
 
   if(matches.length === 0){
-    resultsEl.innerHTML = "<div class='search-no-results'>Nessun risultato</div>";
+    resultsEl.innerHTML = "<div class='search-no-results'>"+t("search.noResults")+"</div>";
     return;
   }
 
   matches.slice(0,30).forEach(m=>{
     const d = new Date(m.key+"T00:00:00");
-    const dateStr = d.toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"numeric"});
+    const dateStr = d.toLocaleDateString(currentLocale(),{day:"numeric",month:"short",year:"numeric"});
     const row = document.createElement("div");
     row.className = "search-result-item";
     row.innerHTML = "<span class='sr-label'>"+escapeHtml(m.item.label)+"</span><span class='sr-meta'>"+escapeHtml(m.item.res)+" · "+dateStr+" · "+fmtHourLabel(m.item.start)+"–"+fmtHourLabel(m.item.end)+"</span>";
@@ -1509,7 +2012,7 @@ function toggleSearchBar(){
 function populateSearchResourceFilter(){
   const sel = document.getElementById("search-resource-filter");
   const current = sel.value;
-  sel.innerHTML = "<option value=''>Tutte le risorse</option>";
+  sel.innerHTML = "<option value=''>"+t("search.allResources")+"</option>";
   RESOURCES.forEach(r=>{
     const o = document.createElement("option");
     o.value = r; o.textContent = r;
@@ -1682,13 +2185,13 @@ window.addEventListener("resize", ()=>{
 function updateDateLabel(){
   const el = document.getElementById("date-label");
   if(currentView==="day"){
-    el.textContent = currentDate.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
+    el.textContent = currentDate.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
   } else if(currentView==="week"){
     const monday = getMonday(currentDate);
     const sunday = new Date(monday); sunday.setDate(sunday.getDate()+6);
-    el.textContent = monday.toLocaleDateString("it-IT",{day:"numeric",month:"short"}) + " – " + sunday.toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"numeric"});
+    el.textContent = monday.toLocaleDateString(currentLocale(),{day:"numeric",month:"short"}) + " – " + sunday.toLocaleDateString(currentLocale(),{day:"numeric",month:"short",year:"numeric"});
   } else {
-    el.textContent = currentDate.toLocaleDateString("it-IT",{month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
+    el.textContent = currentDate.toLocaleDateString(currentLocale(),{month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
   }
 }
 
@@ -1752,7 +2255,7 @@ function renderDayView(){
   tabsEl.innerHTML = "";
 
   const allBtn = document.createElement("button");
-  allBtn.textContent = "Tutti";
+  allBtn.textContent = t("day.all");
   allBtn.className = selectedResource === "__ALL__" ? "active" : "";
   allBtn.onclick = ()=>{ selectedResource = "__ALL__"; renderDayView(); };
   tabsEl.appendChild(allBtn);
@@ -1824,12 +2327,12 @@ function renderDayView(){
       const remainMin = Math.round((ongoing.end - nowHourDecimal)*60);
       countdownEl.style.display = "block";
       countdownEl.className = "day-countdown ongoing";
-      countdownEl.textContent = "In corso: " + ongoing.label + " — finisce tra " + remainMin + " minuti";
+      countdownEl.textContent = t("day.ongoing") + ongoing.label + t("day.ongoingEnds") + remainMin + t("day.minutes");
     } else if(next){
       const diffMin = Math.round((next.start - nowHourDecimal)*60);
       countdownEl.style.display = "block";
       countdownEl.className = "day-countdown upcoming";
-      countdownEl.textContent = "Mancano " + diffMin + " minuti a " + next.label + " (" + fmtHourLabel(next.start) + ")";
+      countdownEl.textContent = t("day.upcomingIn") + diffMin + t("day.upcomingTo") + next.label + " (" + fmtHourLabel(next.start) + ")";
     } else {
       countdownEl.style.display = "none";
     }
@@ -1844,7 +2347,7 @@ function renderDayView(){
     if(isToday && !nowLineInserted && nowHourDecimal < h){
       const nowMarker = document.createElement("div");
       nowMarker.className = "slot-now-line";
-      nowMarker.innerHTML = "<span>Ora — "+fmtHourLabel(nowHourDecimal)+"</span>";
+      nowMarker.innerHTML = "<span>"+t("day.now")+fmtHourLabel(nowHourDecimal)+"</span>";
       listEl.appendChild(nowMarker);
       nowLineInserted = true;
     }
@@ -1881,7 +2384,7 @@ function renderDayView(){
       left.appendChild(labelSpan);
       slot.onclick = ()=>{ showEventDetail(key, covering.id); };
     } else {
-      labelSpan.textContent = "Libero — tocca per aggiungere";
+      labelSpan.textContent = t("day.free");
       left.appendChild(labelSpan);
       slot.onclick = ()=>{ openAddModal(key, selectedResource, h, h+0.5); };
     }
@@ -1913,7 +2416,7 @@ function renderMegaTimeline(key){
   if(RESOURCES.length === 0){
     const empty = document.createElement("div");
     empty.className = "mtl-empty";
-    empty.textContent = "Nessuna risorsa. Aggiungine una dal pannello Risorse.";
+    empty.textContent = t("day.noResources");
     grid.appendChild(empty);
     return;
   }
@@ -1987,10 +2490,10 @@ function renderWeekView(){
     headerEl.className = "week-day-header" + (isToday ? " today" : "");
     const nameSpan = document.createElement("span");
     nameSpan.className = "wd-name";
-    nameSpan.textContent = d.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"short"}).replace(/^\w/,c=>c.toUpperCase());
+    nameSpan.textContent = d.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"short"}).replace(/^\w/,c=>c.toUpperCase());
     const countSpan = document.createElement("span");
     countSpan.className = "wd-count";
-    countSpan.textContent = items.length + (items.length===1 ? " elemento" : " elementi");
+    countSpan.textContent = items.length + (items.length===1 ? t("week.item") : t("week.items"));
     headerEl.appendChild(nameSpan);
     headerEl.appendChild(countSpan);
 
@@ -2007,7 +2510,7 @@ function renderWeekView(){
     if(items.length===0){
       const empty = document.createElement("div");
       empty.className = "week-empty";
-      empty.textContent = "Nessun elemento";
+      empty.textContent = t("week.empty");
       bodyEl.appendChild(empty);
     } else {
       items.forEach(it=>{
@@ -2015,12 +2518,12 @@ function renderWeekView(){
         row.className = "week-item";
         row.style.cursor = "pointer";
         const info = document.createElement("span");
-        const timeLabel = it.allDay ? "Tutto il giorno" : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
+        const timeLabel = it.allDay ? t("detail.allDay") : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
         info.innerHTML = "<span class='wi-res'>"+it.res+"</span> &nbsp; <span class='wi-time'>"+timeLabel+" · "+escapeHtml(it.label)+"</span>";
         const del = document.createElement("span");
         del.className = "wi-del";
         del.innerHTML = "🗑";
-        del.onclick = (e)=>{ e.stopPropagation(); if(confirm("Eliminare questo elemento?")) removeBooking(key, it.id); };
+        del.onclick = (e)=>{ e.stopPropagation(); if(confirm(t("week.confirmDelete"))) removeBooking(key, it.id); };
         row.onclick = ()=>{ showEventDetail(key, it.id); };
         row.appendChild(info);
         row.appendChild(del);
@@ -2116,7 +2619,7 @@ function renderTodos(){
     const del = document.createElement("span");
     del.className = "todo-del";
     del.textContent = "🗑";
-    del.onclick = ()=>{ if(confirm("Eliminare questo elemento?")) deleteTodo(t.id); };
+    del.onclick = ()=>{ if(confirm(t("week.confirmDelete"))) deleteTodo(t.id); };
     row.appendChild(cb);
     row.appendChild(txt);
     row.appendChild(del);
@@ -2140,7 +2643,7 @@ function renderAgendaView(){
     .sort();
 
   if(allDates.length === 0){
-    listEl.innerHTML = "<div class='week-empty' style='padding:24px 0;'>Nessun evento in programma. Usa il pulsante + per aggiungerne uno.</div>";
+    listEl.innerHTML = "<div class='week-empty' style='padding:24px 0;'>"+t("agenda.empty")+"</div>";
     return;
   }
 
@@ -2151,7 +2654,7 @@ function renderAgendaView(){
 
     const groupTitle = document.createElement("div");
     groupTitle.className = "agenda-date-title" + (isToday ? " today" : "");
-    groupTitle.textContent = (isToday ? "Oggi — " : "") + d.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
+    groupTitle.textContent = (isToday ? t("agenda.today") : "") + d.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
     listEl.appendChild(groupTitle);
 
     items.forEach(it=>{
@@ -2173,7 +2676,7 @@ function renderMonthView(){
   const grid = document.getElementById("month-grid");
   grid.innerHTML = "";
 
-  ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"].forEach(dn=>{
+  [t("month.dow.mon"),t("month.dow.tue"),t("month.dow.wed"),t("month.dow.thu"),t("month.dow.fri"),t("month.dow.sat"),t("month.dow.sun")].forEach(dn=>{
     const el = document.createElement("div");
     el.className = "month-dow";
     el.textContent = dn;
@@ -2228,17 +2731,17 @@ function showMonthDayDetail(d){
   const detailEl = document.getElementById("month-detail");
   const isToday = sameDay(d, todayDate());
 
-  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "' data-count='" + items.length + (items.length===1 ? " elemento" : " elementi") + "'><h4>" +
-    (isToday ? "<span class='today-badge'>OGGI</span> " : "") +
-    d.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase()) +
+  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "' data-count='" + items.length + (items.length===1 ? t("week.item") : t("week.items")) + "'><h4>" +
+    (isToday ? "<span class='today-badge'>"+t("detail.today")+"</span> " : "") +
+    d.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase()) +
     "</h4><div class='month-mini-timeline-wrap'><div class='mini-timeline' id='month-mt'></div></div>";
 
   if(items.length===0){
-    html += "<div class='dd-empty'>Nessun elemento. Usa il pulsante + per aggiungerne uno.</div>";
+    html += "<div class='dd-empty'>"+t("detail.empty")+"</div>";
   } else {
     items.forEach(it=>{
-      const timeLabel = it.allDay ? "Tutto il giorno" : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
-      html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+timeLabel+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='if(confirm(\"Eliminare questo elemento?\")){removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");}'>🗑</span></div>";
+      const timeLabel = it.allDay ? t("detail.allDay") : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
+      html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+timeLabel+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='if(confirm(\""+t("week.confirmDelete")+"\")){removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");}'>🗑</span></div>";
     });
   }
   html += "</div>";
@@ -2305,13 +2808,13 @@ function renderManageResourcesList(){
 
     item.innerHTML = `
       <span class="rm-handle" aria-hidden="true">⠿</span>
-      <input type="color" class="rm-color-picker" value="${colors[0]}" title="Cambia colore">
+      <input type="color" class="rm-color-picker" value="${colors[0]}" title="${t('resources.title')}">
       <span class="rm-name">${escapeHtml(res)}</span>
       <span class="rm-arrows">
-        <button class="rm-arrow-up" title="Sposta su" ${idx===0 ? "disabled" : ""}>&#9650;</button>
-        <button class="rm-arrow-down" title="Sposta giù" ${idx===RESOURCES.length-1 ? "disabled" : ""}>&#9660;</button>
+        <button class="rm-arrow-up" title="↑" ${idx===0 ? "disabled" : ""}>&#9650;</button>
+        <button class="rm-arrow-down" title="↓" ${idx===RESOURCES.length-1 ? "disabled" : ""}>&#9660;</button>
       </span>
-      <span class="rm-delete" title="Elimina risorsa">🗑</span>
+      <span class="rm-delete" title="${t('detail.delete')}">🗑</span>
     `;
 
     item.querySelector(".rm-color-picker").addEventListener("input",(e)=>{
@@ -2334,13 +2837,13 @@ function renderManageResourcesList(){
 
     item.querySelector(".rm-delete").onclick = ()=>{
       if(RESOURCES.length <= 1){
-        alert("Deve rimanere almeno una risorsa.");
+        alert(t("resources.onlyOne"));
         return;
       }
       const hasEvents = Object.values(bookings).some(arr => arr.some(b=>b.res===res));
       const msg = hasEvents
-        ? "Ci sono elementi salvati per \""+res+"\". Eliminando la risorsa, quegli elementi resteranno visibili ma la risorsa non sarà più selezionabile per nuovi elementi. Continuare?"
-        : "Eliminare la risorsa \""+res+"\"?";
+        ? t("resources.confirmDeleteWithEvents", {name:res})
+        : t("resources.confirmDelete", {name:res});
       if(confirm(msg)){
         RESOURCES = RESOURCES.filter(r=>r!==res);
         saveResources();
@@ -2377,7 +2880,7 @@ function addNewResource(){
   const name = input.value.trim();
   if(!name){ return; }
   if(RESOURCES.includes(name)){
-    alert("Esiste già una risorsa con questo nome.");
+    alert(t("resources.duplicateName"));
     return;
   }
   RESOURCES.push(name);
@@ -2394,12 +2897,12 @@ function openDuplicateModal(){
   const key = fmtDate(currentDate);
   const items = bookings[key]||[];
   if(items.length === 0){
-    alert("Non ci sono elementi da duplicare in questo giorno.");
+    alert(t("duplicate.noItems"));
     return;
   }
-  const sourceLabel = currentDate.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
+  const sourceLabel = currentDate.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase());
   document.getElementById("duplicate-source-info").textContent =
-    "Da " + sourceLabel + " (" + items.length + (items.length===1 ? " elemento" : " elementi") + ")";
+    t("duplicate.from") + sourceLabel + " (" + items.length + (items.length===1 ? t("week.item") : t("week.items")) + ")";
 
   const targetInp = document.getElementById("duplicate-target-date");
   const nextDay = new Date(currentDate); nextDay.setDate(nextDay.getDate()+1);
@@ -2414,8 +2917,8 @@ function confirmDuplicate(){
   const sourceKey = fmtDate(currentDate);
   const targetKey = document.getElementById("duplicate-target-date").value;
 
-  if(!targetKey){ alert("Scegli una data di destinazione."); return; }
-  if(targetKey === sourceKey){ alert("Scegli un giorno diverso da quello di origine."); return; }
+  if(!targetKey){ alert(t("duplicate.selectTarget")); return; }
+  if(targetKey === sourceKey){ alert(t("duplicate.differentDay")); return; }
 
   const items = bookings[sourceKey]||[];
   if(items.length === 0){ closeDuplicateModal(); return; }
@@ -2438,8 +2941,8 @@ function showEventDetail(dateKey, id){
   if(!item) return;
   const colors = getResourceColor(item.res);
   const dateObj = new Date(dateKey+"T00:00:00");
-  const dateLabel = dateObj.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
-  const timeLabel = item.allDay ? "Tutto il giorno" : (fmtHourLabel(item.start) + " – " + fmtHourLabel(item.end));
+  const dateLabel = dateObj.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
+  const timeLabel = item.allDay ? t("detail.allDay") : (fmtHourLabel(item.start) + " – " + fmtHourLabel(item.end));
 
   const content = document.getElementById("detail-modal-content");
   content.innerHTML = `
@@ -2448,13 +2951,13 @@ function showEventDetail(dateKey, id){
       ${escapeHtml(item.res)}
     </h3>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px;">
-      <div><b>Descrizione</b><br>${escapeHtml(item.label)}</div>
-      <div><b>Giorno</b><br>${dateLabel}</div>
-      <div><b>Orario</b><br>${timeLabel}</div>
+      <div><b>${t("detail.description")}</b><br>${escapeHtml(item.label)}</div>
+      <div><b>${t("detail.day")}</b><br>${dateLabel}</div>
+      <div><b>${t("detail.time")}</b><br>${timeLabel}</div>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeEventDetail()">Chiudi</button>
-      <button class="btn-confirm" style="background:var(--danger);" onclick="deleteFromDetail('${dateKey}', ${id})">Elimina</button>
+      <button class="btn-cancel" onclick="closeEventDetail()">${t("detail.close")}</button>
+      <button class="btn-confirm" style="background:var(--danger);" onclick="deleteFromDetail('${dateKey}', ${id})">${t("detail.delete")}</button>
     </div>
   `;
   document.getElementById("detail-overlay").classList.add("open");
@@ -2505,8 +3008,8 @@ function confirmAddModal(){
   const end = isAllDay ? 24 : timeStrToHour(document.getElementById("modal-end").value);
   const label = document.getElementById("modal-label").value.trim();
 
-  if(!date){ alert("Seleziona una data."); return; }
-  if(!isAllDay && end<=start){ alert("L'ora fine deve essere maggiore dell'ora inizio."); return; }
+  if(!date){ alert(t("modal.selectDate")); return; }
+  if(!isAllDay && end<=start){ alert(t("modal.endAfterStart")); return; }
 
   closeAddModal();
   addBooking(date, res, start, end, label, isAllDay);
@@ -2519,12 +3022,42 @@ document.getElementById("modal-overlay").addEventListener("click",(e)=>{
 function applyTheme(isDark){
   document.body.classList.toggle("dark-mode", isDark);
   document.getElementById("theme-toggle").textContent = isDark ? "☀️" : "🌙";
+  const loginToggle = document.getElementById("login-theme-toggle");
+  if(loginToggle) loginToggle.textContent = isDark ? "☀️" : "🌙";
   const metaTheme = document.getElementById("meta-theme-color");
   if(metaTheme) metaTheme.setAttribute("content", isDark ? "#151412" : "#f4f3f1");
   try{ localStorage.setItem("gestionale_theme", isDark ? "dark" : "light"); }catch(e){}
 }
-function toggleTheme(){
-  applyTheme(!document.body.classList.contains("dark-mode"));
+function toggleTheme(event){
+  const goingDark = !document.body.classList.contains("dark-mode");
+  const wave = document.getElementById("theme-wave-overlay");
+
+  if(wave){
+    let x = "50%", y = "50%";
+    if(event && event.currentTarget){
+      const rect = event.currentTarget.getBoundingClientRect();
+      x = (rect.left + rect.width/2) + "px";
+      y = (rect.top + rect.height/2) + "px";
+    }
+    wave.style.setProperty("--wave-x", x);
+    wave.style.setProperty("--wave-y", y);
+    wave.style.setProperty("--wave-color", goingDark ? "#151412" : "#f4f3f1");
+
+    wave.classList.remove("animating");
+    // forza il reflow così il browser riparte da clip-path:circle(0%) ogni volta
+    void wave.offsetWidth;
+    wave.classList.add("animating");
+
+    // Applica il tema reale a metà dell'espansione, quando l'onda ha già
+    // coperto buona parte dello schermo: così il cambiamento non si vede
+    // "a scatto" ma sembra portato dall'onda stessa.
+    setTimeout(()=>{ applyTheme(goingDark); }, 900);
+
+    // Rimuove la classe a fine animazione per poterla rilanciare al click successivo
+    setTimeout(()=>{ wave.classList.remove("animating"); }, 5200);
+  } else {
+    applyTheme(goingDark);
+  }
 }
 function initTheme(){
   let saved = null;
@@ -2630,10 +3163,10 @@ function renderAnnouncementPanel(){
   const canSeeCounts = canSeeCheckmarkCounts();
   const canManageThis = ann && (isAdmin() || ann.author === currentUser);
 
-  let html = "<h3>📣 Annunci</h3>";
+  let html = "<h3>"+t("announce.title")+"</h3>";
 
   if(!ann){
-    html += "<div class='todo-empty' style='margin-bottom:14px;'>Nessun annuncio al momento.</div>";
+    html += "<div class='todo-empty' style='margin-bottom:14px;'>"+t("announce.none")+"</div>";
   } else {
     const alreadyChecked = (ann.checkedBy || []).includes(currentUser);
     html += `
@@ -2642,18 +3175,18 @@ function renderAnnouncementPanel(){
         <p style="font-size:14px;color:var(--text-main);white-space:pre-wrap;margin:0 0 14px;">${escapeHtml(ann.text)}</p>
         <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
           <input type="checkbox" ${alreadyChecked ? "checked" : ""} onchange="toggleAnnouncementCheck()" style="width:18px;height:18px;accent-color:var(--accent);">
-          Ho letto
+          ${t("announce.markRead")}
         </label>
     `;
     if(canSeeCounts){
       const count = (ann.checkedBy || []).length;
-      html += `<p style="font-size:12.5px;color:var(--text-muted);margin-top:10px;">✔ ${count} ${count===1 ? "persona ha" : "persone hanno"} messo il segno di spunta</p>`;
+      html += `<p style="font-size:12.5px;color:var(--text-muted);margin-top:10px;">✔ ${count}${count===1 ? t("announce.count1") : t("announce.countMany")}</p>`;
     }
     if(canManageThis){
       html += `
         <div style="display:flex;gap:8px;margin-top:12px;">
-          <button class="btn-cancel" style="flex:1;padding:8px;font-size:12.5px;" onclick="startEditAnnouncement()">Modifica</button>
-          <button class="btn-cancel" style="flex:1;padding:8px;font-size:12.5px;color:var(--danger);" onclick="deleteAnnouncement()">Elimina</button>
+          <button class="btn-cancel" style="flex:1;padding:8px;font-size:12.5px;" onclick="startEditAnnouncement()">${t("announce.edit")}</button>
+          <button class="btn-cancel" style="flex:1;padding:8px;font-size:12.5px;color:var(--danger);" onclick="deleteAnnouncement()">${t("announce.delete")}</button>
         </div>
       `;
     }
@@ -2663,21 +3196,21 @@ function renderAnnouncementPanel(){
   if(canWrite){
     html += `
       <div id="announce-write-section" style="display:none;">
-        <label>Scrivi un annuncio</label>
-        <textarea id="announce-input" placeholder="Scrivi qui l'annuncio per tutti..." style="width:100%;min-height:90px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;"></textarea>
+        <label>${t("announce.writeLabel")}</label>
+        <textarea id="announce-input" placeholder="${t('announce.placeholder')}" style="width:100%;min-height:90px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg-soft);color:var(--text-main);box-sizing:border-box;"></textarea>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="cancelEditAnnouncement()">Annulla</button>
-          <button class="btn-confirm" onclick="publishAnnouncement()">Pubblica</button>
+          <button class="btn-cancel" onclick="cancelEditAnnouncement()">${t("modal.cancel")}</button>
+          <button class="btn-confirm" onclick="publishAnnouncement()">${t("announce.publish")}</button>
         </div>
       </div>
     `;
     if(!ann){
-      html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button><button class="btn-confirm" onclick="startEditAnnouncement()">Scrivi annuncio</button></div>`;
+      html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">${t("announce.close")}</button><button class="btn-confirm" onclick="startEditAnnouncement()">${t("announce.writeNew")}</button></div>`;
     } else if(!canManageThis){
-      html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button></div>`;
+      html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">${t("announce.close")}</button></div>`;
     }
   } else {
-    html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">Chiudi</button></div>`;
+    html += `<div class="modal-actions"><button class="btn-cancel" onclick="closeAnnouncementsPanel()">${t("announce.close")}</button></div>`;
   }
 
   content.innerHTML = html;
@@ -2695,7 +3228,7 @@ function cancelEditAnnouncement(){
   if(section) section.style.display = "none";
 }
 function deleteAnnouncement(){
-  if(!confirm("Eliminare questo annuncio?")) return;
+  if(!confirm(t("announce.confirmDelete"))) return;
   try{ localStorage.removeItem("gestionale_announcement"); }catch(e){}
   renderAnnouncementPanel();
   refreshAnnouncementBadge();
@@ -2703,12 +3236,12 @@ function deleteAnnouncement(){
 
 function publishAnnouncement(){
   const text = document.getElementById("announce-input").value.trim();
-  if(!text){ alert("Scrivi un testo per l'annuncio."); return; }
+  if(!text){ alert(t("announce.needText")); return; }
   const existing = loadAnnouncement();
   const ann = {
     text,
     author: currentUser,
-    date: new Date().toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}),
+    date: new Date().toLocaleDateString(currentLocale(),{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}),
     checkedBy: (existing && existing.text === text) ? (existing.checkedBy || []) : []
   };
   saveAnnouncement(ann);
@@ -2733,6 +3266,7 @@ document.getElementById("announce-overlay").addEventListener("click",(e)=>{
 });
 
 /* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
+applyTranslations();
 newCaptcha();
 if(!tryRestoreSession()){
   document.getElementById("login-overlay").style.display = "flex";
