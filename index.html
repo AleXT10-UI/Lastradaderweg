@@ -207,7 +207,6 @@
   .mega-timeline-scroll, .day-detail, .week-day-body{
     scroll-behavior:smooth;
     -webkit-overflow-scrolling:touch;
-    overscroll-behavior:contain;
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}
@@ -381,7 +380,7 @@
     display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);
   }
   .mega-timeline-title{font-size:var(--fs-sm);font-weight:700;color:var(--head);letter-spacing:-.01em;}
-  .mega-timeline-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
+  .mega-timeline-scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;}
   .mega-timeline-grid{
     display:grid;grid-template-columns:90px repeat(48, minmax(16px, 1fr));min-width:max-content;position:relative;
   }
@@ -632,7 +631,7 @@
   /* ---------- Lista slot ---------- */
   .slot-list{
     padding:var(--sp-3);display:flex;flex-direction:column;gap:6px;max-height:65vh;overflow-y:auto;
-    -webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
   }
   .slot{
     display:flex;align-items:center;justify-content:space-between;padding:16px 14px;
@@ -729,6 +728,18 @@
   .month-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:4px;max-width:100%;}
   .month-dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);}
 
+  /* ---------- Footer supporto ---------- */
+  .app-footer{
+    display:flex;justify-content:flex-start;padding:var(--sp-5) 0 var(--sp-3);
+  }
+  .footer-support-link{
+    border:none;background:transparent;color:var(--text-muted);
+    font-size:12.5px;font-weight:600;cursor:pointer;padding:8px 14px;
+    border-radius:999px;transition:background .15s,color .15s;
+    text-decoration:underline;text-underline-offset:3px;
+  }
+  .footer-support-link:hover{background:var(--bg-soft);color:var(--head);}
+
   /* ---------- FAB ---------- */
   .fab{
     position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;
@@ -745,6 +756,9 @@
     z-index:100;padding:16px;backdrop-filter:blur(3px);
   }
   .modal-overlay.open{display:flex;}
+  /* Il modale supporto può essere aperto anche dalla schermata di login
+     (z-index:500), quindi deve stare sopra di essa. */
+  #support-overlay{z-index:600;}
   .modal{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
     padding:var(--sp-5);width:100%;max-width:380px;box-shadow:var(--shadow-pop), var(--shadow-inset-top);
@@ -814,6 +828,15 @@
     box-shadow:var(--shadow-btn);
   }
   #login-theme-toggle:hover{background:var(--bg-soft);box-shadow:var(--shadow-card-hover);}
+  #login-help-toggle{
+    position:fixed;top:20px;right:66px;z-index:501;
+    border:1px solid var(--border);background:var(--surface);color:var(--head);
+    width:38px;height:38px;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s,border-color .15s,box-shadow .15s;
+    box-shadow:var(--shadow-btn);
+  }
+  #login-help-toggle:hover{background:var(--bg-soft);box-shadow:var(--shadow-card-hover);}
   .login-lang-switch{
     display:flex;justify-content:center;gap:6px;margin-bottom:var(--sp-4);
   }
@@ -1016,6 +1039,7 @@
 
 <div id="login-overlay">
   <button id="login-theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+  <button id="login-help-toggle" onclick="openSupportModal()" title="Aiuto" aria-label="Aiuto">?</button>
   <div class="login-card">
     <div class="login-lang-switch" id="login-lang-switch">
       <button class="lang-btn" data-lang="it" onclick="setLanguage('it')">IT</button>
@@ -1171,6 +1195,10 @@
       </div>
     </div>
   </div>
+
+  <div class="app-footer">
+    <button class="footer-support-link" onclick="openSupportModal()" data-i18n="footer.support">Supporto</button>
+  </div>
 </div>
 
 <button class="fab" onclick="openAddModal()" title="Aggiungi"><span aria-hidden="true">+</span></button>
@@ -1255,6 +1283,17 @@
 
 <div class="modal-overlay" id="announce-overlay">
   <div class="modal manage-res-modal" id="announce-modal-content">
+  </div>
+</div>
+
+<div class="modal-overlay" id="support-overlay">
+  <div class="modal">
+    <h3 data-i18n="support.title">Supporto</h3>
+    <p style="font-size:13.5px;color:var(--text-muted);margin:0 0 var(--sp-4);" data-i18n="support.text">Per assistenza, contattaci a:</p>
+    <p style="font-size:15px;font-weight:700;color:var(--head);text-align:center;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin:0 0 var(--sp-4);">prova@gmail.com</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSupportModal()" data-i18n="modal.cancel">Chiudi</button>
+    </div>
   </div>
 </div>
 
@@ -1435,6 +1474,9 @@ const I18N = {
     "search.placeholder": "Cerca per descrizione o risorsa...",
     "search.allResources": "Tutte le risorse",
     "search.noResults": "Nessun risultato",
+    "footer.support": "Supporto",
+    "support.title": "Supporto",
+    "support.text": "Per assistenza, contattaci a:",
   },
   de: {
     "app.title": "Verwaltung",
@@ -1548,6 +1590,9 @@ const I18N = {
     "search.placeholder": "Nach Beschreibung oder Ressource suchen...",
     "search.allResources": "Alle Ressourcen",
     "search.noResults": "Keine Ergebnisse",
+    "footer.support": "Support",
+    "support.title": "Support",
+    "support.text": "Für Unterstützung kontaktiere uns unter:",
   },
   en: {
     "app.title": "Manager",
@@ -1661,6 +1706,9 @@ const I18N = {
     "search.placeholder": "Search by description or resource...",
     "search.allResources": "All resources",
     "search.noResults": "No results",
+    "footer.support": "Support",
+    "support.title": "Support",
+    "support.text": "For assistance, contact us at:",
   }
 };
 
@@ -3397,6 +3445,16 @@ document.getElementById("announce-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="announce-overlay") closeAnnouncementsPanel();
 });
 
+function openSupportModal(){
+  document.getElementById("support-overlay").classList.add("open");
+}
+function closeSupportModal(){
+  document.getElementById("support-overlay").classList.remove("open");
+}
+document.getElementById("support-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="support-overlay") closeSupportModal();
+});
+
 /* Permette di scrollare la timeline giornaliera orizzontalmente usando la
    normale rotellina verticale del mouse, non solo il trackpad/drag. */
 (function(){
@@ -3441,6 +3499,7 @@ window.addEventListener("resize", ()=>{
 /* Swipe orizzontale su mobile per cambiare giorno/settimana/mese */
 (function(){
   let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  let swipeEligible = false;
   const SWIPE_MIN_DIST = 60;
   const SWIPE_MAX_OFF_AXIS = 60;
   const SWIPE_MAX_TIME = 600;
@@ -3450,14 +3509,21 @@ window.addEventListener("resize", ()=>{
   }
 
   document.addEventListener("touchstart", (e)=>{
+    swipeEligible = false;
     if(anyModalOpen()) return;
     if(e.touches.length !== 1) return;
+    // Non intercettare il gesto se parte da un'area con scroll verticale
+    // interno (liste, timeline): lasciamo che lo scroll nativo funzioni
+    // sempre senza alcuna interferenza da parte di questo listener.
+    if(e.target.closest(".slot-list, .week-list, .search-results, .res-manage-list, .mega-timeline-scroll, .day-detail, .week-day-body, .month-grid")) return;
+    swipeEligible = true;
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     touchStartTime = Date.now();
   }, {passive:true});
 
   document.addEventListener("touchend", (e)=>{
+    if(!swipeEligible) return;
     if(anyModalOpen()) return;
     if(!e.changedTouches || e.changedTouches.length !== 1) return;
     const dx = e.changedTouches[0].clientX - touchStartX;
@@ -3467,9 +3533,6 @@ window.addEventListener("resize", ()=>{
     if(dt > SWIPE_MAX_TIME) return;
     if(Math.abs(dy) > SWIPE_MAX_OFF_AXIS) return;
     if(Math.abs(dx) < SWIPE_MIN_DIST) return;
-
-    const target = e.target;
-    if(target.closest(".mega-timeline-scroll, .timeline-scroll")) return;
 
     if(dx > 0) navPrev();
     else navNext();
