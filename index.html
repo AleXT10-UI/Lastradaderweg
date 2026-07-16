@@ -354,12 +354,20 @@
     cursor:pointer;border-radius:var(--radius-sm);padding:4px 8px;transition:background .15s;
   }
   .date-nav .date-label:hover{background:var(--bg-soft);}
-  /* Input date nativo invisibile ma funzionale: apre il calendario di
-     sistema quando si clicca sulla data testuale, per saltare a
-     qualsiasi giorno/mese/anno senza dover usare solo le frecce. */
+  /* Il testo della data e l'input date nativo stanno sovrapposti nello
+     stesso contenitore: l'input è invisibile ma realmente cliccabile
+     (posizionato sopra, pointer-events attivi), così un tap diretto
+     dell'utente apre il calendario nativo in modo affidabile su tutti i
+     browser, senza dipendere da showPicker()/click() via JS che non sono
+     supportati o affidabili ovunque (specialmente Safari/iOS). */
+  .date-label-wrap{position:relative;flex:1;min-width:0;}
+  .date-nav .date-label{
+    position:relative;z-index:1;pointer-events:none;
+  }
   .date-picker-input{
-    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-    clip:rect(0,0,0,0);white-space:nowrap;border:0;opacity:0;pointer-events:none;
+    position:absolute;inset:0;width:100%;height:100%;
+    opacity:0;border:0;padding:0;margin:0;cursor:pointer;z-index:2;
+    -webkit-appearance:none;appearance:none;
   }
   .today-text-btn{
     border:1px solid var(--border);background:var(--surface);color:var(--head);
@@ -1098,8 +1106,10 @@
       <div class="topbar-row" id="topbar-row">
         <div class="date-nav">
           <button onclick="goToday()" class="today-text-btn" aria-label="Vai a oggi">Oggi</button>
-          <div class="date-label" id="date-label" onclick="openDatePicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDatePicker();}" role="button" tabindex="0" aria-label="Apri calendario"></div>
-          <input type="date" id="date-picker-input" class="date-picker-input" onchange="onDatePickerChange(this.value)" aria-hidden="true">
+          <div class="date-label-wrap">
+            <div class="date-label" id="date-label" aria-label="Apri calendario"></div>
+            <input type="date" id="date-picker-input" class="date-picker-input" onchange="onDatePickerChange(this.value)" aria-label="Seleziona una data">
+          </div>
           <div class="date-nav-arrows">
             <button onclick="navPrev()" aria-label="Precedente"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
             <button onclick="navNext()" aria-label="Successivo"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
@@ -1792,8 +1802,8 @@ function applyTranslations(){
   if(dupTxts[1]) dupTxts[1].textContent = t("day.duplicateDay");
 }
 
-const ADMIN_USERNAME = "Admin";
-const ADMIN_PASSWORD = "derwegadmin";
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "derweg";
 const SPECIAL_VIEWER_EMAIL = "dario.volani@lastrada-derweg.org";
 
 async function sha256(text){
@@ -2347,6 +2357,8 @@ function updateDateLabel(){
   } else {
     el.textContent = currentDate.toLocaleDateString(currentLocale(),{month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
   }
+  const picker = document.getElementById("date-picker-input");
+  if(picker) picker.value = fmtDate(currentDate);
 }
 
 function getMonday(d){
