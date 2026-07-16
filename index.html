@@ -66,7 +66,7 @@
     /* Scala spaziatura e tipografia */
     --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
     --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-md:15px; --fs-lg:17px; --fs-xl:20px; --fs-2xl:26px;
-    --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
+    --radius-sm:11px; --radius-md:16px; --radius-lg:22px;
     --shadow-card:0 1px 2px rgba(30,25,20,.05), 0 6px 20px -8px rgba(30,25,20,.10);
     --shadow-card-hover:0 2px 4px rgba(30,25,20,.06), 0 12px 28px -10px rgba(30,25,20,.14);
     --shadow-pop:0 24px 60px -12px rgba(30,25,20,.30);
@@ -130,16 +130,12 @@
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
-  /* Tutte le icone/emoji dell'app in bianco e nero (desaturate).
-     Esclusi i pallini colorati delle risorse (.mtl-dot, .rm-dot), che
-     servono a distinguere le risorse per colore, non sono decorazioni. */
-  span[aria-hidden="true"], .ab-icon, .search-icon,
-  #theme-toggle, #search-toggle, #users-toggle, #announce-toggle, #logout-toggle,
-  #dvt-timeline, #dvt-list,
-  .todo-del, .wi-del, .dd-del, .rm-delete, .rm-handle{
-    filter:grayscale(1);
+  /* Le icone SVG (sostituiscono le emoji) ereditano il colore del testo
+     circostante tramite currentColor: sono monocromatiche per costruzione,
+     senza bisogno di filtri CSS per adattarle al tema chiaro/scuro. */
+  .icon-svg{
+    display:inline-block;vertical-align:-3px;flex-shrink:0;
   }
-  #search-toggle.active, #dvt-timeline.active, #dvt-list.active{filter:none;}
 
   html{overflow-x:hidden;background:var(--bg);min-height:100%;}
   body{
@@ -197,6 +193,7 @@
     background-clip:padding-box;
   }
   *::-webkit-scrollbar-corner{background:transparent;}
+  *::-webkit-scrollbar-button{display:none;width:0;height:0;}
 
   /* Scroll fluido e naturale su tutte le aree con overflow interno */
   .slot-list, .week-list, .search-results, .res-manage-list,
@@ -720,25 +717,25 @@
   .modal-overlay.open{display:flex;}
   .modal{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
-    padding:var(--sp-6);width:100%;max-width:400px;box-shadow:var(--shadow-pop);
+    padding:var(--sp-5);width:100%;max-width:380px;box-shadow:var(--shadow-pop);
   }
-  .modal h3{margin:0 0 var(--sp-4);color:var(--head);font-size:var(--fs-lg);font-weight:700;letter-spacing:-.01em;}
-  .modal label{display:block;font-size:var(--fs-xs);font-weight:600;color:var(--text-muted);margin:var(--sp-3) 0 5px;text-transform:uppercase;letter-spacing:.05em;}
+  .modal h3{margin:0 0 var(--sp-3);color:var(--head);font-size:var(--fs-md);font-weight:700;letter-spacing:-.01em;}
+  .modal label{display:block;font-size:10.5px;font-weight:600;color:var(--text-muted);margin:var(--sp-2) 0 4px;text-transform:uppercase;letter-spacing:.05em;}
   .modal select, .modal input{
-    width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
-    font-size:16px;background:var(--bg-soft);color:var(--text-main);
+    width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    font-size:15px;background:var(--bg-soft);color:var(--text-main);
   }
   .modal select:focus, .modal input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
   .allday-toggle{
-    display:flex !important;align-items:center;gap:8px;font-size:var(--fs-sm) !important;font-weight:600;
-    color:var(--head) !important;cursor:pointer;margin:var(--sp-3) 0 5px;text-transform:none !important;letter-spacing:0 !important;
+    display:flex !important;align-items:center;gap:8px;font-size:13px !important;font-weight:600;
+    color:var(--head) !important;cursor:pointer;margin:var(--sp-2) 0 4px;text-transform:none !important;letter-spacing:0 !important;
   }
-  .allday-toggle input{width:17px !important;height:17px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;padding:0;}
-  .modal-row{display:flex;gap:10px;}
+  .allday-toggle input{width:16px !important;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;padding:0;}
+  .modal-row{display:flex;gap:8px;}
   .modal-row > div{flex:1;}
-  .modal-actions{display:flex;gap:10px;margin-top:var(--sp-5);}
+  .modal-actions{display:flex;gap:8px;margin-top:var(--sp-4);}
   .modal-actions button{
-    flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-size:var(--fs-base);font-weight:700;cursor:pointer;
+    flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-size:13.5px;font-weight:700;cursor:pointer;
     transition:background .15s;
   }
   .modal-actions .btn-cancel{background:var(--btn-secondary-bg);color:var(--btn-secondary-text);}
@@ -918,7 +915,7 @@
     .profile-badge{padding:3px 9px 3px 3px;gap:5px;}
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
-    .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:54px;height:54px;font-size:24px;}
+    .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:46px;height:46px;font-size:20px;}
     .view-switch button{font-size:10.5px;padding:9px 3px;gap:3px;}
     .view-switch button i{font-size:14px;}
 
@@ -954,8 +951,9 @@
     .duplicate-day-btn, .manage-res-btn{flex:1;justify-content:center;}
     .duplicate-day-btn .dup-txt{display:inline;}
 
-    .modal{width:92vw;padding:18px;}
-    .modal-row{flex-direction:column;gap:12px;}
+    .modal{width:94vw;padding:16px;}
+    .modal h3{font-size:15px;margin-bottom:var(--sp-2);}
+    .modal-row{gap:8px;}
     .modal-row > div{width:100%;}
   }
 </style>
@@ -963,7 +961,7 @@
 <body>
 
 <div id="login-overlay">
-  <button id="login-theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+  <button id="login-theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
   <div class="login-card">
     <div class="login-lang-switch" id="login-lang-switch">
       <button class="lang-btn" data-lang="it" onclick="setLanguage('it')">IT</button>
@@ -977,7 +975,7 @@
     <input type="password" id="login-password" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password">
     <div class="captcha-row">
       <div class="captcha-box" id="captcha-text"></div>
-      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice"><span class="captcha-refresh-icon">&#8635;</span></div>
+      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice"><span class="captcha-refresh-icon"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"></path></svg></span></div>
     </div>
     <input type="text" id="login-captcha" data-i18n-placeholder="login.captchaPlaceholder" placeholder="Inserisci il codice mostrato" onkeydown="if(event.key==='Enter') attemptLogin()">
     <div class="login-error" id="login-error"></div>
@@ -1004,10 +1002,10 @@
         <button data-lang="en" onclick="setLanguage('en'); closeLangDropdown();">English</button>
       </div>
     </div>
-    <button id="announce-toggle" onclick="openAnnouncementsPanel()" title="Annunci" aria-label="Annunci" style="display:none;">📣<span class="announce-badge" id="announce-badge" style="display:none;"></span></button>
-    <button id="users-toggle" onclick="openUsersPanel()" title="Gestisci utenti" aria-label="Gestisci utenti" style="display:none;">👤</button>
-    <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca">🔍</button>
-    <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+    <button id="announce-toggle" onclick="openAnnouncementsPanel()" title="Annunci" aria-label="Annunci" style="display:none;"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg><span class="announce-badge" id="announce-badge" style="display:none;"></span></button>
+    <button id="users-toggle" onclick="openUsersPanel()" title="Gestisci utenti" aria-label="Gestisci utenti" style="display:none;"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></button>
+    <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <button id="logout-toggle" onclick="doLogout()" title="Esci" aria-label="Esci">Log Out</button>
     <div class="profile-badge" id="profile-badge">
       <img src="pfp.jpg" alt="Profilo" class="profile-pic">
@@ -1016,16 +1014,16 @@
   </header>
 
   <div class="announce-banner" id="announce-banner" style="display:none;">
-    <span class="ab-icon" aria-hidden="true">📣</span>
+    <span class="ab-icon" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg></span>
     <span class="ab-text" id="announce-banner-text"></span>
-    <button class="ab-check" id="announce-banner-check" onclick="toggleAnnouncementCheck()" title="Segna come letto">✓</button>
+    <button class="ab-check" id="announce-banner-check" onclick="toggleAnnouncementCheck()" title="Segna come letto"><svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></button>
   </div>
 
   <div class="search-bar" id="search-bar" style="display:none;">
-    <span class="search-icon" aria-hidden="true">🔍</span>
+    <span class="search-icon" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></span>
     <input type="text" id="search-input" placeholder="Cerca per descrizione o risorsa..." oninput="onSearchInput()">
     <select id="search-resource-filter" onchange="onSearchInput()"></select>
-    <button id="search-clear" onclick="clearSearch()" style="display:none;" aria-label="Cancella ricerca">✕</button>
+    <button id="search-clear" onclick="clearSearch()" style="display:none;" aria-label="Cancella ricerca"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
   </div>
   <div class="search-results" id="search-results" style="display:none;"></div>
 
@@ -1036,15 +1034,15 @@
           <button onclick="goToday()" class="today-text-btn" aria-label="Vai a oggi">Oggi</button>
           <div class="date-label" id="date-label"></div>
           <div class="date-nav-arrows">
-            <button onclick="navPrev()" aria-label="Precedente"><span aria-hidden="true">&#10094;</span></button>
-            <button onclick="navNext()" aria-label="Successivo"><span aria-hidden="true">&#10095;</span></button>
+            <button onclick="navPrev()" aria-label="Precedente"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+            <button onclick="navNext()" aria-label="Successivo"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
           </div>
         </div>
 
         <div class="view-switch">
-          <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true">☀️</span>Giorno</button>
-          <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true">📅</span>Settimana</button>
-          <button id="tab-agenda" onclick="switchView('agenda')"><span aria-hidden="true">📋</span>Agenda</button>
+          <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg></span>Giorno</button>
+          <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path></svg></span>Settimana</button>
+          <button id="tab-agenda" onclick="switchView('agenda')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M9 12h6M9 16h6M9 8h6"></path></svg></span>Agenda</button>
         </div>
       </div>
 
@@ -1054,8 +1052,8 @@
 
       <div id="day-view-wrapper">
         <div class="day-view-toggle-mobile">
-          <button id="dvt-timeline" class="active" onclick="switchDayPanel('timeline')">📊 Timeline</button>
-          <button id="dvt-list" onclick="switchDayPanel('list')">📋 Lista orari</button>
+          <button id="dvt-timeline" class="active" onclick="switchDayPanel('timeline')"><span class="icon-mono" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M19 5v13h-3M13 8v10M7 12v6"></path></svg></span> Timeline</button>
+          <button id="dvt-list" onclick="switchDayPanel('list')"><span class="icon-mono" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M9 12h6M9 16h6M9 8h6"></path></svg></span> Lista orari</button>
         </div>
 
         <div class="day-view-split">
@@ -1073,10 +1071,10 @@
               <div class="resource-tabs" id="resource-tabs"></div>
               <div class="toolbar-actions">
                 <button class="manage-res-btn" onclick="openManageResourcesModal()" title="Gestisci risorse">
-                  <span aria-hidden="true">⚙</span><span class="dup-txt">Risorse</span>
+                  <span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span><span class="dup-txt">Risorse</span>
                 </button>
                 <button class="duplicate-day-btn" onclick="openDuplicateModal()" title="Duplica tutti gli eventi di questo giorno">
-                  <span aria-hidden="true">⧉</span><span class="dup-txt">Duplica giorno</span>
+                  <span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span><span class="dup-txt">Duplica giorno</span>
                 </button>
               </div>
             </div>
@@ -1104,11 +1102,11 @@
       <div class="card" id="view-agenda-el" style="display:none;">
         <div class="agenda-top-split">
           <div class="agenda-notes">
-            <div class="agenda-notes-title">📝 Appunti</div>
+            <div class="agenda-notes-title"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 2.6a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8L8 16 4 17l1-4Z"></path><path d="M4 22h14a2 2 0 0 0 2-2V8"></path></svg></span> <span data-i18n="agenda.notesTitle">Appunti</span></div>
             <textarea id="agenda-notes-input" placeholder="Scrivi qui appunti generali, promemoria, cose da ricordare..." oninput="saveAgendaNotes()"></textarea>
           </div>
           <div class="todo-section">
-            <div class="agenda-notes-title">☑ Da fare</div>
+            <div class="agenda-notes-title"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 2 2 4-4M3 17l2 2 4-4M11 6h10M11 12h10M11 18h10"></path></svg></span> <span data-i18n="agenda.todoTitle">Da fare</span></div>
             <div class="todo-add-row">
               <input type="text" id="todo-input" placeholder="Nuovo elemento..." onkeydown="if(event.key==='Enter') addTodo()">
               <button onclick="addTodo()">Aggiungi</button>
@@ -1175,7 +1173,7 @@
 <div class="modal-overlay" id="manage-res-overlay">
   <div class="modal manage-res-modal">
     <h3 data-i18n="resources.title">Gestisci risorse</h3>
-    <p style="font-size:12px;color:var(--text-muted);margin:-10px 0 12px;"><span data-i18n="resources.dragHint">Trascina ⠿ per riordinare</span></p>
+    <p style="font-size:12px;color:var(--text-muted);margin:-10px 0 12px;display:flex;align-items:center;gap:5px;"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg><span data-i18n="resources.dragHint">Trascina per riordinare</span></p>
     <div class="res-manage-list" id="res-manage-list"></div>
     <div class="res-add-row">
       <input type="text" id="new-resource-input" data-i18n-placeholder="resources.newPlaceholder" placeholder="Nome nuova risorsa...">
@@ -1227,6 +1225,50 @@
    tMonth gestiscono nomi di giorni/mesi per il rendering di date, dato che
    toLocaleDateString dipende dalla lingua del browser e non da questa scelta.
    ========================================================================= */
+/* =========================================================================
+   LIBRERIA ICONE SVG (sostituisce le emoji)
+   Icone in stile lineare minimale, disegnate con stroke="currentColor":
+   ereditano automaticamente il colore del testo circostante, quindi sono
+   monocromatiche per design — nessun filtro CSS necessario per adattarle
+   al tema chiaro/scuro.
+   ========================================================================= */
+const ICONS = {
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+  megaphone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg>',
+  calendarDays: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path></svg>',
+  clipboardList: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M9 12h6M9 16h6M9 8h6"></path></svg>',
+  barChart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><rect x="7" y="12" width="3" height="6"></rect><rect x="13" y="8" width="3" height="10"></rect><rect x="19" y="5" width="0" height="13"></rect><path d="M19 5v13h-3"></path></svg>',
+  notebookPen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 2.6a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8L8 16 4 17l1-4Z"></path><path d="M4 22h14a2 2 0 0 0 2-2V8"></path></svg>',
+  listChecks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 2 2 4-4M3 17l2 2 4-4M11 6h10M11 12h10M11 18h10"></path></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>',
+  checkCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m22 4-10 10.01-3-3"></path></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"></path><path d="M10 11v6M14 11v6"></path></svg>',
+  calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>',
+  gripVertical: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>',
+  chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>',
+  chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>',
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"></path></svg>',
+  layers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"></path><path d="m3 12 9 5 9-5M3 17l9 5 9-5"></path></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>',
+};
+/* Restituisce l'HTML dell'icona con dimensione e classi opzionali,
+   pronta da inserire con innerHTML. Il colore segue sempre currentColor,
+   quindi eredita automaticamente il colore del testo/tema circostante. */
+function icon(name, size, extraClass){
+  const svg = ICONS[name];
+  if(!svg) return "";
+  const cls = "icon-svg" + (extraClass ? " "+extraClass : "");
+  const sz = size || 16;
+  return svg.replace("<svg ", `<svg class="${cls}" width="${sz}" height="${sz}" `);
+}
+
 const I18N = {
   it: {
     "app.title": "Gestionale",
@@ -1276,9 +1318,9 @@ const I18N = {
     "detail.allDay": "Tutto il giorno",
     "detail.close": "Chiudi",
     "detail.delete": "Elimina",
-    "agenda.notesTitle": "📝 Appunti",
+    "agenda.notesTitle": "Appunti",
     "agenda.notesPlaceholder": "Scrivi qui appunti generali, promemoria, cose da ricordare...",
-    "agenda.todoTitle": "☑ Da fare",
+    "agenda.todoTitle": "Da fare",
     "agenda.todoPlaceholder": "Nuovo elemento...",
     "agenda.todoAdd": "Aggiungi",
     "agenda.todoEmpty": "Nessun elemento da fare.",
@@ -1304,7 +1346,7 @@ const I18N = {
     "duplicate.selectTarget": "Scegli una data di destinazione.",
     "duplicate.differentDay": "Scegli un giorno diverso da quello di origine.",
     "resources.title": "Gestisci risorse",
-    "resources.dragHint": "Trascina ⠿ per riordinare",
+    "resources.dragHint": "Trascina per riordinare",
     "resources.newPlaceholder": "Nome nuova risorsa...",
     "resources.add": "Aggiungi",
     "resources.close": "Chiudi",
@@ -1323,7 +1365,7 @@ const I18N = {
     "users.needBoth": "Inserisci nome utente e password.",
     "users.reserved": "Questo nome è riservato.",
     "users.exists": "Esiste già un utente con questo nome.",
-    "announce.title": "📣 Annunci",
+    "announce.title": "Annunci",
     "announce.none": "Nessun annuncio al momento.",
     "announce.markRead": "Ho letto",
     "announce.count1": " persona ha messo il segno di spunta",
@@ -1389,9 +1431,9 @@ const I18N = {
     "detail.allDay": "Ganztägig",
     "detail.close": "Schließen",
     "detail.delete": "Löschen",
-    "agenda.notesTitle": "📝 Notizen",
+    "agenda.notesTitle": "Notizen",
     "agenda.notesPlaceholder": "Notiere hier allgemeine Hinweise, Erinnerungen, Dinge zum Merken...",
-    "agenda.todoTitle": "☑ Aufgaben",
+    "agenda.todoTitle": "Aufgaben",
     "agenda.todoPlaceholder": "Neuer Eintrag...",
     "agenda.todoAdd": "Hinzufügen",
     "agenda.todoEmpty": "Keine Aufgaben vorhanden.",
@@ -1417,7 +1459,7 @@ const I18N = {
     "duplicate.selectTarget": "Bitte ein Zieldatum auswählen.",
     "duplicate.differentDay": "Bitte einen anderen Tag als den Ausgangstag wählen.",
     "resources.title": "Ressourcen verwalten",
-    "resources.dragHint": "⠿ ziehen, um neu zu ordnen",
+    "resources.dragHint": "Ziehen, um neu zu ordnen",
     "resources.newPlaceholder": "Name der neuen Ressource...",
     "resources.add": "Hinzufügen",
     "resources.close": "Schließen",
@@ -1436,7 +1478,7 @@ const I18N = {
     "users.needBoth": "Bitte Benutzername und Passwort eingeben.",
     "users.reserved": "Dieser Name ist reserviert.",
     "users.exists": "Es gibt bereits einen Benutzer mit diesem Namen.",
-    "announce.title": "📣 Ankündigungen",
+    "announce.title": "Ankündigungen",
     "announce.none": "Derzeit keine Ankündigung.",
     "announce.markRead": "Gelesen",
     "announce.count1": " Person hat das Häkchen gesetzt",
@@ -1502,9 +1544,9 @@ const I18N = {
     "detail.allDay": "All day",
     "detail.close": "Close",
     "detail.delete": "Delete",
-    "agenda.notesTitle": "📝 Notes",
+    "agenda.notesTitle": "Notes",
     "agenda.notesPlaceholder": "Write general notes, reminders, things to remember here...",
-    "agenda.todoTitle": "☑ To-do",
+    "agenda.todoTitle": "To-do",
     "agenda.todoPlaceholder": "New item...",
     "agenda.todoAdd": "Add",
     "agenda.todoEmpty": "No to-do items.",
@@ -1530,7 +1572,7 @@ const I18N = {
     "duplicate.selectTarget": "Please choose a target date.",
     "duplicate.differentDay": "Please choose a different day than the source day.",
     "resources.title": "Manage resources",
-    "resources.dragHint": "Drag ⠿ to reorder",
+    "resources.dragHint": "Drag to reorder",
     "resources.newPlaceholder": "New resource name...",
     "resources.add": "Add",
     "resources.close": "Close",
@@ -1549,7 +1591,7 @@ const I18N = {
     "users.needBoth": "Please enter a username and password.",
     "users.reserved": "This name is reserved.",
     "users.exists": "A user with this name already exists.",
-    "announce.title": "📣 Announcements",
+    "announce.title": "Announcements",
     "announce.none": "No announcement at the moment.",
     "announce.markRead": "Read",
     "announce.count1": " person has checked this",
@@ -1636,16 +1678,16 @@ function applyTranslations(){
   if(logoutBtn) logoutBtn.textContent = t("logout");
   const dvtTimeline = document.getElementById("dvt-timeline");
   const dvtList = document.getElementById("dvt-list");
-  if(dvtTimeline) dvtTimeline.textContent = "📊 " + t("day.timelineTab");
-  if(dvtList) dvtList.textContent = "📋 " + t("day.listTab");
+  if(dvtTimeline) dvtTimeline.innerHTML = '<span class="icon-mono" aria-hidden="true">'+icon("barChart",14)+'</span> ' + t("day.timelineTab");
+  if(dvtList) dvtList.innerHTML = '<span class="icon-mono" aria-hidden="true">'+icon("clipboardList",14)+'</span> ' + t("day.listTab");
   const megaTitle = document.querySelector(".mega-timeline-title");
   if(megaTitle) megaTitle.textContent = t("day.timelineTitle");
   const tabDay = document.getElementById("tab-day");
   const tabWeek = document.getElementById("tab-week");
   const tabAgenda = document.getElementById("tab-agenda");
-  if(tabDay) tabDay.innerHTML = "<span aria-hidden=\"true\">☀️</span>" + t("view.day");
-  if(tabWeek) tabWeek.innerHTML = "<span aria-hidden=\"true\">📅</span>" + t("view.week");
-  if(tabAgenda) tabAgenda.innerHTML = "<span aria-hidden=\"true\">📋</span>" + t("view.agenda");
+  if(tabDay) tabDay.innerHTML = "<span aria-hidden=\"true\">"+icon("sun",14)+"</span>" + t("view.day");
+  if(tabWeek) tabWeek.innerHTML = "<span aria-hidden=\"true\">"+icon("calendarDays",14)+"</span>" + t("view.week");
+  if(tabAgenda) tabAgenda.innerHTML = "<span aria-hidden=\"true\">"+icon("clipboardList",14)+"</span>" + t("view.agenda");
   const todayBtn = document.querySelector(".today-text-btn");
   if(todayBtn) todayBtn.textContent = t("nav.today");
   const searchInput = document.getElementById("search-input");
@@ -1835,10 +1877,10 @@ function renderUsersManageList(){
     item.innerHTML = `
       <span class="rm-dot" style="background:${isSpecial ? 'var(--accent)' : 'var(--text-muted)'};"></span>
       <span class="rm-name">${escapeHtml(name)}${isSpecial ? " <small>"+t("users.seesCheckmarks")+"</small>" : ""}</span>
-      <label class="user-announce-toggle" title="📣">
-        <input type="checkbox" ${canAnnounce ? "checked" : ""}> 📣
+      <label class="user-announce-toggle" title="Annunci">
+        <input type="checkbox" ${canAnnounce ? "checked" : ""}> ${icon("megaphone",14)}
       </label>
-      <span class="rm-delete" title="${t('detail.delete')}">🗑</span>
+      <span class="rm-delete" title="${t('detail.delete')}">${icon("trash",15)}</span>
     `;
     item.querySelector(".user-announce-toggle input").onchange = (e)=>{
       const u = loadUsers();
@@ -2338,7 +2380,7 @@ function renderDayView(){
       const chip = document.createElement("div");
       chip.className = "allday-chip";
       chip.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
-      chip.innerHTML = "<span>🗓 "+(selectedResource==="__ALL__" ? escapeHtml(it.res)+": " : "")+escapeHtml(it.label)+"</span>";
+      chip.innerHTML = "<span>"+icon("calendar",12)+" "+(selectedResource==="__ALL__" ? escapeHtml(it.res)+": " : "")+escapeHtml(it.label)+"</span>";
       chip.onclick = ()=>{ showEventDetail(key, it.id); };
       alldayWrap.appendChild(chip);
     });
@@ -2400,7 +2442,7 @@ function renderDayView(){
 
     const iconSpan = document.createElement("i");
     iconSpan.className = "slot-icon";
-    iconSpan.textContent = covering ? "🔒" : "+";
+    iconSpan.innerHTML = covering ? icon("lock",15) : icon("plus",15);
 
     const left = document.createElement("div");
     left.style.display="flex"; left.style.flexDirection="column"; left.style.gap="2px";
@@ -2555,7 +2597,7 @@ function renderWeekView(){
         info.innerHTML = "<span class='wi-res'>"+it.res+"</span> &nbsp; <span class='wi-time'>"+timeLabel+" · "+escapeHtml(it.label)+"</span>";
         const del = document.createElement("span");
         del.className = "wi-del";
-        del.innerHTML = "🗑";
+        del.innerHTML = icon("trash",15);
         del.onclick = (e)=>{ e.stopPropagation(); if(confirm(t("week.confirmDelete"))) removeBooking(key, it.id); };
         row.onclick = ()=>{ showEventDetail(key, it.id); };
         row.appendChild(info);
@@ -3054,9 +3096,9 @@ document.getElementById("modal-overlay").addEventListener("click",(e)=>{
 
 function applyTheme(isDark){
   document.body.classList.toggle("dark-mode", isDark);
-  document.getElementById("theme-toggle").textContent = isDark ? "☀️" : "🌙";
+  document.getElementById("theme-toggle").innerHTML = isDark ? icon("sun",16) : icon("moon",16);
   const loginToggle = document.getElementById("login-theme-toggle");
-  if(loginToggle) loginToggle.textContent = isDark ? "☀️" : "🌙";
+  if(loginToggle) loginToggle.innerHTML = isDark ? icon("sun",16) : icon("moon",16);
   const metaTheme = document.getElementById("meta-theme-color");
   if(metaTheme) metaTheme.setAttribute("content", isDark ? "#151412" : "#f4f3f1");
   try{ localStorage.setItem("gestionale_theme", isDark ? "dark" : "light"); }catch(e){}
@@ -3147,7 +3189,7 @@ function refreshAnnouncementBadge(){
     bannerText.onclick = openAnnouncementsPanel;
     if(bannerCheck){
       bannerCheck.style.background = alreadyChecked ? "var(--btn-secondary-bg)" : "var(--accent)";
-      bannerCheck.textContent = alreadyChecked ? "✓" : "✓";
+      bannerCheck.innerHTML = icon("check",13);
       bannerCheck.title = alreadyChecked ? "Già letto" : "Segna come letto";
     }
   }
@@ -3168,7 +3210,7 @@ function renderAnnouncementPanel(){
   const canSeeCounts = canSeeCheckmarkCounts();
   const canManageThis = ann && (isAdmin() || ann.author === currentUser);
 
-  let html = "<h3>"+t("announce.title")+"</h3>";
+  let html = "<h3 style='display:flex;align-items:center;gap:8px;'>"+icon("megaphone",18)+t("announce.title")+"</h3>";
 
   if(!ann){
     html += "<div class='todo-empty' style='margin-bottom:14px;'>"+t("announce.none")+"</div>";
@@ -3185,7 +3227,7 @@ function renderAnnouncementPanel(){
     `;
     if(canSeeCounts){
       const count = (ann.checkedBy || []).length;
-      html += `<p style="font-size:12.5px;color:var(--text-muted);margin-top:10px;">✔ ${count}${count===1 ? t("announce.count1") : t("announce.countMany")}</p>`;
+      html += `<p style="font-size:12.5px;color:var(--text-muted);margin-top:10px;display:flex;align-items:center;gap:5px;">${icon("checkCircle",13)} ${count}${count===1 ? t("announce.count1") : t("announce.countMany")}</p>`;
     }
     if(canManageThis){
       html += `
@@ -3269,6 +3311,20 @@ function toggleAnnouncementCheck(){
 document.getElementById("announce-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="announce-overlay") closeAnnouncementsPanel();
 });
+
+/* Permette di scrollare la timeline giornaliera orizzontalmente usando la
+   normale rotellina verticale del mouse, non solo il trackpad/drag. */
+(function(){
+  const scrollArea = document.querySelector(".mega-timeline-scroll");
+  if(!scrollArea) return;
+  scrollArea.addEventListener("wheel",(e)=>{
+    // Se lo scroll è già prevalentemente orizzontale (trackpad), lascialo fare al browser.
+    if(Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    if(e.deltaY === 0) return;
+    e.preventDefault();
+    scrollArea.scrollLeft += e.deltaY;
+  }, {passive:false});
+})();
 
 /* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
 applyTranslations();
