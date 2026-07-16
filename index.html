@@ -785,7 +785,8 @@
     border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
   }
   .modal-row{display:flex;gap:8px;}
-  .modal-row > div{flex:1;}
+  .modal-row > div{flex:1;min-width:0;}
+  .modal input[type="time"]{width:100%;max-width:100%;box-sizing:border-box;}
   .modal-actions{display:flex;gap:8px;margin-top:var(--sp-4);}
   .modal-actions button{
     flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-size:13.5px;font-weight:700;cursor:pointer;
@@ -875,22 +876,6 @@
   }
   .login-btn:hover{background:var(--accent-dark);transform:translateY(-1px);}
   .login-btn:active{transform:translateY(0);}
-
-  .captcha-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-  .captcha-box{
-    flex:1 1 auto;min-width:120px;background:var(--bg-soft);border:1px dashed var(--border-strong);
-    border-radius:var(--radius-sm);padding:12px 8px;font-size:22px;font-weight:700;letter-spacing:7px;
-    color:var(--head);user-select:none;text-align:center;font-family:'Courier New',monospace;min-height:24px;
-  }
-  .captcha-refresh{
-    border:1px solid var(--border);background:var(--surface);color:var(--head);
-    border-radius:var(--radius-sm);padding:11px 14px;cursor:pointer;font-size:16px;flex-shrink:0;
-    transition:background .15s;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .captcha-refresh-icon{display:inline-block;transition:transform .35s cubic-bezier(.2,.8,.3,1);}
-  .captcha-refresh:hover{background:var(--bg-soft);}
-  .captcha-refresh:hover .captcha-refresh-icon{transform:rotate(180deg);}
 
   #loading-overlay{
     display:none;position:fixed;inset:0;z-index:600;flex-direction:column;align-items:center;justify-content:center;gap:16px;
@@ -1030,8 +1015,8 @@
     .modal h3{font-size:15px;margin-bottom:var(--sp-2);}
     .modal-row{gap:6px;}
     .modal-row > div{width:100%;min-width:0;}
-    .modal input[type="time"]{padding:8px 6px;font-size:14px;}
-    .modal input[type="date"]{padding:8px 6px;font-size:13px;}
+    .modal input[type="time"]{padding:7px 4px;font-size:13px;width:100%;box-sizing:border-box;}
+    .modal input[type="date"]{padding:7px 4px;font-size:12px;width:100%;box-sizing:border-box;}
   }
 </style>
 </head>
@@ -1048,13 +1033,8 @@
     </div>
     <img src="L.jpg" alt="Logo" class="login-logo">
     <h2 data-i18n="login.title">LOGIN</h2>
-    <input type="text" id="login-username" data-i18n-placeholder="login.username" placeholder="Email" autocomplete="username">
-    <input type="password" id="login-password" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password">
-    <div class="captcha-row">
-      <div class="captcha-box" id="captcha-text"></div>
-      <div class="captcha-refresh" onclick="newCaptcha()" title="Nuovo codice"><span class="captcha-refresh-icon"><svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"></path></svg></span></div>
-    </div>
-    <input type="text" id="login-captcha" data-i18n-placeholder="login.captchaPlaceholder" placeholder="Inserisci il codice mostrato" onkeydown="if(event.key==='Enter') attemptLogin()">
+    <input type="text" id="login-username" data-i18n-placeholder="login.username" placeholder="E-Mail" autocomplete="username">
+    <input type="password" id="login-password" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter') attemptLogin()">
     <div class="login-error" id="login-error"></div>
     <button class="login-btn" onclick="attemptLogin()" data-i18n="login.submit">Accedi</button>
   </div>
@@ -1366,12 +1346,10 @@ const I18N = {
     "app.title": "Gestionale",
     "login.title": "LOGIN",
     "login.subtitle": "Gestionale La Strada der Weg",
-    "login.username": "Email",
+    "login.username": "E-Mail",
     "login.password": "Password",
-    "login.captchaPlaceholder": "Inserisci il codice mostrato",
     "login.submit": "Accedi",
     "login.errNeedBoth": "Inserisci nome utente e password.",
-    "login.errCaptcha": "Codice di verifica non corretto.",
     "login.errPassword": "Password errata.",
     "login.errUserNotFound": "Utente non trovato.",
     "loading.text": "Caricamento...",
@@ -1484,10 +1462,8 @@ const I18N = {
     "login.subtitle": "Verwaltung La Strada der Weg",
     "login.username": "E-Mail",
     "login.password": "Passwort",
-    "login.captchaPlaceholder": "Angezeigten Code eingeben",
     "login.submit": "Anmelden",
     "login.errNeedBoth": "Bitte Benutzername und Passwort eingeben.",
-    "login.errCaptcha": "Der Sicherheitscode ist falsch.",
     "login.errPassword": "Falsches Passwort.",
     "login.errUserNotFound": "Benutzer nicht gefunden.",
     "loading.text": "Wird geladen...",
@@ -1598,12 +1574,10 @@ const I18N = {
     "app.title": "Manager",
     "login.title": "LOGIN",
     "login.subtitle": "La Strada der Weg Manager",
-    "login.username": "Email",
+    "login.username": "E-Mail",
     "login.password": "Password",
-    "login.captchaPlaceholder": "Enter the code shown above",
     "login.submit": "Sign in",
     "login.errNeedBoth": "Please enter a username and password.",
-    "login.errCaptcha": "The verification code is incorrect.",
     "login.errPassword": "Incorrect password.",
     "login.errUserNotFound": "User not found.",
     "loading.text": "Loading...",
@@ -1835,38 +1809,15 @@ function isAdmin(){ return currentUser === ADMIN_USERNAME; }
 function isSpecialViewer(){ return currentUser === SPECIAL_VIEWER_EMAIL; }
 function canSeeCheckmarkCounts(){ return isAdmin() || isSpecialViewer(); }
 
-let currentCaptcha = "";
-function randCaptcha(){
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "";
-  for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
-  return s;
-}
-function newCaptcha(){
-  currentCaptcha = randCaptcha();
-  const box = document.getElementById("captcha-text");
-  const inp = document.getElementById("login-captcha");
-  if(box) box.textContent = currentCaptcha;
-  if(inp) inp.value = "";
-}
-
 async function attemptLogin(){
   const nameInp = document.getElementById("login-username");
   const passInp = document.getElementById("login-password");
-  const captchaInp = document.getElementById("login-captcha");
   const errEl = document.getElementById("login-error");
   const name = nameInp.value.trim();
   const pass = passInp.value;
-  const captchaValue = captchaInp.value.trim().toUpperCase();
 
   if(!name || !pass){
     errEl.textContent = t("login.errNeedBoth");
-    return;
-  }
-
-  if(captchaValue !== currentCaptcha){
-    errEl.textContent = t("login.errCaptcha");
-    newCaptcha();
     return;
   }
 
@@ -1875,7 +1826,6 @@ async function attemptLogin(){
       completeLogin(ADMIN_USERNAME, true);
     } else {
       errEl.textContent = t("login.errPassword");
-      newCaptcha();
     }
     return;
   }
@@ -1884,13 +1834,11 @@ async function attemptLogin(){
   const user = users[name];
   if(!user){
     errEl.textContent = t("login.errUserNotFound");
-    newCaptcha();
     return;
   }
   const hashed = await sha256(pass);
   if(hashed !== user.passwordHash){
     errEl.textContent = t("login.errPassword");
-    newCaptcha();
     return;
   }
   completeLogin(name, true);
@@ -3481,7 +3429,6 @@ document.addEventListener("click", (e)=>{
 
 /* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
 applyTranslations();
-newCaptcha();
 if(!tryRestoreSession()){
   document.getElementById("login-overlay").style.display = "flex";
 }
