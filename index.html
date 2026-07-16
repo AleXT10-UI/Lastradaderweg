@@ -120,7 +120,13 @@
     --shadow-card-hover:0 2px 4px rgba(0,0,0,.45), 0 14px 32px -10px rgba(0,0,0,.6);
     --shadow-pop:0 24px 60px -12px rgba(0,0,0,.7);
   }
-  body.dark-mode{ background:var(--bg); }
+  body.dark-mode{
+    background:
+      radial-gradient(1100px 700px at 12% -8%, rgba(255,0,132,.06), transparent 55%),
+      radial-gradient(900px 700px at 105% 15%, rgba(255,0,132,.045), transparent 55%),
+      radial-gradient(1200px 800px at 50% 100%, rgba(255,0,132,.22), transparent 60%),
+      var(--bg);
+  }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
@@ -129,10 +135,11 @@
      servono a distinguere le risorse per colore, non sono decorazioni. */
   span[aria-hidden="true"], .ab-icon, .search-icon,
   #theme-toggle, #search-toggle, #users-toggle, #announce-toggle, #logout-toggle,
+  #dvt-timeline, #dvt-list,
   .todo-del, .wi-del, .dd-del, .rm-delete, .rm-handle{
     filter:grayscale(1);
   }
-  #search-toggle.active{filter:none;}
+  #search-toggle.active, #dvt-timeline.active, #dvt-list.active{filter:none;}
 
   html{overflow-x:hidden;background:var(--bg);min-height:100%;}
   body{
@@ -145,6 +152,7 @@
     background:
       radial-gradient(1100px 700px at 12% -8%, rgba(192,57,47,.07), transparent 55%),
       radial-gradient(900px 700px at 105% 15%, rgba(192,57,47,.05), transparent 55%),
+      radial-gradient(1200px 800px at 50% 100%, rgba(192,57,47,.35), transparent 60%),
       var(--bg);
     background-attachment:fixed;
     min-height:100vh;min-height:100dvh;color:var(--text-main);
@@ -219,22 +227,38 @@
     flex:1;font-size:var(--fs-lg);color:var(--head);margin:0;
     font-weight:700;letter-spacing:-.02em;
   }
-  #theme-toggle, #search-toggle, #users-toggle, #announce-toggle{
+  #theme-toggle, #search-toggle, #users-toggle, #announce-toggle, #lang-toggle{
     border:1px solid var(--border);background:var(--surface);color:var(--head);
     width:38px;height:38px;border-radius:var(--radius-sm);font-size:15px;cursor:pointer;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:background .15s,border-color .15s;position:relative;
   }
+  #lang-toggle{font-size:11px;font-weight:800;letter-spacing:.02em;}
   #logout-toggle{
     border:1px solid var(--border);background:var(--surface);color:var(--head);
     height:38px;padding:0 var(--sp-3);border-radius:var(--radius-sm);
     font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;
     flex-shrink:0;transition:background .15s,border-color .15s;white-space:nowrap;
   }
-  #theme-toggle:hover, #search-toggle:hover, #logout-toggle:hover, #users-toggle:hover, #announce-toggle:hover{
+  #theme-toggle:hover, #search-toggle:hover, #logout-toggle:hover, #users-toggle:hover, #announce-toggle:hover, #lang-toggle:hover{
     background:var(--bg-soft);border-color:var(--border-strong);
   }
   #search-toggle.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  /* ---------- Selettore lingua nell'header (dropdown compatto) ---------- */
+  .lang-dropdown-wrap{position:relative;flex-shrink:0;}
+  .lang-dropdown-menu{
+    display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:70;
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-pop);overflow:hidden;min-width:130px;
+  }
+  .lang-dropdown-menu.open{display:block;}
+  .lang-dropdown-menu button{
+    display:block;width:100%;text-align:left;border:none;background:transparent;color:var(--text-main);
+    padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;
+  }
+  .lang-dropdown-menu button:hover{background:var(--bg-soft);}
+  .lang-dropdown-menu button.active{color:var(--accent);background:var(--accent-soft);}
   .announce-badge{
     position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;
     min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;
@@ -818,23 +842,6 @@
   .loading-text{color:var(--head);font-size:var(--fs-base);font-weight:700;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* ---------- Onda di transizione tema (giorno/notte) ----------
-     Un cerchio parte dal punto in cui è stato premuto il bottone tema e si
-     espande fino a coprire tutto lo schermo in modo fluido, poi svanisce.
-     Il colore dell'onda anticipa il tema verso cui si sta passando. */
-  #theme-wave-overlay{
-    position:fixed;inset:0;z-index:550;pointer-events:none;
-    opacity:0;
-    background:radial-gradient(circle at var(--wave-x,50%) var(--wave-y,50%),
-      var(--wave-color,#151412) 0%, var(--wave-color,#151412) 70%, transparent 71%);
-    clip-path:circle(0% at var(--wave-x,50%) var(--wave-y,50%));
-  }
-  #theme-wave-overlay.animating{
-    opacity:1;
-    transition:clip-path 4.2s cubic-bezier(.4,0,.2,1), opacity .8s ease 4.2s;
-    clip-path:circle(150% at var(--wave-x,50%) var(--wave-y,50%));
-  }
-
   /* ---------- Gestione risorse / utenti ---------- */
   .manage-res-modal{max-width:440px;}
   .res-manage-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;margin-bottom:var(--sp-4);}
@@ -904,7 +911,7 @@
     header{padding:8px 10px;flex-wrap:wrap;gap:6px;row-gap:8px;}
     header h1{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     header img{height:28px;}
-    #theme-toggle, #search-toggle, #users-toggle, #announce-toggle{width:32px;height:32px;font-size:13px;}
+    #theme-toggle, #search-toggle, #users-toggle, #announce-toggle, #lang-toggle{width:32px;height:32px;font-size:11px;}
     #logout-toggle{height:32px;padding:0 9px;font-size:11px;}
     .profile-pic{width:24px;height:24px;}
     .profile-name{font-size:11px;max-width:70px;}
@@ -956,7 +963,7 @@
 <body>
 
 <div id="login-overlay">
-  <button id="login-theme-toggle" onclick="toggleTheme(event)" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+  <button id="login-theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
   <div class="login-card">
     <div class="login-lang-switch" id="login-lang-switch">
       <button class="lang-btn" data-lang="it" onclick="setLanguage('it')">IT</button>
@@ -966,7 +973,7 @@
     <img src="L.jpg" alt="Logo" class="login-logo">
     <h2 data-i18n="login.title">Accedi</h2>
     <p class="login-subtitle" data-i18n="login.subtitle">Gestionale La Strada der Weg</p>
-    <input type="text" id="login-username" data-i18n-placeholder="login.username" placeholder="Nome utente" autocomplete="username">
+    <input type="text" id="login-username" data-i18n-placeholder="login.username" placeholder="Email" autocomplete="username">
     <input type="password" id="login-password" data-i18n-placeholder="login.password" placeholder="Password" autocomplete="current-password">
     <div class="captcha-row">
       <div class="captcha-box" id="captcha-text"></div>
@@ -983,16 +990,24 @@
   <div class="loading-text" data-i18n="loading.text">Caricamento...</div>
 </div>
 
-<div id="theme-wave-overlay"></div>
-
 <div class="app">
   <header>
     <img src="L.jpg" alt="Logo" id="logo-img">
     <h1 data-i18n="app.title">Gestionale</h1>
+    <div class="lang-dropdown-wrap" id="lang-dropdown-wrap">
+      <button id="lang-toggle" onclick="toggleLangDropdown()" title="Lingua / Language / Sprache" aria-label="Lingua">
+        <span id="lang-toggle-label">IT</span>
+      </button>
+      <div class="lang-dropdown-menu" id="lang-dropdown-menu">
+        <button data-lang="it" onclick="setLanguage('it'); closeLangDropdown();">Italiano</button>
+        <button data-lang="de" onclick="setLanguage('de'); closeLangDropdown();">Deutsch</button>
+        <button data-lang="en" onclick="setLanguage('en'); closeLangDropdown();">English</button>
+      </div>
+    </div>
     <button id="announce-toggle" onclick="openAnnouncementsPanel()" title="Annunci" aria-label="Annunci" style="display:none;">📣<span class="announce-badge" id="announce-badge" style="display:none;"></span></button>
     <button id="users-toggle" onclick="openUsersPanel()" title="Gestisci utenti" aria-label="Gestisci utenti" style="display:none;">👤</button>
     <button id="search-toggle" onclick="toggleSearchBar()" title="Cerca" aria-label="Cerca">🔍</button>
-    <button id="theme-toggle" onclick="toggleTheme(event)" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema" aria-label="Cambia tema">🌙</button>
     <button id="logout-toggle" onclick="doLogout()" title="Esci" aria-label="Esci">Log Out</button>
     <div class="profile-badge" id="profile-badge">
       <img src="pfp.jpg" alt="Profilo" class="profile-pic">
@@ -1217,7 +1232,7 @@ const I18N = {
     "app.title": "Gestionale",
     "login.title": "Accedi",
     "login.subtitle": "Gestionale La Strada der Weg",
-    "login.username": "Nome utente",
+    "login.username": "Email",
     "login.password": "Password",
     "login.captchaPlaceholder": "Inserisci il codice mostrato",
     "login.submit": "Accedi",
@@ -1330,7 +1345,7 @@ const I18N = {
     "app.title": "Verwaltung",
     "login.title": "Anmelden",
     "login.subtitle": "Verwaltung La Strada der Weg",
-    "login.username": "Benutzername",
+    "login.username": "E-Mail",
     "login.password": "Passwort",
     "login.captchaPlaceholder": "Angezeigten Code eingeben",
     "login.submit": "Anmelden",
@@ -1443,7 +1458,7 @@ const I18N = {
     "app.title": "Manager",
     "login.title": "Sign in",
     "login.subtitle": "La Strada der Weg Manager",
-    "login.username": "Username",
+    "login.username": "Email",
     "login.password": "Password",
     "login.captchaPlaceholder": "Enter the code shown above",
     "login.submit": "Sign in",
@@ -1585,6 +1600,19 @@ function setLanguage(lang){
   }
 }
 
+function toggleLangDropdown(){
+  const menu = document.getElementById("lang-dropdown-menu");
+  if(menu) menu.classList.toggle("open");
+}
+function closeLangDropdown(){
+  const menu = document.getElementById("lang-dropdown-menu");
+  if(menu) menu.classList.remove("open");
+}
+document.addEventListener("click",(e)=>{
+  const wrap = document.getElementById("lang-dropdown-wrap");
+  if(wrap && !wrap.contains(e.target)) closeLangDropdown();
+});
+
 /* Applica le traduzioni a tutti gli elementi statici marcati con
    data-i18n (testo) o data-i18n-placeholder (placeholder input), e
    aggiorna lo stato attivo del selettore lingua nel login. */
@@ -1597,6 +1625,11 @@ function applyTranslations(){
     el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
   });
   document.querySelectorAll(".login-lang-switch .lang-btn").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
+  const langLabel = document.getElementById("lang-toggle-label");
+  if(langLabel) langLabel.textContent = currentLang.toUpperCase();
+  document.querySelectorAll(".lang-dropdown-menu button").forEach(btn=>{
     btn.classList.toggle("active", btn.dataset.lang === currentLang);
   });
   const logoutBtn = document.getElementById("logout-toggle");
@@ -1849,7 +1882,7 @@ document.getElementById("users-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="users-overlay") closeUsersPanel();
 });
 
-const DEFAULT_RESOURCES = ["1"];
+const DEFAULT_RESOURCES = ["1","2","3","4","5","6","7","8"];
 
 
 let RESOURCES = loadResources();
@@ -3028,36 +3061,8 @@ function applyTheme(isDark){
   if(metaTheme) metaTheme.setAttribute("content", isDark ? "#151412" : "#f4f3f1");
   try{ localStorage.setItem("gestionale_theme", isDark ? "dark" : "light"); }catch(e){}
 }
-function toggleTheme(event){
-  const goingDark = !document.body.classList.contains("dark-mode");
-  const wave = document.getElementById("theme-wave-overlay");
-
-  if(wave){
-    let x = "50%", y = "50%";
-    if(event && event.currentTarget){
-      const rect = event.currentTarget.getBoundingClientRect();
-      x = (rect.left + rect.width/2) + "px";
-      y = (rect.top + rect.height/2) + "px";
-    }
-    wave.style.setProperty("--wave-x", x);
-    wave.style.setProperty("--wave-y", y);
-    wave.style.setProperty("--wave-color", goingDark ? "#151412" : "#f4f3f1");
-
-    wave.classList.remove("animating");
-    // forza il reflow così il browser riparte da clip-path:circle(0%) ogni volta
-    void wave.offsetWidth;
-    wave.classList.add("animating");
-
-    // Applica il tema reale a metà dell'espansione, quando l'onda ha già
-    // coperto buona parte dello schermo: così il cambiamento non si vede
-    // "a scatto" ma sembra portato dall'onda stessa.
-    setTimeout(()=>{ applyTheme(goingDark); }, 900);
-
-    // Rimuove la classe a fine animazione per poterla rilanciare al click successivo
-    setTimeout(()=>{ wave.classList.remove("animating"); }, 5200);
-  } else {
-    applyTheme(goingDark);
-  }
+function toggleTheme(){
+  applyTheme(!document.body.classList.contains("dark-mode"));
 }
 function initTheme(){
   let saved = null;
