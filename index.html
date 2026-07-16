@@ -67,8 +67,8 @@
     --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
     --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-md:15px; --fs-lg:17px; --fs-xl:20px; --fs-2xl:26px;
     --radius-sm:11px; --radius-md:16px; --radius-lg:22px;
-    --shadow-card:0 1px 3px rgba(30,25,20,.08), 0 10px 28px -8px rgba(30,25,20,.16);
-    --shadow-card-hover:0 3px 6px rgba(30,25,20,.10), 0 18px 38px -10px rgba(30,25,20,.22);
+    --shadow-card:0 1px 2px rgba(30,25,20,.08), 0 4px 12px -4px rgba(30,25,20,.18);
+    --shadow-card-hover:0 2px 4px rgba(30,25,20,.10), 0 8px 18px -6px rgba(30,25,20,.24);
     --shadow-pop:0 30px 70px -12px rgba(30,25,20,.38);
     --shadow-inset-top:inset 0 1px 0 rgba(255,255,255,.6);
     --shadow-btn:0 1px 2px rgba(30,25,20,.06), 0 4px 10px -4px rgba(30,25,20,.14);
@@ -118,13 +118,14 @@
     --page-grad-end:#151412;
     --shadow-soft:rgba(0,0,0,.35);
     --shadow-strong:rgba(0,0,0,.5);
-    --shadow-card:0 1px 3px rgba(0,0,0,.5), 0 12px 30px -8px rgba(0,0,0,.6);
-    --shadow-card-hover:0 3px 6px rgba(0,0,0,.55), 0 20px 40px -10px rgba(0,0,0,.7);
+    --shadow-card:0 1px 2px rgba(0,0,0,.5), 0 5px 14px -4px rgba(0,0,0,.65);
+    --shadow-card-hover:0 2px 4px rgba(0,0,0,.55), 0 10px 22px -6px rgba(0,0,0,.75);
     --shadow-pop:0 30px 70px -12px rgba(0,0,0,.8);
     --shadow-inset-top:inset 0 1px 0 rgba(255,255,255,.06);
     --shadow-btn:0 1px 2px rgba(0,0,0,.4), 0 4px 12px -4px rgba(0,0,0,.5);
   }
   body.dark-mode{
+    color-scheme:dark;
     background:
       radial-gradient(1100px 700px at 12% -8%, rgba(255,0,132,.06), transparent 55%),
       radial-gradient(900px 700px at 105% 15%, rgba(255,0,132,.045), transparent 55%),
@@ -173,7 +174,7 @@
   button:disabled:active{transform:none;}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
-  /* allora togli la roba che mi chiede se sono sicuro di eliminare qualcosa da per tutto poi nella agenda c'e un piccolo problema quando provo a rimuovere una cosa su le robe da fare non me le fa eliminare poi una cosa carina essendo che c'e l'effetto neon volevo che le cornici di tutta la pagina riflettevano in base come si muove la roba neon quindi quando ho la tab giorno aperta tutte le cornici vicino ad esso riflettono poi volevo piu ombre le voglio piu vicine poi su la timeline c'e una piccola impresicazione allora in pratica gli orari sono 30 minuti in dietro es: la linea è a metta di 12 l'elemento finisce alle 12 pero nella linea finisce alle alla fine fine fine delle 11 inizio 12 pero in questo momento sono le 11:40 è un poi sfasato cerca di sistemarlo (succede solo da telefono) poi se puoi spostare solo da telefono spostare la ricerca è la roba giorno è notte tutto a destra poi inverti la posizione del nome utente e logout e logout e nome utente deve stare a sinistra poi il tasto elimina quello che clicchi quando vai nella daily timeline c'e il tasto ancora rosso mentre sono in modalita notte poi sempre nella timeline il nome del'evento deve seguire la tua posizione e poi piccola cosa su telefono ci sia il feedback aptico se è possibile poi voglio che sistemi il fatto che dei nuovi elementi allora ho un grande problema io nei nuovi elementi è ancora troppo grande per telefono ORIZONTALMENTE tu devi rimpiciolire di tanto orizontalmente quella finestra pop up e perfavore sistame un poco la ui di essa perche tipo c'e la roba chiamata all day o tutto il giorno che il bottone è ancora bianco e poi ci sono le icone ancora nere qaundo sono in modalita scura quindi non riesco a vedere poi la roba quando metto l'orario tipo dalle alle deve essere molto piu piccolo orizontalmente
+  /* ---------- Scrollbar personalizzate ---------- */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--border-strong) transparent;
@@ -362,6 +363,14 @@
   .card{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
     box-shadow:var(--shadow-card), var(--shadow-inset-top);overflow:hidden;margin-bottom:var(--sp-3);
+    transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  /* In dark mode, le card della vista attualmente attiva riflettono un
+     sottile bagliore neon sul bordo, coerente con l'accento del tema. */
+  body.dark-mode .mega-timeline-card,
+  body.dark-mode #view-day-el{
+    border-color:rgba(255,0,132,.25);
+    box-shadow:var(--shadow-card), var(--shadow-inset-top), 0 0 24px rgba(255,0,132,.08);
   }
 
   /* ---------- Timeline giornaliera (mega) ---------- */
@@ -406,6 +415,16 @@
   .mtl-block .mtl-block-time{font-size:8px;opacity:.9;}
   .mtl-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--now-line);z-index:4;pointer-events:none;}
   .mtl-empty{padding:var(--sp-6);text-align:center;color:var(--text-muted);font-size:var(--fs-sm);}
+
+  .following-tooltip{
+    position:fixed;top:0;left:0;z-index:200;pointer-events:none;
+    background:var(--head);color:var(--surface);font-size:12px;font-weight:600;
+    padding:6px 10px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25);
+    opacity:0;transform:translateY(4px);
+    transition:opacity .12s ease, transform .12s ease;
+    max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .following-tooltip.visible{opacity:1;transform:translateY(0);}
 
   /* ---------- Toggle pannello giorno (mobile) ---------- */
   .day-view-toggle-mobile{
@@ -739,7 +758,16 @@
     display:flex !important;align-items:center;gap:8px;font-size:13px !important;font-weight:600;
     color:var(--head) !important;cursor:pointer;margin:var(--sp-2) 0 4px;text-transform:none !important;letter-spacing:0 !important;
   }
-  .allday-toggle input{width:16px !important;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;padding:0;}
+  .allday-toggle input{
+    width:16px !important;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;padding:0;
+    -webkit-appearance:none;appearance:none;border:2px solid var(--border-strong);border-radius:4px;
+    background:var(--bg-soft);position:relative;
+  }
+  .allday-toggle input:checked{background:var(--accent);border-color:var(--accent);}
+  .allday-toggle input:checked::after{
+    content:"";position:absolute;left:3px;top:0px;width:4px;height:8px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
   .modal-row{display:flex;gap:8px;}
   .modal-row > div{flex:1;}
   .modal-actions{display:flex;gap:8px;margin-top:var(--sp-4);}
@@ -917,8 +945,8 @@
   @media (max-width:600px){
     .app{padding:10px;padding-bottom:96px;}
     header{padding:8px 10px;flex-wrap:wrap;gap:6px;row-gap:8px;}
-    header h1{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    header img{height:28px;}
+    header h1{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;order:1;}
+    header img{height:28px;order:0;}
     #theme-toggle, #search-toggle, #users-toggle, #announce-toggle, #lang-toggle{width:32px;height:32px;font-size:11px;}
     #logout-toggle{height:32px;padding:0 9px;font-size:11px;}
     .profile-pic{width:24px;height:24px;}
@@ -929,6 +957,17 @@
     .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:46px;height:46px;font-size:20px;}
     .view-switch button{font-size:10.5px;padding:9px 3px;gap:3px;}
     .view-switch button i{font-size:14px;}
+
+    /* Ordine header mobile: logo, titolo, poi logout+profilo (invertiti,
+       a sinistra), poi lingua/annunci/utenti, poi ricerca+tema in fondo
+       a destra */
+    #logout-toggle{order:2;}
+    .profile-badge{order:3;}
+    .lang-dropdown-wrap{order:4;}
+    #announce-toggle{order:5;}
+    #users-toggle{order:6;}
+    #search-toggle{order:7;}
+    #theme-toggle{order:8;}
 
     .announce-banner.visible{
       display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--accent);
@@ -962,10 +1001,12 @@
     .duplicate-day-btn, .manage-res-btn{flex:1;justify-content:center;}
     .duplicate-day-btn .dup-txt{display:inline;}
 
-    .modal{width:94vw;padding:16px;}
+    .modal{width:88vw;max-width:340px;padding:16px;}
     .modal h3{font-size:15px;margin-bottom:var(--sp-2);}
-    .modal-row{gap:8px;}
-    .modal-row > div{width:100%;}
+    .modal-row{gap:6px;}
+    .modal-row > div{width:100%;min-width:0;}
+    .modal input[type="time"]{padding:8px 6px;font-size:14px;}
+    .modal input[type="date"]{padding:8px 6px;font-size:13px;}
   }
 </style>
 </head>
@@ -1901,12 +1942,10 @@ function renderUsersManageList(){
       }
     };
     item.querySelector(".rm-delete").onclick = ()=>{
-      if(confirm(t("users.confirmDelete", {name:name}))){
-        const u = loadUsers();
-        delete u[name];
-        saveUsers(u);
-        renderUsersManageList();
-      }
+      const u = loadUsers();
+      delete u[name];
+      saveUsers(u);
+      renderUsersManageList();
     };
     listEl.appendChild(item);
   });
@@ -2483,6 +2522,36 @@ function renderDayView(){
   renderMegaTimeline(key);
 }
 
+/* Tooltip custom che segue la posizione del mouse mentre è sopra
+   l'elemento, invece del title nativo del browser (statico, lento a
+   comparire, non personalizzabile). Usato per i nomi degli eventi nella
+   mega-timeline giornaliera. */
+let followingTooltipEl = null;
+function getFollowingTooltip(){
+  if(!followingTooltipEl){
+    followingTooltipEl = document.createElement("div");
+    followingTooltipEl.className = "following-tooltip";
+    document.body.appendChild(followingTooltipEl);
+  }
+  return followingTooltipEl;
+}
+function attachFollowingTooltip(el, text){
+  el.addEventListener("mouseenter", ()=>{
+    const tip = getFollowingTooltip();
+    tip.textContent = text;
+    tip.classList.add("visible");
+  });
+  el.addEventListener("mousemove", (e)=>{
+    const tip = getFollowingTooltip();
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY + 18) + "px";
+  });
+  el.addEventListener("mouseleave", ()=>{
+    const tip = getFollowingTooltip();
+    tip.classList.remove("visible");
+  });
+}
+
 function renderMegaTimeline(key){
   const grid = document.getElementById("mega-timeline-grid");
   if(!grid) return;
@@ -2539,7 +2608,8 @@ function renderMegaTimeline(key){
 
       block.appendChild(nameEl);
       block.appendChild(timeEl);
-      block.title = res + " — " + it.label + " (" + timeEl.textContent + ")";
+      const tooltipText = res + " — " + it.label + " (" + timeEl.textContent + ")";
+      attachFollowingTooltip(block, tooltipText);
       track.appendChild(block);
     });
 
@@ -2551,7 +2621,10 @@ function renderMegaTimeline(key){
     const pct = (now.getHours() + now.getMinutes()/60) / 24 * 100;
     const nowLine = document.createElement("div");
     nowLine.className = "mtl-now-line";
-    nowLine.style.left = "calc(140px + (100% - 140px) * " + (pct/100) + ")";
+    // La larghezza della colonna etichetta risorsa cambia per breakpoint:
+    // 90px su mobile, 130px da 1100px in su (vedi .mega-timeline-grid).
+    const labelColWidth = window.matchMedia("(min-width:1100px)").matches ? 130 : 90;
+    nowLine.style.left = "calc(" + labelColWidth + "px + (100% - " + labelColWidth + "px) * " + (pct/100) + ")";
     nowLine.style.top = "0";
     nowLine.style.bottom = "0";
     grid.appendChild(nowLine);
@@ -2609,7 +2682,7 @@ function renderWeekView(){
         const del = document.createElement("span");
         del.className = "wi-del";
         del.innerHTML = icon("trash",15);
-        del.onclick = (e)=>{ e.stopPropagation(); if(confirm(t("week.confirmDelete"))) removeBooking(key, it.id); };
+        del.onclick = (e)=>{ e.stopPropagation(); removeBooking(key, it.id); };
         row.onclick = ()=>{ showEventDetail(key, it.id); };
         row.appendChild(info);
         row.appendChild(del);
@@ -2630,6 +2703,14 @@ function renderWeekView(){
     const mtEl = renderMiniTimeline(items, "week-mt-"+i);
     addNowLineToTimeline(mtEl, d);
   }
+}
+
+/* Feedback aptico su mobile (vibrazione breve), se il dispositivo/browser
+   lo supporta. Su desktop o dispositivi senza supporto non fa nulla. */
+function haptic(ms){
+  try{
+    if(navigator.vibrate) navigator.vibrate(ms || 10);
+  }catch(e){}
 }
 
 function escapeHtml(s){
@@ -2692,20 +2773,20 @@ function renderTodos(){
     listEl.innerHTML = "<div class='todo-empty'>Nessun elemento da fare.</div>";
     return;
   }
-  todos.forEach(t=>{
+  todos.forEach(todo=>{
     const row = document.createElement("div");
-    row.className = "todo-item" + (t.done ? " done" : "");
+    row.className = "todo-item" + (todo.done ? " done" : "");
     const cb = document.createElement("input");
     cb.type = "checkbox";
-    cb.checked = t.done;
-    cb.onchange = ()=>toggleTodo(t.id);
+    cb.checked = todo.done;
+    cb.onchange = ()=>toggleTodo(todo.id);
     const txt = document.createElement("span");
     txt.className = "todo-text";
-    txt.textContent = t.text;
+    txt.textContent = todo.text;
     const del = document.createElement("span");
     del.className = "todo-del";
     del.innerHTML = icon("trash",14);
-    del.onclick = ()=>{ if(confirm(t("week.confirmDelete"))) deleteTodo(t.id); };
+    del.onclick = ()=>{ deleteTodo(todo.id); };
     row.appendChild(cb);
     row.appendChild(txt);
     row.appendChild(del);
@@ -2827,7 +2908,7 @@ function showMonthDayDetail(d){
   } else {
     items.forEach(it=>{
       const timeLabel = it.allDay ? t("detail.allDay") : (fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end));
-      html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+timeLabel+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='if(confirm(\""+t("week.confirmDelete")+"\")){removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");}'>"+icon("trash",13)+"</span></div>";
+      html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+timeLabel+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");'>"+icon("trash",13)+"</span></div>";
     });
   }
   html += "</div>";
@@ -2926,16 +3007,10 @@ function renderManageResourcesList(){
         alert(t("resources.onlyOne"));
         return;
       }
-      const hasEvents = Object.values(bookings).some(arr => arr.some(b=>b.res===res));
-      const msg = hasEvents
-        ? t("resources.confirmDeleteWithEvents", {name:res})
-        : t("resources.confirmDelete", {name:res});
-      if(confirm(msg)){
-        RESOURCES = RESOURCES.filter(r=>r!==res);
-        saveResources();
-        if(selectedResource === res) selectedResource = RESOURCES[0];
-        renderManageResourcesList();
-      }
+      RESOURCES = RESOURCES.filter(r=>r!==res);
+      saveResources();
+      if(selectedResource === res) selectedResource = RESOURCES[0];
+      renderManageResourcesList();
     };
 
     item.addEventListener("dragstart",(e)=>{
@@ -3043,7 +3118,7 @@ function showEventDetail(dateKey, id){
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEventDetail()">${t("detail.close")}</button>
-      <button class="btn-confirm" style="background:var(--danger);" onclick="deleteFromDetail('${dateKey}', ${id})">${t("detail.delete")}</button>
+      <button class="btn-confirm" style="background:var(--accent);box-shadow:0 2px 8px var(--accent-shadow), var(--neon-glow);" onclick="deleteFromDetail('${dateKey}', ${id})">${t("detail.delete")}</button>
     </div>
   `;
   document.getElementById("detail-overlay").classList.add("open");
@@ -3052,10 +3127,8 @@ function closeEventDetail(){
   document.getElementById("detail-overlay").classList.remove("open");
 }
 function deleteFromDetail(dateKey, id){
-  if(confirm("Eliminare questo elemento?")){
-    closeEventDetail();
-    removeBooking(dateKey, id);
-  }
+  closeEventDetail();
+  removeBooking(dateKey, id);
 }
 document.getElementById("detail-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="detail-overlay") closeEventDetail();
@@ -3286,7 +3359,6 @@ function cancelEditAnnouncement(){
   if(section) section.style.display = "none";
 }
 function deleteAnnouncement(){
-  if(!confirm(t("announce.confirmDelete"))) return;
   try{ localStorage.removeItem("gestionale_announcement"); }catch(e){}
   renderAnnouncementPanel();
   refreshAnnouncementBadge();
@@ -3336,6 +3408,16 @@ document.getElementById("announce-overlay").addEventListener("click",(e)=>{
     scrollArea.scrollLeft += e.deltaY;
   }, {passive:false});
 })();
+
+/* Feedback aptico globale: vibra brevemente ad ogni click su elementi
+   interattivi comuni (bottoni, slot orari, celle calendario, righe
+   cliccabili). Delegato su document così copre tutta l'app senza dover
+   toccare ogni singolo handler onclick. */
+document.addEventListener("click", (e)=>{
+  if(e.target.closest("button, .slot, .month-cell, .agenda-item, .week-item, .mtl-block, .allday-chip, .todo-item input[type=checkbox], .res-manage-item")){
+    haptic(10);
+  }
+});
 
 /* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
 applyTranslations();
