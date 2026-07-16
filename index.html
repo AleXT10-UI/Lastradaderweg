@@ -80,11 +80,11 @@
     --border:#33302b;
     --border-strong:#44403a;
 
-    --accent:#e2594c;
-    --accent-dark:#b93a2f;
-    --accent-soft:#3a221f;
-    --accent-shadow:rgba(0,0,0,.5);
-    --focus-shadow:rgba(226,89,76,.18);
+    --accent:#ff0084;
+    --accent-dark:#c8006a;
+    --accent-soft:#3a1029;
+    --accent-shadow:rgba(255,0,132,.35);
+    --focus-shadow:rgba(255,0,132,.20);
 
     --head:#f2efe9;
     --text-main:#dcd8d0;
@@ -335,37 +335,47 @@
   /* ---------- Layout desktop ---------- */
   @media (min-width:1100px){
     .day-view-toggle-mobile{display:none;}
-    .day-view-split{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--sp-5);align-items:start;}
+    .day-view-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:start;}
     .day-view-split .mega-timeline-card.mobile-hidden,
     .day-view-split #view-day-el.mobile-hidden{display:block;}
-    #side-detail-card{width:calc((100% - 20px) * 1.6 / 2.6);margin-bottom:var(--sp-4);}
-    .date-nav{width:calc((100% - 20px) * 1.6 / 2.6);margin-bottom:var(--sp-4);}
+    /* Colonna destra (Risorse/lista slot in vista Giorno, Mese in vista
+       Settimana) risale con un margine negativo fino a toccare quasi la
+       barra di navigazione, alla stessa Y della colonna sinistra
+       ("Oggi + data" comprime tutto sopra la timeline, non sopra le risorse). */
+    #side-detail-card{margin-bottom:var(--sp-2);}
+    .date-nav{margin-bottom:var(--sp-2);}
   }
 
   @media (min-width:1100px){
     .app{max-width:1280px;padding:var(--sp-6) var(--sp-8);}
 
-    header{padding:var(--sp-3) var(--sp-5);margin-bottom:var(--sp-4);}
+    header{padding:var(--sp-3) var(--sp-5);margin-bottom:var(--sp-3);}
     header h1{font-size:var(--fs-xl);}
     header img{height:38px;}
 
-    .view-switch{max-width:440px;margin-bottom:var(--sp-4);}
+    .view-switch{max-width:440px;margin:0 auto var(--sp-3);}
     .view-switch button{font-size:var(--fs-sm);padding:var(--sp-2) var(--sp-4);}
 
     .date-nav .date-label{font-size:var(--fs-md);}
 
+    /* "Oggi" + selettore data e card dettaglio giorno: stessa larghezza della
+       colonna sinistra della vista Settimana, allineati a sinistra */
+    .date-nav{width:calc((100% - var(--sp-5)) / 2);max-width:none;margin-left:0;margin-right:auto;}
+    #side-detail-card{width:calc((100% - var(--sp-5)) / 2);max-width:none;margin-left:0;margin-right:auto;}
+
     .main-layout{display:block;}
     .main-col{min-width:0;}
 
+    /* La colonna destra risale con margin-top negativo, pari all'altezza
+       di date-nav + side-detail-card + i loro margini, così parte allo
+       stesso Y della barra "Giorno/Settimana/Agenda" invece che sotto
+       la card dettaglio. Il valore è una stima robusta per le altezze
+       standard di questi elementi a questa scala tipografica. */
+    #view-day-el.mobile-hidden{margin-top:var(--right-col-offset, 0px);}
+    #view-week-el{margin-top:var(--right-col-offset, 0px);}
+
     .week-month-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:start;}
     .week-month-split .card{margin-bottom:0;}
-
-    /* In vista Settimana, allinea intestazione e navigazione data alla larghezza
-       della colonna sinistra (settimana) invece di estendersi su tutta l'area */
-    body.view-is-week .view-switch,
-    body.view-is-week .date-nav{
-      width:calc((100% - var(--sp-5)) / 2);
-    }
     .week-list{max-height:640px;overflow-y:auto;}
 
     .agenda-top-split{display:grid;grid-template-columns:1fr 1fr;gap:0;}
@@ -391,7 +401,7 @@
     .mtl-block{top:7px;height:36px;font-size:var(--fs-xs);padding:4px 8px;border-radius:7px;}
     .mtl-block .mtl-block-time{font-size:10px;}
 
-    .slot-list{padding:var(--sp-3) var(--sp-5);max-height:none;}
+    .slot-list{padding:var(--sp-3) var(--sp-5);max-height:520px;overflow-y:auto;}
     .slot{padding:var(--sp-3) var(--sp-4);}
     .slot-time{font-size:var(--fs-md);}
 
@@ -917,12 +927,12 @@
       </div>
 
       <div class="week-month-split" id="week-month-split">
-        <div class="card" id="view-week-el" style="display:none;">
-          <div class="week-list" id="week-list"></div>
-        </div>
-
         <div class="card" id="view-month-el" style="display:none;">
           <div class="month-grid" id="month-grid"></div>
+        </div>
+
+        <div class="card" id="view-week-el" style="display:none;">
+          <div class="week-list" id="week-list"></div>
         </div>
       </div>
 
@@ -1469,6 +1479,7 @@ function switchView(view){
   document.getElementById("view-month-el").style.display = showMonthAlongsideWeek ? "" : "none";
   document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
   document.querySelector(".date-nav").style.display = view==="agenda" ? "none" : "flex";
+  document.getElementById("side-detail-card").style.display = view==="agenda" ? "none" : "";
   renderAll();
   refreshSidePanel();
 }
@@ -1476,6 +1487,7 @@ function switchView(view){
 function refreshSidePanel(){
   const dateToShow = (currentView === "day") ? currentDate : todayDate();
   showMonthDayDetail(dateToShow);
+  updateRightColOffset();
 }
 
 function navPrev(){
@@ -1506,7 +1518,34 @@ function renderAll(){
     if(window.matchMedia("(min-width:1100px)").matches) renderMonthView();
   }
   else if(currentView==="agenda") renderAgendaView();
+  updateRightColOffset();
 }
+
+/* Misura l'altezza reale di "Oggi + data" e della card dettaglio/mese, e la
+   usa come margine negativo per far risalire la colonna destra (Risorse in
+   vista Giorno, calendario mese in vista Settimana) fino alla stessa Y della
+   barra Giorno/Settimana/Agenda. Ricalcolato ad ogni render perché il
+   contenuto di quelle card cambia dimensione in base al numero di eventi. */
+function updateRightColOffset(){
+  if(!window.matchMedia("(min-width:1100px)").matches){
+    document.documentElement.style.setProperty("--right-col-offset", "0px");
+    return;
+  }
+  const dateNav = document.querySelector(".date-nav");
+  const sideCard = document.getElementById("side-detail-card");
+  if(!dateNav || !sideCard) return;
+
+  const dateNavStyle = getComputedStyle(dateNav);
+  const sideCardStyle = getComputedStyle(sideCard);
+  const dateNavHeight = dateNav.offsetHeight + parseFloat(dateNavStyle.marginTop) + parseFloat(dateNavStyle.marginBottom);
+  const sideCardHeight = sideCard.offsetHeight + parseFloat(sideCardStyle.marginTop) + parseFloat(sideCardStyle.marginBottom);
+  const total = dateNavHeight + sideCardHeight;
+
+  document.documentElement.style.setProperty("--right-col-offset", (-total) + "px");
+}
+window.addEventListener("resize", ()=>{
+  if(typeof currentUser !== "undefined" && currentUser) updateRightColOffset();
+});
 
 function updateDateLabel(){
   const el = document.getElementById("date-label");
