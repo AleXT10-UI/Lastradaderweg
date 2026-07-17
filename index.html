@@ -1493,7 +1493,7 @@ const I18N = {
     "nav.next": "Weiter",
     "view.day": "Tag",
     "view.week": "Woche",
-    "view.agenda": "Agenda",
+    "view.agenda": "Termine",
     "day.timelineTitle": "Tagesübersicht",
     "day.timelineTab": "Zeitleiste",
     "day.listTab": "Zeitliste",
@@ -1607,7 +1607,7 @@ const I18N = {
     "nav.next": "Next",
     "view.day": "Day",
     "view.week": "Week",
-    "view.agenda": "Agenda",
+    "view.agenda": "Schedule",
     "day.timelineTitle": "Daily timeline",
     "day.timelineTab": "Timeline",
     "day.listTab": "Time list",
@@ -1825,6 +1825,18 @@ function saveUsers(users){
 
 let currentUser = null;
 
+/* Genera una chiave localStorage specifica per l'utente corrente, così
+   ogni account ha prenotazioni, risorse, note e todo completamente
+   separati dagli altri. Solo gli annunci restano su una chiave globale
+   condivisa (vedi loadAnnouncement/saveAnnouncement, che non usano
+   questa funzione). Se per qualche motivo non c'è un utente loggato,
+   ricade su una chiave neutra "_guest" invece di scrivere su una chiave
+   condivisa per errore. */
+function userKey(baseKey){
+  const userId = currentUser || "_guest";
+  return baseKey + "__" + userId;
+}
+
 function isAdmin(){ return currentUser === ADMIN_USERNAME; }
 function isSpecialViewer(){ return currentUser === SPECIAL_VIEWER_EMAIL; }
 function canSeeCheckmarkCounts(){ return isAdmin() || isSpecialViewer(); }
@@ -1867,6 +1879,17 @@ async function attemptLogin(){
 function completeLogin(username, showLoading){
   currentUser = username;
   try{ sessionStorage.setItem("gestionale_current_user", username); }catch(e){}
+
+  // Tutte le variabili dati sono state inizializzate all'avvio dello
+  // script quando currentUser era ancora null (chiave "_guest"). Ora che
+  // sappiamo chi si è loggato, ricarichiamo tutto con la chiave corretta
+  // per quell'account, così ogni utente vede solo i propri dati privati.
+  RESOURCES = loadResources();
+  customResourceColors = loadCustomColors();
+  bookings = JSON.parse(safeGetInit());
+  idCounter = computeMaxId(bookings) + 1;
+  todos = loadTodos();
+
   document.getElementById("login-overlay").style.display = "none";
   document.getElementById("login-error").textContent = "";
   document.getElementById("login-username").value = "";
@@ -1991,6 +2014,19 @@ document.getElementById("users-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="users-overlay") closeUsersPanel();
 });
 
+/* Intervallo orario mostrato nella timeline giornaliera: le ore fuori da
+   questo intervallo (notte e prima mattina) non vengono visualizzate.
+   Tutti i calcoli di posizione percentuale usano queste costanti. */
+const TL_START_HOUR = 0;
+const TL_END_HOUR = 24;
+const TL_SPAN_HOURS = TL_END_HOUR - TL_START_HOUR;
+/* Converte un'ora decimale (es. 13.5) nella sua posizione percentuale
+   all'interno della timeline visibile, con clamp ai bordi. */
+function hourToPct(h){
+  const pct = (h - TL_START_HOUR) / TL_SPAN_HOURS * 100;
+  return Math.max(0, Math.min(100, pct));
+}
+
 const DEFAULT_RESOURCES = ["1","2","3","4","5","6","7","8"];
 
 
@@ -2012,13 +2048,13 @@ let customResourceColors = loadCustomColors();
 
 function loadCustomColors(){
   try{
-    const raw = localStorage.getItem("gestionale_resource_colors");
+    const raw = localStorage.getItem(userKey("gestionale_resource_colors"));
     if(raw) return JSON.parse(raw);
   }catch(e){}
   return {};
 }
 function saveCustomColors(){
-  try{ localStorage.setItem("gestionale_resource_colors", JSON.stringify(customResourceColors)); }catch(e){}
+  try{ localStorage.setItem(userKey("gestionale_resource_colors"), JSON.stringify(customResourceColors)); }catch(e){}
 }
 function darkenColor(hex, amount){
   hex = hex.replace("#","");
@@ -2041,7 +2077,7 @@ function getResourceColor(res){
 
 function loadResources(){
   try{
-    const raw = localStorage.getItem("gestionale_resources");
+    const raw = localStorage.getItem(userKey("gestionale_resources"));
     if(raw){
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2050,12 +2086,12 @@ function loadResources(){
   return DEFAULT_RESOURCES.slice();
 }
 function saveResources(){
-  try{ localStorage.setItem("gestionale_resources", JSON.stringify(RESOURCES)); }catch(e){}
+  try{ localStorage.setItem(userKey("gestionale_resources"), JSON.stringify(RESOURCES)); }catch(e){}
 }
 
 function safeGetInit(){
   try{
-    const raw = localStorage.getItem("gestionale_data_v2");
+    const raw = localStorage.getItem(userKey("gestionale_data_v2"));
     return raw || "{}";
   }catch(e){ return "{}"; }
 }
@@ -2066,7 +2102,7 @@ function computeMaxId(b){
 }
 function persist(){
   try{
-    localStorage.setItem("gestionale_data_v2", JSON.stringify(bookings));
+    localStorage.setItem(userKey("gestionale_data_v2"), JSON.stringify(bookings));
   }catch(e){ /* storage non disponibile, i dati restano solo in memoria per la sessione */ }
 }
 
@@ -2374,18 +2410,21 @@ function renderMiniTimeline(dayBookings, containerId){
   if(!el) return;
   el.innerHTML = "";
 
-  for(let h=3; h<24; h+=3){
+  for(let h=TL_START_HOUR+3; h<TL_END_HOUR; h+=3){
     const tick = document.createElement("div");
     tick.className = "mt-tick";
-    tick.style.left = (h/24*100)+"%";
+    tick.style.left = hourToPct(h)+"%";
     el.appendChild(tick);
   }
 
   dayBookings.forEach(b=>{
+    // Salta gli eventi fuori dall'intervallo orario visibile.
+    if(b.end <= TL_START_HOUR || b.start >= TL_END_HOUR) return;
     const seg = document.createElement("div");
     seg.className = "mt-segment";
-    const widthPct = (b.end-b.start)/24*100;
-    seg.style.left = (b.start/24*100)+"%";
+    const leftPct = hourToPct(b.start);
+    const widthPct = hourToPct(b.end) - leftPct;
+    seg.style.left = leftPct+"%";
     seg.style.width = widthPct+"%";
     const colors = getResourceColor(b.res);
     seg.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
@@ -2408,10 +2447,11 @@ function renderMiniTimeline(dayBookings, containerId){
 function addNowLineToTimeline(el, dateForCheck){
   if(sameDay(dateForCheck, todayDate())){
     const now = new Date();
-    const pct = (now.getHours() + now.getMinutes()/60) / 24 * 100;
+    const nowHour = now.getHours() + now.getMinutes()/60;
+    if(nowHour < TL_START_HOUR || nowHour > TL_END_HOUR) return;
     const nowLine = document.createElement("div");
     nowLine.className = "mt-now";
-    nowLine.style.left = pct+"%";
+    nowLine.style.left = hourToPct(nowHour)+"%";
     el.appendChild(nowLine);
   }
 }
@@ -2507,7 +2547,7 @@ function renderDayView(){
   }
 
   let nowLineInserted = false;
-  for(let hh=0; hh<48; hh++){
+  for(let hh=TL_START_HOUR*2; hh<TL_END_HOUR*2; hh++){
     const h = hh * 0.5;
 
     if(isToday && !nowLineInserted && nowHourDecimal < h){
@@ -2602,7 +2642,7 @@ function renderMegaTimeline(key){
   corner.className = "mtl-corner";
   grid.appendChild(corner);
 
-  for(let h=0; h<24; h++){
+  for(let h=TL_START_HOUR; h<TL_END_HOUR; h++){
     const label = document.createElement("div");
     label.className = "mtl-hour-label";
     label.textContent = String(h).padStart(2,"0");
@@ -2631,10 +2671,16 @@ function renderMegaTimeline(key){
 
     const items = allItems.filter(b=>b.res===res);
     items.forEach(it=>{
+      const rawStart = it.allDay ? TL_START_HOUR : it.start;
+      const rawEnd = it.allDay ? TL_END_HOUR : it.end;
+      // Salta gli eventi che cadono interamente fuori dall'intervallo
+      // orario visibile: altrimenti verrebbero schiacciati sul bordo.
+      if(rawEnd <= TL_START_HOUR || rawStart >= TL_END_HOUR) return;
+
       const block = document.createElement("div");
       block.className = "mtl-block";
-      const startPct = (it.allDay ? 0 : it.start) / 24 * 100;
-      const endPct = (it.allDay ? 24 : it.end) / 24 * 100;
+      const startPct = hourToPct(rawStart);
+      const endPct = hourToPct(rawEnd);
       block.style.left = startPct + "%";
       block.style.width = (endPct - startPct) + "%";
       block.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
@@ -2659,7 +2705,11 @@ function renderMegaTimeline(key){
 
   if(sameDay(currentDate, todayDate())){
     const now = new Date();
-    const pct = (now.getHours() + now.getMinutes()/60) / 24 * 100;
+    const nowHour = now.getHours() + now.getMinutes()/60;
+    // Mostra la linea "ora" solo se l'orario attuale ricade nell'intervallo
+    // visibile della timeline.
+    if(nowHour >= TL_START_HOUR && nowHour <= TL_END_HOUR){
+    const pct = hourToPct(nowHour);
     const nowLine = document.createElement("div");
     nowLine.className = "mtl-now-line";
     // La larghezza della colonna etichetta risorsa cambia per breakpoint:
@@ -2669,6 +2719,7 @@ function renderMegaTimeline(key){
     nowLine.style.top = "0";
     nowLine.style.bottom = "0";
     grid.appendChild(nowLine);
+    }
   }
 }
 
@@ -2762,11 +2813,11 @@ function escapeHtml(s){
 
 function saveAgendaNotes(){
   const val = document.getElementById("agenda-notes-input").value;
-  try{ localStorage.setItem("gestionale_agenda_notes", val); }catch(e){}
+  try{ localStorage.setItem(userKey("gestionale_agenda_notes"), val); }catch(e){}
 }
 function loadAgendaNotes(){
   let val = "";
-  try{ val = localStorage.getItem("gestionale_agenda_notes") || ""; }catch(e){}
+  try{ val = localStorage.getItem(userKey("gestionale_agenda_notes")) || ""; }catch(e){}
   const inp = document.getElementById("agenda-notes-input");
   if(inp) inp.value = val;
 }
@@ -2776,7 +2827,7 @@ let todos = loadTodos();
 
 function loadTodos(){
   try{
-    const raw = localStorage.getItem("gestionale_todos");
+    const raw = localStorage.getItem(userKey("gestionale_todos"));
     if(raw){
       const parsed = JSON.parse(raw);
       todoIdCounter = (parsed.reduce((max,t)=>Math.max(max,t.id),0)) + 1;
@@ -2786,7 +2837,7 @@ function loadTodos(){
   return [];
 }
 function saveTodos(){
-  try{ localStorage.setItem("gestionale_todos", JSON.stringify(todos)); }catch(e){}
+  try{ localStorage.setItem(userKey("gestionale_todos"), JSON.stringify(todos)); }catch(e){}
 }
 function addTodo(){
   const inp = document.getElementById("todo-input");
