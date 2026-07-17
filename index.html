@@ -282,6 +282,20 @@
   body.dark-mode #logo-img{filter:invert(1) hue-rotate(160deg) saturate(2.4);mix-blend-mode:screen;}
 
   .announce-banner{display:none;}
+  .announce-banner.visible{
+    display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--accent);
+    border-radius:var(--radius-md);padding:10px 14px;margin-bottom:var(--sp-3);box-shadow:var(--shadow-card);
+  }
+  .ab-icon{flex-shrink:0;display:flex;align-items:center;}
+  .ab-text{
+    flex:1;min-width:0;font-size:13px;color:var(--text-main);line-height:1.4;
+    overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    white-space:normal;word-break:break-word;
+  }
+  .ab-check{
+    border:none;background:var(--accent);color:#fff;width:28px;height:28px;border-radius:50%;
+    cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  }
 
   /* ---------- Ricerca ---------- */
   .search-bar{
@@ -779,6 +793,7 @@
   .modal{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
     padding:var(--sp-5);width:100%;max-width:380px;box-shadow:var(--shadow-pop), var(--shadow-inset-top);
+    overflow-wrap:break-word;word-break:break-word;
   }
   .modal h3{margin:0 0 var(--sp-3);color:var(--head);font-size:var(--fs-md);font-weight:700;letter-spacing:-.01em;}
   .modal label{display:block;font-size:10.5px;font-weight:600;color:var(--text-muted);margin:var(--sp-2) 0 4px;text-transform:uppercase;letter-spacing:.05em;}
@@ -996,16 +1011,7 @@
     #search-toggle{order:7;}
     #theme-toggle{order:8;}
 
-    .announce-banner.visible{
-      display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--accent);
-      border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:10px;box-shadow:var(--shadow-card);
-    }
     .ab-icon{font-size:14px;flex-shrink:0;}
-    .ab-text{flex:1;min-width:0;font-size:12px;color:var(--text-main);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;line-height:1.35;}
-    .ab-check{
-      border:none;background:var(--accent);color:#fff;width:26px;height:26px;border-radius:50%;
-      font-size:13px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    }
 
     #side-detail-card .day-detail{
       padding:8px 12px;margin-top:0;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;
@@ -2691,7 +2697,7 @@ function renderMegaTimeline(key){
       nameEl.textContent = it.label;
       const timeEl = document.createElement("div");
       timeEl.className = "mtl-block-time";
-      timeEl.textContent = it.allDay ? "Tutto il giorno" : (fmtHourLabel(it.start)+"–"+fmtHourLabel(it.end));
+      timeEl.textContent = it.allDay ? t("detail.allDay") : (fmtHourLabel(it.start)+"–"+fmtHourLabel(it.end));
 
       block.appendChild(nameEl);
       block.appendChild(timeEl);
@@ -3402,7 +3408,7 @@ function renderAnnouncementPanel(){
     html += `
       <div class="day-detail" style="margin-top:0;margin-bottom:16px;border:1px solid var(--border);">
         <h4 style="display:block;">${escapeHtml(ann.date)}</h4>
-        <p style="font-size:14px;color:var(--text-main);white-space:pre-wrap;margin:0 0 14px;">${escapeHtml(ann.text)}</p>
+        <p style="font-size:14px;color:var(--text-main);white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;margin:0 0 14px;">${escapeHtml(ann.text)}</p>
         <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
           <input type="checkbox" ${alreadyChecked ? "checked" : ""} onchange="toggleAnnouncementCheck()" style="width:18px;height:18px;accent-color:var(--accent);">
           ${t("announce.markRead")}
