@@ -135,6 +135,32 @@
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
+  /* ---------- Animazioni globali: bounce sui bottoni, zoom+fade sui modali ---------- */
+  @keyframes btnBounce{
+    0%{transform:scale(1);}
+    35%{transform:scale(.90);}
+    60%{transform:scale(1.04);}
+    100%{transform:scale(1);}
+  }
+  @keyframes modalZoomFade{
+    0%{opacity:0;transform:scale(.85) translateY(10px);filter:blur(6px);}
+    60%{opacity:1;filter:blur(0);}
+    100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0);}
+  }
+  @keyframes overlayFadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+  }
+  button, .slot, .month-cell, .resource-tabs button, .view-switch button,
+  .day-view-toggle-mobile button, .allday-chip, .week-item, .agenda-item,
+  .todo-del, .wi-del, .dd-del, .rm-delete{
+    transition:transform .12s cubic-bezier(.34,1.56,.64,1), background .15s, box-shadow .15s, border-color .15s;
+  }
+  button:active, .slot:active, .month-cell:active, .allday-chip:active{
+    animation:btnBounce .38s cubic-bezier(.34,1.56,.64,1);
+  }
+
+
   /* Le icone SVG (sostituiscono le emoji) ereditano il colore del testo
      circostante tramite currentColor: sono monocromatiche per costruzione,
      senza bisogno di filtri CSS per adattarle al tema chiaro/scuro. */
@@ -397,6 +423,7 @@
     box-shadow:var(--shadow-card), var(--shadow-inset-top);overflow:hidden;margin-bottom:var(--sp-3);
     transition:border-color .3s ease, box-shadow .3s ease;
   }
+  .card.view-enter{animation:modalZoomFade .35s cubic-bezier(.2,.9,.3,1.1);}
   /* In dark mode, le card della vista attualmente attiva riflettono un
      sottile bagliore neon sul bordo, coerente con l'accento del tema. */
   body.dark-mode .mega-timeline-card,
@@ -416,7 +443,7 @@
     display:grid;grid-template-columns:90px repeat(48, minmax(16px, 1fr));min-width:max-content;position:relative;
   }
   .mtl-corner{
-    position:sticky;left:0;z-index:3;background:var(--surface);
+    position:sticky;left:0;z-index:20;background:var(--surface);
     border-right:1px solid var(--border-strong);border-bottom:1px solid var(--border);
   }
   .mtl-hour-label{
@@ -425,7 +452,7 @@
     grid-column:span 2;
   }
   .mtl-res-label{
-    position:sticky;left:0;z-index:2;background:var(--surface);
+    position:sticky;left:0;z-index:15;background:var(--surface);
     border-right:1px solid var(--border-strong);border-top:1px solid var(--border);
     padding:var(--sp-2) var(--sp-3);font-size:11px;font-weight:600;color:var(--head);
     display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -440,12 +467,63 @@
     padding:3px 7px;overflow:hidden;white-space:nowrap;cursor:pointer;
     box-shadow:0 1px 4px rgba(0,0,0,.22);display:flex;flex-direction:column;justify-content:center;gap:0;
     transition:transform .12s, box-shadow .12s;
+    z-index:1;
   }
-  .mtl-block:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.3);z-index:5;}
+  .mtl-block:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.3);z-index:2;}
   .mtl-block:active{transform:scale(0.97);}
   .mtl-block .mtl-block-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .mtl-block .mtl-block-time{font-size:8px;opacity:.9;}
-  .mtl-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--now-line);z-index:4;pointer-events:none;}
+  .mtl-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--now-line);z-index:5;pointer-events:none;}
+
+  /* ---------- Timeline Globale (multi-giorno, una riga per risorsa) ---------- */
+  .global-toolbar{
+    display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);
+    padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--border);flex-wrap:wrap;
+  }
+  .global-week-nav{display:flex;align-items:center;gap:10px;}
+  .global-week-nav button{
+    border:1px solid var(--border);background:var(--surface);color:var(--head);
+    width:32px;height:32px;border-radius:var(--radius-sm);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-btn);
+  }
+  .global-week-label{font-weight:700;font-size:var(--fs-sm);color:var(--head);min-width:150px;text-align:center;}
+  .global-readonly-hint{font-size:11.5px;color:var(--text-muted);font-style:italic;}
+  .global-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .global-grid{
+    display:grid;grid-template-columns:110px repeat(7, minmax(220px, 1fr));min-width:max-content;position:relative;
+  }
+  .global-corner{
+    position:sticky;left:0;z-index:20;background:var(--surface);
+    border-right:1px solid var(--border-strong);border-bottom:1px solid var(--border);
+  }
+  .global-day-header{
+    text-align:center;font-size:11px;font-weight:700;color:var(--head);padding:8px 4px;
+    border-bottom:1px solid var(--border);border-right:1px solid var(--border);background:var(--surface-2);
+  }
+  .global-day-header.today{color:var(--accent);}
+  .global-res-label{
+    position:sticky;left:0;z-index:15;background:var(--surface);
+    border-right:1px solid var(--border-strong);border-top:1px solid var(--border);
+    padding:var(--sp-2) var(--sp-3);font-size:11px;font-weight:600;color:var(--head);
+    display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .global-res-label .mtl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .global-day-track{
+    position:relative;border-top:1px solid var(--border);border-right:1px solid var(--border);
+    height:46px;
+  }
+  .global-block{
+    position:absolute;top:5px;height:36px;border-radius:6px;color:#fff;font-size:9px;font-weight:600;
+    padding:3px 6px;overflow:hidden;white-space:nowrap;
+    box-shadow:0 1px 4px rgba(0,0,0,.22);display:flex;flex-direction:column;justify-content:center;gap:0;
+    transition:transform .12s, box-shadow .12s;
+    z-index:1;
+  }
+  .global-block.is-clickable{cursor:pointer;}
+  .global-block.is-clickable:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.3);z-index:2;}
+  .global-block-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .global-day-track.today-col{background:var(--accent-soft);}
+  .global-empty{padding:var(--sp-6);text-align:center;color:var(--text-muted);font-size:var(--fs-sm);}
   .mtl-empty{padding:var(--sp-6);text-align:center;color:var(--text-muted);font-size:var(--fs-sm);}
 
   .following-tooltip{
@@ -778,15 +856,18 @@
     box-shadow:0 8px 22px var(--accent-shadow), var(--neon-glow), inset 0 1px 0 rgba(255,255,255,.35);cursor:pointer;z-index:60;
     display:flex;align-items:center;justify-content:center;transition:transform .12s,background .15s,box-shadow .15s;
   }
-  .fab:hover{background:var(--accent-dark);box-shadow:0 10px 26px var(--accent-shadow), var(--neon-glow), inset 0 1px 0 rgba(255,255,255,.35);}
-  .fab:active{transform:scale(0.92);}
+  .fab:hover{background:var(--accent-dark);box-shadow:0 10px 26px var(--accent-shadow), var(--neon-glow), inset 0 1px 0 rgba(255,255,255,.35);transform:scale(1.06);}
+  .fab:active{animation:btnBounce .38s cubic-bezier(.34,1.56,.64,1);}
 
   /* ---------- Modali ---------- */
   .modal-overlay{
-    position:fixed;inset:0;background:rgba(22,18,14,.5);display:none;align-items:center;justify-content:center;
-    z-index:100;padding:16px;backdrop-filter:blur(3px);
+    position:fixed;inset:0;background:rgba(22,18,14,.58);display:none;align-items:center;justify-content:center;
+    z-index:100;padding:16px;backdrop-filter:blur(6px);
   }
-  .modal-overlay.open{display:flex;}
+  .modal-overlay.open{display:flex;animation:overlayFadeIn .25s ease;}
+  .modal-overlay.open .modal, .modal-overlay.open .manage-res-modal{
+    animation:modalZoomFade .32s cubic-bezier(.2,.9,.3,1.1);
+  }
   /* Il modale supporto può essere aperto anche dalla schermata di login
      (z-index:500), quindi deve stare sopra di essa. */
   #support-overlay{z-index:600;}
@@ -849,8 +930,9 @@
     animation:loginCardIn .45s cubic-bezier(.2,.8,.3,1);
   }
   @keyframes loginCardIn{
-    from{opacity:0;transform:translateY(14px) scale(.97);}
-    to{opacity:1;transform:translateY(0) scale(1);}
+    0%{opacity:0;transform:translateY(14px) scale(.85);filter:blur(6px);}
+    60%{opacity:1;filter:blur(0);}
+    100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
   }
   #login-theme-toggle{
     position:fixed;top:20px;right:20px;z-index:501;
@@ -907,7 +989,7 @@
     transition:transform .12s, background .15s, box-shadow .15s;
   }
   .login-btn:hover{background:var(--accent-dark);transform:translateY(-1px);}
-  .login-btn:active{transform:translateY(0);}
+  .login-btn:active{animation:btnBounce .38s cubic-bezier(.34,1.56,.64,1);}
 
   #loading-overlay{
     display:none;position:fixed;inset:0;z-index:600;flex-direction:column;align-items:center;justify-content:center;gap:16px;
@@ -997,8 +1079,8 @@
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
     .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:46px;height:46px;font-size:20px;}
-    .view-switch button{font-size:10.5px;padding:9px 3px;gap:3px;}
-    .view-switch button i{font-size:14px;}
+    .view-switch button{font-size:9.5px;padding:9px 2px;gap:2px;}
+    .view-switch button i{font-size:13px;}
 
     /* Ordine header mobile: logo, titolo, poi logout+profilo (invertiti,
        a sinistra), poi lingua/annunci/utenti, poi ricerca+tema in fondo
@@ -1126,6 +1208,7 @@
           <button id="tab-day" onclick="switchView('day')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg></span>Giorno</button>
           <button id="tab-week" onclick="switchView('week')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path></svg></span>Settimana</button>
           <button id="tab-agenda" onclick="switchView('agenda')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M9 12h6M9 16h6M9 8h6"></path></svg></span>Agenda</button>
+          <button id="tab-global" onclick="switchView('global')"><span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"></path><path d="m3 12 9 5 9-5M3 17l9 5 9-5"></path></svg></span><span data-i18n="view.global">Globale</span></button>
         </div>
       </div>
 
@@ -1199,6 +1282,24 @@
         </div>
         <div class="agenda-list" id="agenda-list"></div>
       </div>
+
+      <div class="card" id="view-global-el" style="display:none;">
+        <div class="global-toolbar">
+          <div class="global-week-nav">
+            <button onclick="globalNavPrev()" aria-label="Settimana precedente"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+            <span id="global-week-label" class="global-week-label"></span>
+            <button onclick="globalNavNext()" aria-label="Settimana successiva"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+          </div>
+          <button class="manage-res-btn" id="global-manage-res-btn" onclick="openGlobalManageResourcesModal()" title="Gestisci risorse" style="display:none;">
+            <span aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>
+            <span class="dup-txt" data-i18n="day.manageResources">Risorse</span>
+          </button>
+          <span class="global-readonly-hint" id="global-readonly-hint" data-i18n="global.readonlyHint" style="display:none;">Sola lettura — solo gli amministratori possono modificare</span>
+        </div>
+        <div class="global-scroll" id="global-scroll">
+          <div class="global-grid" id="global-grid"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1207,7 +1308,7 @@
   </div>
 </div>
 
-<button class="fab" onclick="openAddModal()" title="Aggiungi"><span aria-hidden="true">+</span></button>
+<button class="fab" onclick="onFabClick()" title="Aggiungi"><span aria-hidden="true">+</span></button>
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
@@ -1268,6 +1369,21 @@
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeManageResourcesModal()" data-i18n="resources.close">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="global-manage-res-overlay">
+  <div class="modal manage-res-modal">
+    <h3 data-i18n="resources.title">Gestisci risorse</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin:-10px 0 12px;display:flex;align-items:center;gap:5px;"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg><span data-i18n="resources.dragHint">Trascina per riordinare</span></p>
+    <div class="res-manage-list" id="global-res-manage-list"></div>
+    <div class="res-add-row">
+      <input type="text" id="global-new-resource-input" data-i18n-placeholder="resources.newPlaceholder" placeholder="Nome nuova risorsa...">
+      <button onclick="addNewGlobalResource()" data-i18n="resources.add">Aggiungi</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeGlobalManageResourcesModal()" data-i18n="resources.close">Chiudi</button>
     </div>
   </div>
 </div>
@@ -1386,6 +1502,8 @@ const I18N = {
     "view.day": "Giorno",
     "view.week": "Settimana",
     "view.agenda": "Agenda",
+    "view.global": "Globale",
+    "global.readonlyHint": "Sola lettura — solo gli amministratori possono modificare",
     "day.timelineTitle": "Timeline giornaliera",
     "day.timelineTab": "Timeline",
     "day.listTab": "Lista orari",
@@ -1500,6 +1618,8 @@ const I18N = {
     "view.day": "Tag",
     "view.week": "Woche",
     "view.agenda": "Termine",
+    "view.global": "Global",
+    "global.readonlyHint": "Nur Lesezugriff — nur Administratoren können bearbeiten",
     "day.timelineTitle": "Tagesübersicht",
     "day.timelineTab": "Zeitleiste",
     "day.listTab": "Zeitliste",
@@ -1614,6 +1734,8 @@ const I18N = {
     "view.day": "Day",
     "view.week": "Week",
     "view.agenda": "Schedule",
+    "view.global": "Global",
+    "global.readonlyHint": "Read-only — only administrators can edit",
     "day.timelineTitle": "Daily timeline",
     "day.timelineTab": "Timeline",
     "day.listTab": "Time list",
@@ -1786,9 +1908,11 @@ function applyTranslations(){
   const tabDay = document.getElementById("tab-day");
   const tabWeek = document.getElementById("tab-week");
   const tabAgenda = document.getElementById("tab-agenda");
+  const tabGlobal = document.getElementById("tab-global");
   if(tabDay) tabDay.innerHTML = "<span aria-hidden=\"true\">"+icon("sun",14)+"</span>" + t("view.day");
   if(tabWeek) tabWeek.innerHTML = "<span aria-hidden=\"true\">"+icon("calendarDays",14)+"</span>" + t("view.week");
   if(tabAgenda) tabAgenda.innerHTML = "<span aria-hidden=\"true\">"+icon("clipboardList",14)+"</span>" + t("view.agenda");
+  if(tabGlobal) tabGlobal.innerHTML = "<span aria-hidden=\"true\">"+icon("layers",14)+"</span>" + t("view.global");
   const todayBtn = document.querySelector(".today-text-btn");
   if(todayBtn) todayBtn.textContent = t("nav.today");
   const searchInput = document.getElementById("search-input");
@@ -2115,6 +2239,40 @@ function persist(){
 let bookings = JSON.parse(safeGetInit());
 let idCounter = computeMaxId(bookings) + 1;
 
+/* ---------- Dati della Timeline Globale ----------
+   Completamente separati dalle prenotazioni private di ogni utente:
+   usano chiavi localStorage FISSE (non per-utente), quindi sono condivisi
+   e visibili a tutti allo stesso modo. Le risorse seguono quelle create
+   dall'admin, non quelle personali dell'utente che sta guardando. */
+function loadGlobalResources(){
+  try{
+    const raw = localStorage.getItem("gestionale_global_resources");
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  }catch(e){}
+  return DEFAULT_RESOURCES.slice();
+}
+function saveGlobalResources(){
+  try{ localStorage.setItem("gestionale_global_resources", JSON.stringify(GLOBAL_RESOURCES)); }catch(e){}
+}
+function safeGetGlobalInit(){
+  try{
+    const raw = localStorage.getItem("gestionale_global_data");
+    return raw || "{}";
+  }catch(e){ return "{}"; }
+}
+function persistGlobal(){
+  try{
+    localStorage.setItem("gestionale_global_data", JSON.stringify(globalBookings));
+  }catch(e){}
+}
+
+let GLOBAL_RESOURCES = loadGlobalResources();
+let globalBookings = JSON.parse(safeGetGlobalInit());
+let globalIdCounter = computeMaxId(globalBookings) + 1;
+
 function fmtDate(d){
   const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
   return y+"-"+m+"-"+day;
@@ -2124,6 +2282,9 @@ function sameDay(a,b){ return fmtDate(a)===fmtDate(b); }
 
 let currentView = "day";
 let currentDate = todayDate();
+/* Settimana visualizzata nella Timeline Globale: separata da currentDate
+   perché questa vista naviga in autonomia rispetto alle altre. */
+let globalWeekAnchor = todayDate();
 let selectedResource = RESOURCES[0];
 let openWeekDayKey = null;
 
@@ -2230,6 +2391,7 @@ function switchView(view){
   document.getElementById("tab-day").classList.toggle("active", view==="day");
   document.getElementById("tab-week").classList.toggle("active", view==="week");
   document.getElementById("tab-agenda").classList.toggle("active", view==="agenda");
+  document.getElementById("tab-global").classList.toggle("active", view==="global");
   document.getElementById("day-view-wrapper").style.display = view==="day" ? "" : "none";
   document.body.classList.toggle("view-is-week", view==="week");
 
@@ -2239,8 +2401,25 @@ function switchView(view){
   document.getElementById("view-week-el").style.display = view==="week" ? "" : "none";
   document.getElementById("view-month-el").style.display = showMonthAlongsideWeek ? "" : "none";
   document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
+  document.getElementById("view-global-el").style.display = view==="global" ? "" : "none";
   document.getElementById("side-detail-card").style.display = "none";
+  if(view !== "global"){
+    const fabEl = document.querySelector(".fab");
+    if(fabEl) fabEl.style.display = "";
+  }
   renderAll();
+
+  // Applica un breve effetto zoom+fade+blur alle card appena diventate
+  // visibili, solo al cambio di vista effettivo (non ad ogni re-render).
+  requestAnimationFrame(()=>{
+    document.querySelectorAll(".card").forEach(card=>{
+      if(card.offsetParent !== null){
+        card.classList.remove("view-enter");
+        void card.offsetWidth;
+        card.classList.add("view-enter");
+      }
+    });
+  });
   refreshSidePanel();
 }
 
@@ -2300,6 +2479,7 @@ function renderAll(){
     if(window.matchMedia("(min-width:1100px)").matches) renderMonthView();
   }
   else if(currentView==="agenda") renderAgendaView();
+  else if(currentView==="global") renderGlobalView();
   updateRightColOffset();
   syncDayColumnsHeight();
   syncWeekColumnsHeight();
@@ -2943,6 +3123,144 @@ function renderAgendaView(){
   });
 }
 
+/* ---------- Timeline Globale ---------- */
+function globalNavPrev(){
+  globalWeekAnchor.setDate(globalWeekAnchor.getDate()-7);
+  renderGlobalView();
+}
+function globalNavNext(){
+  globalWeekAnchor.setDate(globalWeekAnchor.getDate()+7);
+  renderGlobalView();
+}
+
+function renderGlobalView(){
+  const canEdit = canEditGlobalTimeline();
+  const fabEl = document.querySelector(".fab");
+  if(fabEl) fabEl.style.display = canEdit ? "" : "none";
+  const hintEl = document.getElementById("global-readonly-hint");
+  if(hintEl) hintEl.style.display = canEdit ? "none" : "";
+  const manageBtnEl = document.getElementById("global-manage-res-btn");
+  if(manageBtnEl) manageBtnEl.style.display = canEdit ? "" : "none";
+
+  const monday = getMonday(globalWeekAnchor);
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate()+6);
+  const labelEl = document.getElementById("global-week-label");
+  if(labelEl){
+    labelEl.textContent = monday.toLocaleDateString(currentLocale(),{day:"numeric",month:"short"}) + " – " + sunday.toLocaleDateString(currentLocale(),{day:"numeric",month:"short",year:"numeric"});
+  }
+
+  const grid = document.getElementById("global-grid");
+  if(!grid) return;
+  grid.innerHTML = "";
+
+  const corner = document.createElement("div");
+  corner.className = "global-corner";
+  grid.appendChild(corner);
+
+  const days = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(monday); d.setDate(d.getDate()+i);
+    days.push(d);
+  }
+
+  const today = todayDate();
+  days.forEach(d=>{
+    const header = document.createElement("div");
+    header.className = "global-day-header" + (sameDay(d, today) ? " today" : "");
+    header.textContent = d.toLocaleDateString(currentLocale(),{weekday:"short",day:"numeric",month:"short"});
+    grid.appendChild(header);
+  });
+
+  if(GLOBAL_RESOURCES.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "global-empty";
+    empty.textContent = t("day.noResources");
+    grid.appendChild(empty);
+    return;
+  }
+
+  GLOBAL_RESOURCES.forEach(res=>{
+    const colors = getResourceColor(res);
+    const label = document.createElement("div");
+    label.className = "global-res-label";
+    const dot = document.createElement("span");
+    dot.className = "mtl-dot";
+    dot.style.background = colors[0];
+    label.appendChild(dot);
+    label.appendChild(document.createTextNode(res));
+    grid.appendChild(label);
+
+    days.forEach(d=>{
+      const key = fmtDate(d);
+      const items = (globalBookings[key]||[]).filter(b=>b.res===res);
+      const track = document.createElement("div");
+      track.className = "global-day-track" + (sameDay(d, today) ? " today-col" : "");
+
+      items.forEach(it=>{
+        const startPct = it.allDay ? 0 : hourToPct(it.start);
+        const endPct = it.allDay ? 100 : hourToPct(it.end);
+        const block = document.createElement("div");
+        block.className = "global-block" + (canEdit ? " is-clickable" : "");
+        block.style.left = startPct + "%";
+        block.style.width = Math.max(endPct - startPct, 4) + "%";
+        block.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
+        const nameEl = document.createElement("div");
+        nameEl.className = "global-block-name";
+        nameEl.textContent = it.label;
+        block.appendChild(nameEl);
+        block.title = res + " — " + it.label + " (" + (it.allDay ? t("detail.allDay") : fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)) + ")";
+        if(canEdit){
+          block.onclick = ()=>{ showGlobalEventDetail(key, it.id); };
+        }
+        track.appendChild(block);
+      });
+
+      grid.appendChild(track);
+    });
+  });
+}
+
+/* Dettaglio/eliminazione di un evento della Timeline Globale: analogo a
+   showEventDetail, ma opera sui dati globali separati invece che sulle
+   prenotazioni private dell'utente. */
+function showGlobalEventDetail(dateKey, id){
+  const item = (globalBookings[dateKey]||[]).find(b=>b.id===id);
+  if(!item) return;
+  const colors = getResourceColor(item.res);
+  const dateObj = new Date(dateKey+"T00:00:00");
+  const dateLabel = dateObj.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
+  const timeLabel = item.allDay ? t("detail.allDay") : (fmtHourLabel(item.start) + " – " + fmtHourLabel(item.end));
+
+  const content = document.getElementById("detail-modal-content");
+  content.innerHTML = `
+    <h3 style="display:flex;align-items:center;gap:8px;">
+      <span style="width:12px;height:12px;border-radius:50%;background:${colors[0]};display:inline-block;"></span>
+      ${escapeHtml(item.res)}
+    </h3>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px;">
+      <div><b>${t("detail.description")}</b><br>${escapeHtml(item.label)}</div>
+      <div><b>${t("detail.day")}</b><br>${dateLabel}</div>
+      <div><b>${t("detail.time")}</b><br>${timeLabel}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEventDetail()">${t("detail.close")}</button>
+      <button class="btn-confirm" style="background:var(--accent);box-shadow:0 2px 8px var(--accent-shadow), var(--neon-glow);" onclick="deleteFromGlobalDetail('${dateKey}', ${id})">${t("detail.delete")}</button>
+    </div>
+  `;
+  document.getElementById("detail-overlay").classList.add("open");
+}
+function deleteFromGlobalDetail(dateKey, id){
+  closeEventDetail();
+  removeGlobalBooking(dateKey, id);
+}
+function removeGlobalBooking(dateKey, id){
+  if(!globalBookings[dateKey]) return;
+  globalBookings[dateKey] = globalBookings[dateKey].filter(b=>b.id!==id);
+  if(globalBookings[dateKey].length===0) delete globalBookings[dateKey];
+  persistGlobal();
+  renderGlobalView();
+}
+
 function renderMonthView(){
   const grid = document.getElementById("month-grid");
   grid.innerHTML = "";
@@ -3154,8 +3472,113 @@ function addNewResource(){
   renderManageResourcesList();
 }
 
+/* ---------- Gestione risorse della Timeline Globale ----------
+   Analoga a quella personale sopra, ma opera su GLOBAL_RESOURCES: solo
+   admin/permessi possono aprire questo pannello (bottone nascosto agli
+   altri utenti in renderGlobalView). */
+function openGlobalManageResourcesModal(){
+  renderGlobalManageResourcesList();
+  document.getElementById("global-manage-res-overlay").classList.add("open");
+}
+function closeGlobalManageResourcesModal(){
+  document.getElementById("global-manage-res-overlay").classList.remove("open");
+  renderGlobalView();
+}
+
+let globalDragSrcIndex = null;
+
+function renderGlobalManageResourcesList(){
+  const listEl = document.getElementById("global-res-manage-list");
+  listEl.innerHTML = "";
+
+  GLOBAL_RESOURCES.forEach((res, idx)=>{
+    const colors = getResourceColor(res);
+    const item = document.createElement("div");
+    item.className = "res-manage-item";
+    item.draggable = true;
+    item.dataset.index = idx;
+
+    item.innerHTML = `
+      <span class="rm-handle" aria-hidden="true">${icon("gripVertical",14)}</span>
+      <input type="color" class="rm-color-picker" value="${colors[0]}" title="${t('resources.title')}">
+      <span class="rm-name">${escapeHtml(res)}</span>
+      <span class="rm-arrows">
+        <button class="rm-arrow-up" title="↑" ${idx===0 ? "disabled" : ""}>&#9650;</button>
+        <button class="rm-arrow-down" title="↓" ${idx===GLOBAL_RESOURCES.length-1 ? "disabled" : ""}>&#9660;</button>
+      </span>
+      <span class="rm-delete" title="${t('detail.delete')}">${icon("trash",15)}</span>
+    `;
+
+    item.querySelector(".rm-color-picker").addEventListener("input",(e)=>{
+      setResourceColor(res, e.target.value);
+      renderGlobalView();
+    });
+
+    item.querySelector(".rm-arrow-up").onclick = ()=>{
+      if(idx===0) return;
+      [GLOBAL_RESOURCES[idx-1], GLOBAL_RESOURCES[idx]] = [GLOBAL_RESOURCES[idx], GLOBAL_RESOURCES[idx-1]];
+      saveGlobalResources();
+      renderGlobalManageResourcesList();
+    };
+    item.querySelector(".rm-arrow-down").onclick = ()=>{
+      if(idx===GLOBAL_RESOURCES.length-1) return;
+      [GLOBAL_RESOURCES[idx+1], GLOBAL_RESOURCES[idx]] = [GLOBAL_RESOURCES[idx], GLOBAL_RESOURCES[idx+1]];
+      saveGlobalResources();
+      renderGlobalManageResourcesList();
+    };
+
+    item.querySelector(".rm-delete").onclick = ()=>{
+      if(GLOBAL_RESOURCES.length <= 1){
+        alert(t("resources.onlyOne"));
+        return;
+      }
+      GLOBAL_RESOURCES = GLOBAL_RESOURCES.filter(r=>r!==res);
+      saveGlobalResources();
+      renderGlobalManageResourcesList();
+    };
+
+    item.addEventListener("dragstart",(e)=>{
+      globalDragSrcIndex = idx;
+      item.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    item.addEventListener("dragend",()=>{
+      item.classList.remove("dragging");
+    });
+    item.addEventListener("dragover",(e)=>{ e.preventDefault(); });
+    item.addEventListener("drop",(e)=>{
+      e.preventDefault();
+      const targetIndex = idx;
+      if(globalDragSrcIndex === null || globalDragSrcIndex === targetIndex) return;
+      const moved = GLOBAL_RESOURCES.splice(globalDragSrcIndex, 1)[0];
+      GLOBAL_RESOURCES.splice(targetIndex, 0, moved);
+      saveGlobalResources();
+      renderGlobalManageResourcesList();
+    });
+
+    listEl.appendChild(item);
+  });
+}
+
+function addNewGlobalResource(){
+  const input = document.getElementById("global-new-resource-input");
+  const name = input.value.trim();
+  if(!name){ return; }
+  if(GLOBAL_RESOURCES.includes(name)){
+    alert(t("resources.duplicateName"));
+    return;
+  }
+  GLOBAL_RESOURCES.push(name);
+  saveGlobalResources();
+  input.value = "";
+  renderGlobalManageResourcesList();
+}
+
 document.getElementById("manage-res-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="manage-res-overlay") closeManageResourcesModal();
+});
+document.getElementById("global-manage-res-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="global-manage-res-overlay") closeGlobalManageResourcesModal();
 });
 
 function openDuplicateModal(){
@@ -3238,7 +3661,25 @@ document.getElementById("detail-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="detail-overlay") closeEventDetail();
 });
 
+/* Il modal "Nuovo elemento" è condiviso tra il contesto personale
+   (prenotazioni private dell'utente) e quello della Timeline Globale
+   (dati condivisi, editabili solo da admin/permessi). Questo flag
+   determina quale set di risorse mostrare e dove salvare al conferma. */
+let addModalContext = "personal";
+
+/* Instrada il click del FAB al modal corretto in base alla vista
+   attualmente aperta: nella Timeline Globale apre il modal dedicato ai
+   dati condivisi, altrove il modal personale come sempre. */
+function onFabClick(){
+  if(currentView === "global"){
+    openGlobalAddModal();
+  } else {
+    openAddModal();
+  }
+}
+
 function openAddModal(prefDate, prefRes, prefStart, prefEnd){
+  addModalContext = "personal";
   const dateInp = document.getElementById("modal-date");
   const resSel = document.getElementById("modal-resource");
   resSel.innerHTML = "";
@@ -3249,6 +3690,27 @@ function openAddModal(prefDate, prefRes, prefStart, prefEnd){
 
   dateInp.value = prefDate || fmtDate(currentDate);
   resSel.value = prefRes || selectedResource;
+  document.getElementById("modal-start").value = hourToTimeStr(prefStart!==undefined ? prefStart : 9);
+  document.getElementById("modal-end").value = hourToTimeStr(prefEnd!==undefined ? prefEnd : 11);
+  document.getElementById("modal-label").value = "";
+
+  document.getElementById("modal-overlay").classList.add("open");
+}
+/* Apre lo stesso modal "Nuovo elemento" ma per la Timeline Globale:
+   elenco risorse globali (create dall'admin) e salvataggio sui dati
+   condivisi invece che su quelli privati dell'utente. */
+function openGlobalAddModal(prefDate, prefRes, prefStart, prefEnd){
+  addModalContext = "global";
+  const dateInp = document.getElementById("modal-date");
+  const resSel = document.getElementById("modal-resource");
+  resSel.innerHTML = "";
+  GLOBAL_RESOURCES.forEach(r=>{
+    const o = document.createElement("option"); o.value=r; o.textContent=r;
+    resSel.appendChild(o);
+  });
+
+  dateInp.value = prefDate || fmtDate(globalWeekAnchor);
+  resSel.value = prefRes || GLOBAL_RESOURCES[0] || "";
   document.getElementById("modal-start").value = hourToTimeStr(prefStart!==undefined ? prefStart : 9);
   document.getElementById("modal-end").value = hourToTimeStr(prefEnd!==undefined ? prefEnd : 11);
   document.getElementById("modal-label").value = "";
@@ -3275,7 +3737,17 @@ function confirmAddModal(){
   if(!isAllDay && end<=start){ alert(t("modal.endAfterStart")); return; }
 
   closeAddModal();
-  addBooking(date, res, start, end, label, isAllDay);
+  if(addModalContext === "global"){
+    addGlobalBooking(date, res, start, end, label, isAllDay);
+  } else {
+    addBooking(date, res, start, end, label, isAllDay);
+  }
+}
+function addGlobalBooking(date, res, start, end, label, isAllDay){
+  if(!globalBookings[date]) globalBookings[date] = [];
+  globalBookings[date].push({id: globalIdCounter++, res, start, end, label, allDay: !!isAllDay});
+  persistGlobal();
+  if(currentView === "global") renderGlobalView();
 }
 
 document.getElementById("modal-overlay").addEventListener("click",(e)=>{
@@ -3348,6 +3820,17 @@ function saveAnnouncement(ann){
 
 function canWriteAnnouncement(){
   if(isAdmin() || isSpecialViewer()) return true;
+  if(!currentUser) return false;
+  const users = loadUsers();
+  return !!(users[currentUser] && users[currentUser].canAnnounce);
+}
+
+/* Chi può modificare la Timeline Globale: admin sempre, più chiunque
+   abbia il permesso "può scrivere annunci" (stesso meccanismo/flag già
+   usato per gli annunci, riutilizzato qui su richiesta). Tutti gli altri
+   utenti vedono la timeline in sola lettura. */
+function canEditGlobalTimeline(){
+  if(isAdmin()) return true;
   if(!currentUser) return false;
   const users = loadUsers();
   return !!(users[currentUser] && users[currentUser].canAnnounce);
