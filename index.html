@@ -573,17 +573,17 @@
   .agenda-notes textarea::placeholder{color:var(--text-muted);}
 
   .todo-section{padding:var(--sp-4);border-bottom:1px solid var(--border);}
-  .todo-add-row{display:flex;gap:var(--sp-2);margin-bottom:var(--sp-3);}
+  .todo-add-row{display:flex;gap:var(--sp-2);margin-bottom:var(--sp-3);max-width:100%;}
   .todo-add-row input{
-    flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:16px;
+    flex:1;min-width:0;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:16px;
     background:var(--bg-soft);color:var(--text-main);
   }
   .todo-add-row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-shadow);}
   .todo-add-row input::placeholder{color:var(--text-muted);}
   .todo-add-row button{
-    background:var(--accent);color:#fff;border:none;padding:0 var(--sp-4);
+    background:var(--accent);color:#fff;border:none;padding:0 var(--sp-3);
     border-radius:var(--radius-sm);font-size:var(--fs-sm);font-weight:700;cursor:pointer;white-space:nowrap;
-    transition:background .15s;
+    transition:background .15s;flex-shrink:0;
   }
   .todo-add-row button:hover{background:var(--accent-dark);}
   .todo-list{display:flex;flex-direction:column;gap:6px;}
