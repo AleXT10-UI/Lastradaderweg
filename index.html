@@ -1004,7 +1004,7 @@
 
   /* ---------- Gestione risorse / utenti ---------- */
   .manage-res-modal{max-width:440px;max-height:85vh;overflow-y:auto;}
-  .res-manage-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;margin-bottom:var(--sp-4);}
+  .res-manage-list{display:flex;flex-direction:column;gap:6px;margin-bottom:var(--sp-4);}
   .res-manage-item{
     display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--radius-sm);
     background:var(--bg-soft);border:1px solid var(--border);cursor:grab;
@@ -3226,6 +3226,7 @@ function renderGlobalView(){
 function showGlobalEventDetail(dateKey, id){
   const item = (globalBookings[dateKey]||[]).find(b=>b.id===id);
   if(!item) return;
+  const canEdit = canEditGlobalTimeline();
   const colors = getResourceColor(item.res);
   const dateObj = new Date(dateKey+"T00:00:00");
   const dateLabel = dateObj.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long",year:"numeric"}).replace(/^\w/,c=>c.toUpperCase());
@@ -3244,7 +3245,7 @@ function showGlobalEventDetail(dateKey, id){
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEventDetail()">${t("detail.close")}</button>
-      <button class="btn-confirm" style="background:var(--accent);box-shadow:0 2px 8px var(--accent-shadow), var(--neon-glow);" onclick="deleteFromGlobalDetail('${dateKey}', ${id})">${t("detail.delete")}</button>
+      ${canEdit ? `<button class="btn-confirm" style="background:var(--accent);box-shadow:0 2px 8px var(--accent-shadow), var(--neon-glow);" onclick="deleteFromGlobalDetail('${dateKey}', ${id})">${t("detail.delete")}</button>` : ""}
     </div>
   `;
   document.getElementById("detail-overlay").classList.add("open");
@@ -3254,6 +3255,7 @@ function deleteFromGlobalDetail(dateKey, id){
   removeGlobalBooking(dateKey, id);
 }
 function removeGlobalBooking(dateKey, id){
+  if(!canEditGlobalTimeline()) return;
   if(!globalBookings[dateKey]) return;
   globalBookings[dateKey] = globalBookings[dateKey].filter(b=>b.id!==id);
   if(globalBookings[dateKey].length===0) delete globalBookings[dateKey];
