@@ -9,13 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* =====================================================================
-     DESIGN SYSTEM — "Gestionale La Strada der Weg"
-     Palette neutra e calda, rosso mattone come unico accento.
-     Scala di spaziatura 4px, tipografia Inter, ombre morbide a due livelli.
-     ===================================================================== */
   :root{
-    /* Superfici e struttura */
     --bg:#f4f3f1;
     --surface:#ffffff;
     --surface-2:#faf9f8;
@@ -23,20 +17,17 @@
     --border:#e7e4df;
     --border-strong:#d9d5cf;
 
-    /* Colori di marca */
     --accent:#c0392f;
     --accent-dark:#96271f;
     --accent-soft:#fbeeec;
     --accent-shadow:rgba(150,39,31,.28);
     --focus-shadow:rgba(192,57,47,.14);
 
-    /* Testo */
     --head:#211f1c;
     --text-main:#33302b;
     --text-muted:#84806f;
     --num-color:#33302b;
 
-    /* Stati */
     --free:#eef6ef;
     --free-border:#d2e6d5;
     --free-text:#2b7a45;
@@ -49,7 +40,6 @@
     --warn-text:#96690a;
     --warn-border:#f0dda8;
 
-    /* Elementi secondari */
     --btn-secondary-bg:#f0eeeb;
     --btn-secondary-text:#5b574f;
     --muted-timeline:#84806f;
@@ -57,13 +47,11 @@
     --muted-week-time:#84806f;
     --muted-empty:#a8a396;
 
-    /* Compat (usati dal vecchio markup) */
     --page-grad-start:#f4f3f1;
     --page-grad-end:#f4f3f1;
     --shadow-soft:rgba(30,25,20,.06);
     --shadow-strong:rgba(30,25,20,.10);
 
-    /* Scala spaziatura e tipografia */
     --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
     --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-md:15px; --fs-lg:17px; --fs-xl:20px; --fs-2xl:26px;
     --radius-sm:11px; --radius-md:16px; --radius-lg:22px;
@@ -135,7 +123,6 @@
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
-  /* ---------- Animazioni globali: bounce sui bottoni, zoom+fade sui modali ---------- */
   @keyframes btnBounce{
     0%{transform:scale(1);}
     35%{transform:scale(.90);}
@@ -161,9 +148,6 @@
   }
 
 
-  /* Le icone SVG (sostituiscono le emoji) ereditano il colore del testo
-     circostante tramite currentColor: sono monocromatiche per costruzione,
-     senza bisogno di filtri CSS per adattarle al tema chiaro/scuro. */
   .icon-svg{
     display:inline-block;vertical-align:-3px;flex-shrink:0;
   }
@@ -202,7 +186,6 @@
   button:disabled:active{transform:none;}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
-  /* ---------- Scrollbar personalizzate ---------- */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--border-strong) transparent;
@@ -228,7 +211,6 @@
   *::-webkit-scrollbar-corner{background:transparent;}
   *::-webkit-scrollbar-button{display:none;width:0;height:0;}
 
-  /* Scroll fluido e naturale su tutte le aree con overflow interno */
   .slot-list, .week-list, .search-results, .res-manage-list,
   .mega-timeline-scroll, .day-detail, .week-day-body{
     scroll-behavior:smooth;
@@ -244,7 +226,6 @@
   #side-detail-card{margin-bottom:var(--sp-2);}
   .side-card{padding:var(--sp-4);}
 
-  /* ---------- Header ---------- */
   header{
     display:flex;align-items:center;gap:var(--sp-3);
     background:var(--surface);padding:var(--sp-2) var(--sp-4);
@@ -276,7 +257,6 @@
   }
   #search-toggle.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 
-  /* ---------- Selettore lingua nell'header (dropdown compatto) ---------- */
   .lang-dropdown-wrap{position:relative;flex-shrink:0;}
   .lang-dropdown-menu{
     display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:70;
@@ -323,7 +303,6 @@
     cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
   }
 
-  /* ---------- Ricerca ---------- */
   .search-bar{
     display:flex;align-items:center;gap:var(--sp-2);background:var(--surface);
     border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3);
@@ -358,7 +337,6 @@
   .search-result-item .sr-meta{font-size:var(--fs-xs);color:var(--text-muted);}
   .search-no-results{padding:var(--sp-4);text-align:center;color:var(--text-muted);font-size:var(--fs-sm);}
 
-  /* ---------- Selettore vista ---------- */
   .view-switch{
     display:flex;background:var(--surface);border:1px solid var(--border);
     border-radius:var(--radius-md);padding:4px;gap:4px;
@@ -374,7 +352,6 @@
   .view-switch button i{font-size:16px;flex-shrink:0;}
   .view-switch button.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-shadow), var(--neon-glow), var(--shadow-inset-top);}
 
-  /* ---------- Navigazione data ---------- */
   .date-nav{
     display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
@@ -394,12 +371,6 @@
     cursor:pointer;border-radius:var(--radius-sm);padding:4px 8px;transition:background .15s;
   }
   .date-nav .date-label:hover{background:var(--bg-soft);}
-  /* Il testo della data e l'input date nativo stanno sovrapposti nello
-     stesso contenitore: l'input è invisibile ma realmente cliccabile
-     (posizionato sopra, pointer-events attivi), così un tap diretto
-     dell'utente apre il calendario nativo in modo affidabile su tutti i
-     browser, senza dipendere da showPicker()/click() via JS che non sono
-     supportati o affidabili ovunque (specialmente Safari/iOS). */
   .date-label-wrap{position:relative;flex:1;min-width:0;}
   .date-nav .date-label{
     position:relative;z-index:1;pointer-events:none;
@@ -417,22 +388,18 @@
   }
   .today-text-btn:hover{background:var(--bg-soft);box-shadow:var(--shadow-card-hover);}
 
-  /* ---------- Card ---------- */
   .card{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
     box-shadow:var(--shadow-card), var(--shadow-inset-top);overflow:hidden;margin-bottom:var(--sp-3);
     transition:border-color .3s ease, box-shadow .3s ease;
   }
   .card.view-enter{animation:modalZoomFade .35s cubic-bezier(.2,.9,.3,1.1);}
-  /* In dark mode, le card della vista attualmente attiva riflettono un
-     sottile bagliore neon sul bordo, coerente con l'accento del tema. */
   body.dark-mode .mega-timeline-card,
   body.dark-mode #view-day-el{
     border-color:rgba(255,0,132,.25);
     box-shadow:var(--shadow-card), var(--shadow-inset-top), 0 0 24px rgba(255,0,132,.08);
   }
 
-  /* ---------- Timeline giornaliera (mega) ---------- */
   .mega-timeline-header{
     padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--border);
     display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);
@@ -475,7 +442,6 @@
   .mtl-block .mtl-block-time{font-size:8px;opacity:.9;}
   .mtl-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--now-line);z-index:5;pointer-events:none;}
 
-  /* ---------- Timeline Globale (multi-giorno, una riga per risorsa) ---------- */
   .global-toolbar{
     display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);
     padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--border);flex-wrap:wrap;
@@ -536,7 +502,6 @@
   }
   .following-tooltip.visible{opacity:1;transform:translateY(0);}
 
-  /* ---------- Toggle pannello giorno (mobile) ---------- */
   .day-view-toggle-mobile{
     display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);
     border-radius:var(--radius-md);padding:4px;margin-bottom:var(--sp-3);box-shadow:var(--shadow-card), var(--shadow-inset-top);
@@ -551,16 +516,11 @@
   .day-view-split .mega-timeline-card.mobile-hidden,
   .day-view-split #view-day-el.mobile-hidden{display:none;}
 
-  /* ---------- Layout desktop ---------- */
   @media (min-width:1100px){
     .day-view-toggle-mobile{display:none;}
     .day-view-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:start;}
     .day-view-split .mega-timeline-card.mobile-hidden,
     .day-view-split #view-day-el.mobile-hidden{display:block;}
-    /* Colonna destra (Risorse/lista slot in vista Giorno, Mese in vista
-       Settimana) risale con un margine negativo fino a toccare quasi la
-       barra di navigazione, alla stessa Y della colonna sinistra
-       ("Oggi + data" comprime tutto sopra la timeline, non sopra le risorse). */
     #side-detail-card{margin-bottom:var(--sp-2);}
     .date-nav{margin-bottom:var(--sp-2);}
   }
@@ -587,9 +547,6 @@
 
     .date-nav .date-label{font-size:var(--fs-md);}
 
-    /* "Oggi" + selettore data e card dettaglio giorno: stessa larghezza della
-       colonna sinistra della vista Settimana, allineati a sinistra */
-    /* larghezza gestita da .topbar-row .date-nav sopra */
     #side-detail-card{width:calc((100% - var(--sp-5)) / 2);max-width:none;margin-left:0;margin-right:auto;}
 
     .main-layout{display:block;}
@@ -640,7 +597,6 @@
     .fab:hover{transform:translateY(-2px);box-shadow:0 8px 22px var(--accent-shadow), 0 2px 5px rgba(0,0,0,.12);}
   }
 
-  /* ---------- Appunti agenda / To-do ---------- */
   .agenda-notes{padding:var(--sp-4);border-bottom:1px solid var(--border);}
   .agenda-notes-title{font-size:var(--fs-sm);font-weight:700;color:var(--head);margin-bottom:var(--sp-2);}
   .agenda-notes textarea{
@@ -675,7 +631,6 @@
   .todo-item .todo-del{color:var(--danger);cursor:pointer;flex-shrink:0;font-size:14px;padding:6px 9px;}
   .todo-empty{color:var(--text-muted);font-size:var(--fs-sm);text-align:center;padding:var(--sp-2) 0;}
 
-  /* ---------- Agenda ---------- */
   .agenda-list{padding:var(--sp-2) var(--sp-1);}
   .agenda-date-title{
     font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);padding:var(--sp-3) var(--sp-4) var(--sp-1);
@@ -693,7 +648,6 @@
   .agenda-time{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);flex-shrink:0;width:88px;}
   .agenda-info{font-size:var(--fs-sm);color:var(--text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-  /* ---------- Toolbar giorno ---------- */
   .day-toolbar{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);border-bottom:1px solid var(--border);background:var(--surface-2);}
   .resource-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:var(--sp-2) var(--sp-3);flex:1;}
   .toolbar-actions{display:flex;gap:var(--sp-2);flex-shrink:0;margin-right:var(--sp-3);}
@@ -713,7 +667,6 @@
     background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px var(--accent-shadow), var(--neon-glow), var(--shadow-inset-top);
   }
 
-  /* ---------- Mini timeline ---------- */
   .mini-timeline-wrap{padding:var(--sp-3) var(--sp-3) var(--sp-2);border-bottom:1px solid var(--border);}
   .mini-timeline{
     position:relative;height:32px;background:var(--free);border:1px solid var(--free-border);
@@ -737,7 +690,6 @@
     color:var(--muted-timeline);margin-top:6px;padding:0 1px;
   }
 
-  /* ---------- Lista slot ---------- */
   .slot-list{
     padding:var(--sp-3);display:flex;flex-direction:column;gap:6px;max-height:65vh;overflow-y:auto;
     -webkit-overflow-scrolling:touch;
@@ -781,7 +733,6 @@
     border-radius:999px;white-space:nowrap;box-shadow:0 2px 5px rgba(225,29,72,.3);letter-spacing:.02em;
   }
 
-  /* ---------- Vista settimana ---------- */
   .week-list{padding:var(--sp-3);display:flex;flex-direction:column;gap:var(--sp-3);}
   .week-day{border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.04);}
   .week-day-header{
@@ -816,7 +767,6 @@
   .week-item .wi-del{color:var(--danger);cursor:pointer;font-size:15px;padding:6px 9px;}
   .week-empty{padding:10px 0;text-align:center;color:var(--muted-empty);font-size:var(--fs-sm);}
 
-  /* ---------- Vista mese ---------- */
   .month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:var(--sp-3);}
   .month-dow{
     text-align:center;font-size:10.5px;font-weight:700;color:var(--text-muted);
@@ -837,7 +787,6 @@
   .month-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:4px;max-width:100%;}
   .month-dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);}
 
-  /* ---------- Footer supporto ---------- */
   .app-footer{
     display:flex;justify-content:flex-start;padding:var(--sp-5) 0 var(--sp-3);
   }
@@ -849,7 +798,6 @@
   }
   .footer-support-link:hover{background:var(--bg-soft);color:var(--head);}
 
-  /* ---------- FAB ---------- */
   .fab{
     position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;
     background:var(--accent);color:#fff;border:none;font-size:26px;
@@ -859,7 +807,6 @@
   .fab:hover{background:var(--accent-dark);box-shadow:0 10px 26px var(--accent-shadow), var(--neon-glow), inset 0 1px 0 rgba(255,255,255,.35);transform:scale(1.06);}
   .fab:active{animation:btnBounce .38s cubic-bezier(.34,1.56,.64,1);}
 
-  /* ---------- Modali ---------- */
   .modal-overlay{
     position:fixed;inset:0;background:rgba(22,18,14,.58);display:none;align-items:center;justify-content:center;
     z-index:100;padding:16px;backdrop-filter:blur(6px);
@@ -868,8 +815,6 @@
   .modal-overlay.open .modal, .modal-overlay.open .manage-res-modal{
     animation:modalZoomFade .32s cubic-bezier(.2,.9,.3,1.1);
   }
-  /* Il modale supporto può essere aperto anche dalla schermata di login
-     (z-index:500), quindi deve stare sopra di essa. */
   #support-overlay{z-index:600;}
   .modal{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
@@ -910,7 +855,6 @@
   .modal-actions .btn-confirm{background:var(--accent);color:#fff;box-shadow:0 3px 10px var(--accent-shadow);}
   .modal-actions .btn-confirm:hover{background:var(--accent-dark);}
 
-  /* ---------- Login ---------- */
   #login-overlay{
     position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
     background:
@@ -1002,7 +946,6 @@
   .loading-text{color:var(--head);font-size:var(--fs-base);font-weight:700;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* ---------- Gestione risorse / utenti ---------- */
   .manage-res-modal{max-width:440px;max-height:85vh;overflow-y:auto;}
   .res-manage-list{display:flex;flex-direction:column;gap:6px;margin-bottom:var(--sp-4);}
   .res-manage-item{
@@ -1043,7 +986,6 @@
   }
   .res-add-row button:hover{background:var(--accent-dark);}
 
-  /* ---------- Dettaglio giorno ---------- */
   .day-detail{
     background:var(--surface);border-radius:var(--radius-md);padding:var(--sp-4);
   }
@@ -1065,7 +1007,6 @@
   .day-detail .dd-item .dd-del{color:var(--danger);cursor:pointer;padding:6px 9px;}
   .day-detail .dd-empty{color:var(--muted-empty);font-size:var(--fs-sm);text-align:center;padding:var(--sp-2) 0;}
 
-  /* ---------- Mobile ---------- */
   @media (max-width:600px){
     .app{padding:10px;padding-bottom:96px;}
     header{padding:8px 10px;flex-wrap:wrap;gap:6px;row-gap:8px;}
@@ -1082,9 +1023,6 @@
     .view-switch button{font-size:9.5px;padding:9px 2px;gap:2px;}
     .view-switch button i{font-size:13px;}
 
-    /* Ordine header mobile: logo, titolo, poi logout+profilo (invertiti,
-       a sinistra), poi lingua/annunci/utenti, poi ricerca+tema in fondo
-       a destra */
     #logout-toggle{order:2;}
     .profile-badge{order:3;}
     .lang-dropdown-wrap{order:4;}
@@ -1420,32 +1358,7 @@
 </div>
 
 <script>
-/* =========================================================================
-   SISTEMA DI AUTENTICAZIONE
-   ATTENZIONE — nota di sicurezza onesta: questo sito gira interamente nel
-   browser senza un server dietro. Le password vengono trasformate con SHA-256
-   prima di essere salvate (quindi non sono leggibili in chiaro), ma chiunque
-   apra gli strumenti sviluppatore del browser può comunque vedere il codice
-   sorgente e i dati salvati in locale. Non è equivalente alla sicurezza di un
-   vero sistema server-side con database. Ogni account creato/loggato resta
-   solo sul dispositivo/browser dove viene creato, finché non verrà collegato
-   un backend condiviso (Firebase, come discusso).
-   ========================================================================= */
 
-/* =========================================================================
-   SISTEMA DI INTERNAZIONALIZZAZIONE (i18n)
-   Tre lingue supportate: italiano (it, default), tedesco (de), inglese (en).
-   t(key) restituisce la stringa tradotta nella lingua corrente; tWeekday/
-   tMonth gestiscono nomi di giorni/mesi per il rendering di date, dato che
-   toLocaleDateString dipende dalla lingua del browser e non da questa scelta.
-   ========================================================================= */
-/* =========================================================================
-   LIBRERIA ICONE SVG (sostituisce le emoji)
-   Icone in stile lineare minimale, disegnate con stroke="currentColor":
-   ereditano automaticamente il colore del testo circostante, quindi sono
-   monocromatiche per design — nessun filtro CSS necessario per adattarle
-   al tema chiaro/scuro.
-   ========================================================================= */
 const ICONS = {
   sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>',
   moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>',
@@ -1472,9 +1385,6 @@ const ICONS = {
   layers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"></path><path d="m3 12 9 5 9-5M3 17l9 5 9-5"></path></svg>',
   copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>',
 };
-/* Restituisce l'HTML dell'icona con dimensione e classi opzionali,
-   pronta da inserire con innerHTML. Il colore segue sempre currentColor,
-   quindi eredita automaticamente il colore del testo/tema circostante. */
 function icon(name, size, extraClass){
   const svg = ICONS[name];
   if(!svg) return "";
@@ -1878,9 +1788,6 @@ document.addEventListener("click",(e)=>{
   if(wrap && !wrap.contains(e.target)) closeLangDropdown();
 });
 
-/* Applica le traduzioni a tutti gli elementi statici marcati con
-   data-i18n (testo) o data-i18n-placeholder (placeholder input), e
-   aggiorna lo stato attivo del selettore lingua nel login. */
 function applyTranslations(){
   document.title = t("app.title");
   document.querySelectorAll("[data-i18n]").forEach(el=>{
@@ -1955,13 +1862,6 @@ function saveUsers(users){
 
 let currentUser = null;
 
-/* Genera una chiave localStorage specifica per l'utente corrente, così
-   ogni account ha prenotazioni, risorse, note e todo completamente
-   separati dagli altri. Solo gli annunci restano su una chiave globale
-   condivisa (vedi loadAnnouncement/saveAnnouncement, che non usano
-   questa funzione). Se per qualche motivo non c'è un utente loggato,
-   ricade su una chiave neutra "_guest" invece di scrivere su una chiave
-   condivisa per errore. */
 function userKey(baseKey){
   const userId = currentUser || "_guest";
   return baseKey + "__" + userId;
@@ -2010,10 +1910,6 @@ function completeLogin(username, showLoading){
   currentUser = username;
   try{ sessionStorage.setItem("gestionale_current_user", username); }catch(e){}
 
-  // Tutte le variabili dati sono state inizializzate all'avvio dello
-  // script quando currentUser era ancora null (chiave "_guest"). Ora che
-  // sappiamo chi si è loggato, ricarichiamo tutto con la chiave corretta
-  // per quell'account, così ogni utente vede solo i propri dati privati.
   RESOURCES = loadResources();
   customResourceColors = loadCustomColors();
   bookings = JSON.parse(safeGetInit());
@@ -2071,7 +1967,6 @@ function tryRestoreSession(){
   return false;
 }
 
-/* ---- Gestione utenti (solo Admin) ---- */
 function openUsersPanel(){
   if(!isAdmin()) return;
   renderUsersManageList();
@@ -2144,14 +2039,9 @@ document.getElementById("users-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="users-overlay") closeUsersPanel();
 });
 
-/* Intervallo orario mostrato nella timeline giornaliera: le ore fuori da
-   questo intervallo (notte e prima mattina) non vengono visualizzate.
-   Tutti i calcoli di posizione percentuale usano queste costanti. */
 const TL_START_HOUR = 0;
 const TL_END_HOUR = 24;
 const TL_SPAN_HOURS = TL_END_HOUR - TL_START_HOUR;
-/* Converte un'ora decimale (es. 13.5) nella sua posizione percentuale
-   all'interno della timeline visibile, con clamp ai bordi. */
 function hourToPct(h){
   const pct = (h - TL_START_HOUR) / TL_SPAN_HOURS * 100;
   return Math.max(0, Math.min(100, pct));
@@ -2239,11 +2129,6 @@ function persist(){
 let bookings = JSON.parse(safeGetInit());
 let idCounter = computeMaxId(bookings) + 1;
 
-/* ---------- Dati della Timeline Globale ----------
-   Completamente separati dalle prenotazioni private di ogni utente:
-   usano chiavi localStorage FISSE (non per-utente), quindi sono condivisi
-   e visibili a tutti allo stesso modo. Le risorse seguono quelle create
-   dall'admin, non quelle personali dell'utente che sta guardando. */
 function loadGlobalResources(){
   try{
     const raw = localStorage.getItem("gestionale_global_resources");
@@ -2282,8 +2167,6 @@ function sameDay(a,b){ return fmtDate(a)===fmtDate(b); }
 
 let currentView = "day";
 let currentDate = todayDate();
-/* Settimana visualizzata nella Timeline Globale: separata da currentDate
-   perché questa vista naviga in autonomia rispetto alle altre. */
 let globalWeekAnchor = todayDate();
 let selectedResource = RESOURCES[0];
 let openWeekDayKey = null;
@@ -2409,8 +2292,6 @@ function switchView(view){
   }
   renderAll();
 
-  // Applica un breve effetto zoom+fade+blur alle card appena diventate
-  // visibili, solo al cambio di vista effettivo (non ad ogni re-render).
   requestAnimationFrame(()=>{
     document.querySelectorAll(".card").forEach(card=>{
       if(card.offsetParent !== null){
@@ -2449,10 +2330,6 @@ function goToday(){
   refreshSidePanel();
 }
 
-/* Apre il calendario nativo del sistema (input type="date") sincronizzato
-   con il giorno attualmente mostrato, per permettere di saltare a
-   qualsiasi giorno/mese/anno con pochi tap invece di usare solo le frecce
-   avanti/indietro una alla volta. */
 function openDatePicker(){
   const picker = document.getElementById("date-picker-input");
   if(!picker) return;
@@ -2485,11 +2362,6 @@ function renderAll(){
   syncWeekColumnsHeight();
 }
 
-/* Misura l'altezza reale di "Oggi + data" e della card dettaglio/mese, e la
-   usa come margine negativo per far risalire la colonna destra (Risorse in
-   vista Giorno, calendario mese in vista Settimana) fino alla stessa Y della
-   barra Giorno/Settimana/Agenda. Ricalcolato ad ogni render perché il
-   contenuto di quelle card cambia dimensione in base al numero di eventi. */
 function updateRightColOffset(){
   if(!window.matchMedia("(min-width:1100px)").matches){
     document.documentElement.style.setProperty("--right-col-offset", "0px");
@@ -2511,11 +2383,6 @@ window.addEventListener("resize", ()=>{
   if(typeof currentUser !== "undefined" && currentUser) updateRightColOffset();
 });
 
-/* Fa sì che la card "Risorse/Duplica giorno" abbia la STESSA altezza totale
-   della mega-timeline a fianco, senza stirare la cornice: si misura
-   l'altezza reale della timeline (che varia col numero di risorse) e si
-   sottrae lo spazio già occupato da toolbar/mini-timeline/countdown dentro
-   la card Risorse, ottenendo l'altezza esatta da dare allo slot-list. */
 function syncDayColumnsHeight(){
   requestAnimationFrame(()=>{
     if(!window.matchMedia("(min-width:1100px)").matches){
@@ -2547,10 +2414,6 @@ window.addEventListener("resize", ()=>{
   if(typeof currentUser !== "undefined" && currentUser) syncDayColumnsHeight();
 });
 
-/* Sincronizza l'altezza massima della lista "Lunedì...Domenica" (colonna
-   destra in vista Settimana) con l'altezza reale del calendario mensile
-   a fianco (colonna sinistra), così la card destra resta compatta e
-   allineata in Y invece di espandersi oltre il calendario. */
 function syncWeekColumnsHeight(){
   requestAnimationFrame(()=>{
     if(!window.matchMedia("(min-width:1100px)").matches){
@@ -2604,7 +2467,6 @@ function renderMiniTimeline(dayBookings, containerId){
   }
 
   dayBookings.forEach(b=>{
-    // Salta gli eventi fuori dall'intervallo orario visibile.
     if(b.end <= TL_START_HOUR || b.start >= TL_END_HOUR) return;
     const seg = document.createElement("div");
     seg.className = "mt-segment";
@@ -2685,7 +2547,6 @@ function renderDayView(){
   const mtEl = renderMiniTimeline(dayBookings, "mini-timeline");
   addNowLineToTimeline(mtEl, currentDate);
 
-  // Chip compatti per gli elementi "tutto il giorno" — non occupano slot orari
   const alldayWrap = document.getElementById("allday-chips");
   alldayWrap.innerHTML = "";
   if(allDayItemsAll.length === 0){
@@ -2710,7 +2571,6 @@ function renderDayView(){
     nowHourDecimal = now.getHours() + now.getMinutes()/60;
   }
 
-  // Countdown al prossimo elemento della risorsa selezionata
   const countdownEl = document.getElementById("day-countdown");
   if(isToday){
     const next = dayBookings.filter(b=>b.start > nowHourDecimal).sort((a,b)=>a.start-b.start)[0];
@@ -2789,10 +2649,6 @@ function renderDayView(){
   renderMegaTimeline(key);
 }
 
-/* Tooltip custom che segue la posizione del mouse mentre è sopra
-   l'elemento, invece del title nativo del browser (statico, lento a
-   comparire, non personalizzabile). Usato per i nomi degli eventi nella
-   mega-timeline giornaliera. */
 let followingTooltipEl = null;
 function getFollowingTooltip(){
   if(!followingTooltipEl){
@@ -2859,8 +2715,6 @@ function renderMegaTimeline(key){
     items.forEach(it=>{
       const rawStart = it.allDay ? TL_START_HOUR : it.start;
       const rawEnd = it.allDay ? TL_END_HOUR : it.end;
-      // Salta gli eventi che cadono interamente fuori dall'intervallo
-      // orario visibile: altrimenti verrebbero schiacciati sul bordo.
       if(rawEnd <= TL_START_HOUR || rawStart >= TL_END_HOUR) return;
 
       const block = document.createElement("div");
@@ -2892,14 +2746,10 @@ function renderMegaTimeline(key){
   if(sameDay(currentDate, todayDate())){
     const now = new Date();
     const nowHour = now.getHours() + now.getMinutes()/60;
-    // Mostra la linea "ora" solo se l'orario attuale ricade nell'intervallo
-    // visibile della timeline.
     if(nowHour >= TL_START_HOUR && nowHour <= TL_END_HOUR){
     const pct = hourToPct(nowHour);
     const nowLine = document.createElement("div");
     nowLine.className = "mtl-now-line";
-    // La larghezza della colonna etichetta risorsa cambia per breakpoint:
-    // 90px su mobile, 130px da 1100px in su (vedi .mega-timeline-grid).
     const labelColWidth = window.matchMedia("(min-width:1100px)").matches ? 130 : 90;
     nowLine.style.left = "calc(" + labelColWidth + "px + (100% - " + labelColWidth + "px) * " + (pct/100) + ")";
     nowLine.style.top = "0";
@@ -2983,8 +2833,6 @@ function renderWeekView(){
   }
 }
 
-/* Feedback aptico su mobile (vibrazione breve), se il dispositivo/browser
-   lo supporta. Su desktop o dispositivi senza supporto non fa nulla. */
 function haptic(ms){
   try{
     if(navigator.vibrate) navigator.vibrate(ms || 10);
@@ -3079,9 +2927,6 @@ function renderAgendaView(){
   listEl.innerHTML = "";
 
   const today = todayDate();
-  // Mostra solo gli eventi del mese attualmente visualizzato, agganciato
-  // a currentDate come nelle altre viste, invece di tutti gli eventi
-  // futuri senza limite.
   const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0);
 
@@ -3123,7 +2968,6 @@ function renderAgendaView(){
   });
 }
 
-/* ---------- Timeline Globale ---------- */
 function globalNavPrev(){
   globalWeekAnchor.setDate(globalWeekAnchor.getDate()-7);
   renderGlobalView();
@@ -3220,9 +3064,6 @@ function renderGlobalView(){
   });
 }
 
-/* Dettaglio/eliminazione di un evento della Timeline Globale: analogo a
-   showEventDetail, ma opera sui dati globali separati invece che sulle
-   prenotazioni private dell'utente. */
 function showGlobalEventDetail(dateKey, id){
   const item = (globalBookings[dateKey]||[]).find(b=>b.id===id);
   if(!item) return;
@@ -3474,10 +3315,6 @@ function addNewResource(){
   renderManageResourcesList();
 }
 
-/* ---------- Gestione risorse della Timeline Globale ----------
-   Analoga a quella personale sopra, ma opera su GLOBAL_RESOURCES: solo
-   admin/permessi possono aprire questo pannello (bottone nascosto agli
-   altri utenti in renderGlobalView). */
 function openGlobalManageResourcesModal(){
   renderGlobalManageResourcesList();
   document.getElementById("global-manage-res-overlay").classList.add("open");
@@ -3663,15 +3500,8 @@ document.getElementById("detail-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="detail-overlay") closeEventDetail();
 });
 
-/* Il modal "Nuovo elemento" è condiviso tra il contesto personale
-   (prenotazioni private dell'utente) e quello della Timeline Globale
-   (dati condivisi, editabili solo da admin/permessi). Questo flag
-   determina quale set di risorse mostrare e dove salvare al conferma. */
 let addModalContext = "personal";
 
-/* Instrada il click del FAB al modal corretto in base alla vista
-   attualmente aperta: nella Timeline Globale apre il modal dedicato ai
-   dati condivisi, altrove il modal personale come sempre. */
 function onFabClick(){
   if(currentView === "global"){
     openGlobalAddModal();
@@ -3698,9 +3528,6 @@ function openAddModal(prefDate, prefRes, prefStart, prefEnd){
 
   document.getElementById("modal-overlay").classList.add("open");
 }
-/* Apre lo stesso modal "Nuovo elemento" ma per la Timeline Globale:
-   elenco risorse globali (create dall'admin) e salvataggio sui dati
-   condivisi invece che su quelli privati dell'utente. */
 function openGlobalAddModal(prefDate, prefRes, prefStart, prefEnd){
   addModalContext = "global";
   const dateInp = document.getElementById("modal-date");
@@ -3802,12 +3629,6 @@ document.addEventListener("keydown", (e)=>{
   }
 });
 
-/* =========================================================================
-   SISTEMA ANNUNCI
-   Solo Admin (o Dario) può scrivere un annuncio. Tutti gli utenti loggati lo
-   vedono e possono mettere un segno di spunta "letto". Solo Admin e Dario
-   vedono quante persone hanno messo il segno di spunta.
-   ========================================================================= */
 
 function loadAnnouncement(){
   try{
@@ -3827,10 +3648,6 @@ function canWriteAnnouncement(){
   return !!(users[currentUser] && users[currentUser].canAnnounce);
 }
 
-/* Chi può modificare la Timeline Globale: admin sempre, più chiunque
-   abbia il permesso "può scrivere annunci" (stesso meccanismo/flag già
-   usato per gli annunci, riutilizzato qui su richiesta). Tutti gli altri
-   utenti vedono la timeline in sola lettura. */
 function canEditGlobalTimeline(){
   if(isAdmin()) return true;
   if(!currentUser) return false;
@@ -3995,13 +3812,10 @@ document.getElementById("support-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="support-overlay") closeSupportModal();
 });
 
-/* Permette di scrollare la timeline giornaliera orizzontalmente usando la
-   normale rotellina verticale del mouse, non solo il trackpad/drag. */
 (function(){
   const scrollArea = document.querySelector(".mega-timeline-scroll");
   if(!scrollArea) return;
   scrollArea.addEventListener("wheel",(e)=>{
-    // Se lo scroll è già prevalentemente orizzontale (trackpad), lascialo fare al browser.
     if(Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     if(e.deltaY === 0) return;
     e.preventDefault();
@@ -4009,17 +3823,12 @@ document.getElementById("support-overlay").addEventListener("click",(e)=>{
   }, {passive:false});
 })();
 
-/* Feedback aptico globale: vibra brevemente ad ogni click su elementi
-   interattivi comuni (bottoni, slot orari, celle calendario, righe
-   cliccabili). Delegato su document così copre tutta l'app senza dover
-   toccare ogni singolo handler onclick. */
 document.addEventListener("click", (e)=>{
   if(e.target.closest("button, .slot, .month-cell, .agenda-item, .week-item, .mtl-block, .allday-chip, .todo-item input[type=checkbox], .res-manage-item")){
     haptic(10);
   }
 });
 
-/* ---- Avvio: prova sessione salvata, altrimenti mostra login ---- */
 applyTranslations();
 if(!tryRestoreSession()){
   document.getElementById("login-overlay").style.display = "flex";
@@ -4033,12 +3842,6 @@ let lastResizeHeight = window.innerHeight;
 window.addEventListener("resize", ()=>{
   clearTimeout(resizeDebounceTimer);
   resizeDebounceTimer = setTimeout(()=>{
-    // Ignora resize "spurii" generati dal nostro stesso codice (es. una
-    // scrollbar che appare/scompare per un cambio di altezza di pochi
-    // pixel innescato da syncDayColumnsHeight/syncWeekColumnsHeight):
-    // altrimenti si crea un loop resize -> switchView -> renderAll ->
-    // sync*Height -> cambia altezza -> nuovo resize -> ripete all'infinito,
-    // dando l'impressione che la UI si aggiorni di continuo da sola.
     const w = window.innerWidth, h = window.innerHeight;
     const widthChanged = Math.abs(w - lastResizeWidth) > 2;
     const heightChanged = Math.abs(h - lastResizeHeight) > 60;
@@ -4048,7 +3851,6 @@ window.addEventListener("resize", ()=>{
   }, 250);
 });
 
-/* Swipe orizzontale su mobile per cambiare giorno/settimana/mese */
 (function(){
   let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
   let swipeEligible = false;
@@ -4064,9 +3866,6 @@ window.addEventListener("resize", ()=>{
     swipeEligible = false;
     if(anyModalOpen()) return;
     if(e.touches.length !== 1) return;
-    // Non intercettare il gesto se parte da un'area con scroll verticale
-    // interno (liste, timeline): lasciamo che lo scroll nativo funzioni
-    // sempre senza alcuna interferenza da parte di questo listener.
     if(e.target.closest(".slot-list, .week-list, .search-results, .res-manage-list, .mega-timeline-scroll, .day-detail, .week-day-body, .month-grid")) return;
     swipeEligible = true;
     touchStartX = e.touches[0].clientX;
@@ -4091,8 +3890,6 @@ window.addEventListener("resize", ()=>{
   }, {passive:true});
 })();
 
-/* Impedisce che un tap che chiude un modal "passi attraverso" e attivi un
-   elemento sottostante (problema noto su mobile con overlay + touch events) */
 document.querySelectorAll(".modal-overlay").forEach(overlay=>{
   overlay.addEventListener("touchstart", (e)=>{ e.stopPropagation(); }, {passive:true});
   overlay.addEventListener("touchend", (e)=>{ e.stopPropagation(); }, {passive:false});
