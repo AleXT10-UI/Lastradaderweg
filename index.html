@@ -4026,11 +4026,24 @@ if(!tryRestoreSession()){
 switchView("day");
 
 let resizeDebounceTimer = null;
+let lastResizeWidth = window.innerWidth;
+let lastResizeHeight = window.innerHeight;
 window.addEventListener("resize", ()=>{
   clearTimeout(resizeDebounceTimer);
   resizeDebounceTimer = setTimeout(()=>{
+    // Ignora resize "spurii" generati dal nostro stesso codice (es. una
+    // scrollbar che appare/scompare per un cambio di altezza di pochi
+    // pixel innescato da syncDayColumnsHeight/syncWeekColumnsHeight):
+    // altrimenti si crea un loop resize -> switchView -> renderAll ->
+    // sync*Height -> cambia altezza -> nuovo resize -> ripete all'infinito,
+    // dando l'impressione che la UI si aggiorni di continuo da sola.
+    const w = window.innerWidth, h = window.innerHeight;
+    const widthChanged = Math.abs(w - lastResizeWidth) > 2;
+    const heightChanged = Math.abs(h - lastResizeHeight) > 60;
+    lastResizeWidth = w; lastResizeHeight = h;
+    if(!widthChanged && !heightChanged) return;
     if(currentUser) switchView(currentView);
-  }, 200);
+  }, 250);
 });
 
 /* Swipe orizzontale su mobile per cambiare giorno/settimana/mese */
