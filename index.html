@@ -3230,8 +3230,8 @@ function renderMonthView(){
       cell.appendChild(dots);
     }
 
-    cell.onclick = ()=>{ openAddModal(key); };
-    attachLongPress(cell, ()=>{ showMonthDayDetail(d); });
+    cell.onclick = ()=>{ showMonthDayDetail(d); };
+    attachLongPress(cell, ()=>{ openAddModal(key); });
     grid.appendChild(cell);
   }
 }
