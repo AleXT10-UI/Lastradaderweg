@@ -2,7 +2,7 @@
   "name": "Gestionale La Strada der Weg",
   "short_name": "Gestionale",
   "description": "Gestionale prenotazioni e risorse",
-  "start_url": "./gestionale.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f4f3f1",
