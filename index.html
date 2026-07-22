@@ -515,12 +515,17 @@
   .day-view-split{display:block;}
   .day-view-split .mega-timeline-card.mobile-hidden,
   .day-view-split #view-day-el.mobile-hidden{display:none;}
+  .week-month-split #view-month-el.mobile-hidden,
+  .week-month-split #view-week-el.mobile-hidden{display:none;}
 
   @media (min-width:1100px){
     .day-view-toggle-mobile{display:none;}
     .day-view-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:start;}
     .day-view-split .mega-timeline-card.mobile-hidden,
     .day-view-split #view-day-el.mobile-hidden{display:block;}
+    #week-view-toggle-mobile{display:none;}
+    .week-month-split #view-month-el.mobile-hidden,
+    .week-month-split #view-week-el.mobile-hidden{display:block;}
     #side-detail-card{margin-bottom:var(--sp-2);}
     .date-nav{margin-bottom:var(--sp-2);}
   }
@@ -777,15 +782,17 @@
     display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 2px;
     cursor:pointer;transition:background .15s ease, border-color .15s ease, transform .12s cubic-bezier(.2,.8,.3,1);
     position:relative;
+    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   }
   .month-cell:hover{background:var(--bg-soft);border-color:var(--border-strong);transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.08);}
   .month-cell:active{transform:scale(0.95);}
+  .month-cell.long-pressing{transform:scale(0.93);background:var(--accent-soft);border-color:var(--accent);transition:transform .3s ease, background .3s ease, border-color .3s ease;}
   .month-cell.other-month{opacity:.35;}
   .month-cell.today{border-color:var(--accent);border-width:2px;background:var(--accent-soft);}
   .month-cell .mc-num{font-size:13px;font-weight:600;color:var(--num-color);}
   .month-cell.today .mc-num{color:var(--accent);font-weight:800;}
-  .month-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:4px;max-width:100%;}
-  .month-dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+  .month-dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:4px;max-width:100%;}
+  .month-dots span{width:7px;height:7px;border-radius:50%;background:var(--accent);}
 
   .app-footer{
     display:flex;justify-content:flex-start;padding:var(--sp-5) 0 var(--sp-3);
@@ -816,6 +823,8 @@
     animation:modalZoomFade .32s cubic-bezier(.2,.9,.3,1.1);
   }
   #support-overlay{z-index:600;}
+  #detail-overlay{z-index:150;}
+  #day-detail-overlay{z-index:110;}
   .modal{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
     padding:var(--sp-5);width:100%;max-width:380px;box-shadow:var(--shadow-pop), var(--shadow-inset-top);
@@ -1150,10 +1159,6 @@
         </div>
       </div>
 
-      <div class="card side-card" id="side-detail-card">
-        <div id="month-detail"></div>
-      </div>
-
       <div id="day-view-wrapper">
         <div class="day-view-toggle-mobile">
           <button id="dvt-timeline" class="active" onclick="switchDayPanel('timeline')"><span class="icon-mono" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M19 5v13h-3M13 8v10M7 12v6"></path></svg></span> Timeline</button>
@@ -1194,6 +1199,11 @@
       </div>
 
       <div class="week-month-split" id="week-month-split">
+        <div class="day-view-toggle-mobile" id="week-view-toggle-mobile">
+          <button id="wvt-calendar" class="active" onclick="switchWeekPanel('calendar')"><span class="icon-mono" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span> Calendario</button>
+          <button id="wvt-week" onclick="switchWeekPanel('week')"><span class="icon-mono" aria-hidden="true"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path></svg></span> Settimana</button>
+        </div>
+
         <div class="card" id="view-month-el" style="display:none;">
           <div class="month-grid" id="month-grid"></div>
         </div>
@@ -1280,6 +1290,11 @@
 
 <div class="modal-overlay" id="detail-overlay">
   <div class="modal" id="detail-modal-content">
+  </div>
+</div>
+
+<div class="modal-overlay" id="day-detail-overlay">
+  <div class="modal manage-res-modal" id="day-detail-modal-content">
   </div>
 </div>
 
@@ -2249,6 +2264,26 @@ function populateSearchResourceFilter(){
   sel.value = current;
 }
 
+function switchWeekPanel(panel){
+  const monthCard = document.getElementById("view-month-el");
+  const weekCard = document.getElementById("view-week-el");
+  const btnCalendar = document.getElementById("wvt-calendar");
+  const btnWeek = document.getElementById("wvt-week");
+  if(!monthCard || !weekCard) return;
+
+  if(panel === "calendar"){
+    monthCard.classList.remove("mobile-hidden");
+    weekCard.classList.add("mobile-hidden");
+    btnCalendar.classList.add("active");
+    btnWeek.classList.remove("active");
+  } else {
+    monthCard.classList.add("mobile-hidden");
+    weekCard.classList.remove("mobile-hidden");
+    btnCalendar.classList.remove("active");
+    btnWeek.classList.add("active");
+  }
+}
+
 function switchDayPanel(panel){
   const timelineCard = document.getElementById("mega-timeline-card");
   const listCard = document.getElementById("view-day-el");
@@ -2279,13 +2314,15 @@ function switchView(view){
   document.body.classList.toggle("view-is-week", view==="week");
 
   const isDesktop = window.matchMedia("(min-width:1100px)").matches;
-  const showMonthAlongsideWeek = isDesktop && view==="week";
 
   document.getElementById("view-week-el").style.display = view==="week" ? "" : "none";
-  document.getElementById("view-month-el").style.display = showMonthAlongsideWeek ? "" : "none";
+  document.getElementById("view-month-el").style.display = view==="week" ? "" : "none";
+  document.getElementById("week-month-split").style.display = view==="week" ? "" : "none";
   document.getElementById("view-agenda-el").style.display = view==="agenda" ? "" : "none";
   document.getElementById("view-global-el").style.display = view==="global" ? "" : "none";
-  document.getElementById("side-detail-card").style.display = "none";
+  if(view==="week" && !isDesktop){
+    switchWeekPanel("calendar");
+  }
   if(view !== "global"){
     const fabEl = document.querySelector(".fab");
     if(fabEl) fabEl.style.display = "";
@@ -2305,8 +2342,6 @@ function switchView(view){
 }
 
 function refreshSidePanel(){
-  const dateToShow = (currentView === "day") ? currentDate : todayDate();
-  showMonthDayDetail(dateToShow);
   updateRightColOffset();
 }
 
@@ -2353,7 +2388,7 @@ function renderAll(){
   if(currentView==="day") renderDayView();
   else if(currentView==="week"){
     renderWeekView();
-    if(window.matchMedia("(min-width:1100px)").matches) renderMonthView();
+    renderMonthView();
   }
   else if(currentView==="agenda") renderAgendaView();
   else if(currentView==="global") renderGlobalView();
@@ -2363,21 +2398,6 @@ function renderAll(){
 }
 
 function updateRightColOffset(){
-  if(!window.matchMedia("(min-width:1100px)").matches){
-    document.documentElement.style.setProperty("--right-col-offset", "0px");
-    return;
-  }
-  const dateNav = document.querySelector(".date-nav");
-  const sideCard = document.getElementById("side-detail-card");
-  if(!dateNav || !sideCard) return;
-
-  const dateNavStyle = getComputedStyle(dateNav);
-  const sideCardStyle = getComputedStyle(sideCard);
-  const dateNavHeight = dateNav.offsetHeight + parseFloat(dateNavStyle.marginTop) + parseFloat(dateNavStyle.marginBottom);
-  const sideCardHeight = sideCard.offsetHeight + parseFloat(sideCardStyle.marginTop) + parseFloat(sideCardStyle.marginBottom);
-  const total = dateNavHeight + sideCardHeight;
-
-  document.documentElement.style.setProperty("--right-col-offset", (-total) + "px");
 }
 window.addEventListener("resize", ()=>{
   if(typeof currentUser !== "undefined" && currentUser) updateRightColOffset();
@@ -2560,6 +2580,7 @@ function renderDayView(){
       chip.style.background = "linear-gradient(135deg,"+colors[0]+","+colors[1]+")";
       chip.innerHTML = "<span>"+icon("calendar",12)+" "+(selectedResource==="__ALL__" ? escapeHtml(it.res)+": " : "")+escapeHtml(it.label)+"</span>";
       chip.onclick = ()=>{ showEventDetail(key, it.id); };
+      attachFollowingTooltip(chip, it.res+" — "+it.label+" ("+t("detail.allDay")+")");
       alldayWrap.appendChild(chip);
     });
   }
@@ -2635,6 +2656,10 @@ function renderDayView(){
       }
       left.appendChild(labelSpan);
       slot.onclick = ()=>{ showEventDetail(key, covering.id); };
+      const tooltipText = coveringAll.length > 1
+        ? coveringAll.map(b=>b.res+": "+b.label+" ("+fmtHourLabel(b.start)+"-"+fmtHourLabel(b.end)+")").join(" · ")
+        : covering.res+" — "+covering.label+" ("+fmtHourLabel(covering.start)+"-"+fmtHourLabel(covering.end)+")";
+      attachFollowingTooltip(slot, tooltipText);
     } else {
       labelSpan.textContent = t("day.free");
       left.appendChild(labelSpan);
@@ -2673,6 +2698,55 @@ function attachFollowingTooltip(el, text){
     const tip = getFollowingTooltip();
     tip.classList.remove("visible");
   });
+}
+
+function attachLongPress(el, onLongPress, delay){
+  let timer = null;
+  let moved = false;
+  let longPressFired = false;
+  const threshold = delay || 450;
+
+  const start = (e)=>{
+    moved = false;
+    longPressFired = false;
+    el.classList.add("long-pressing");
+    timer = setTimeout(()=>{
+      if(!moved){
+        longPressFired = true;
+        el.classList.remove("long-pressing");
+        haptic(15);
+        onLongPress(e);
+      }
+    }, threshold);
+  };
+  const cancel = ()=>{
+    if(timer){ clearTimeout(timer); timer = null; }
+    el.classList.remove("long-pressing");
+  };
+  const onMove = ()=>{ moved = true; cancel(); };
+  const suppressClickIfLongPress = (e)=>{
+    if(longPressFired){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      longPressFired = false;
+    }
+  };
+
+  el.addEventListener("touchstart", start, {passive:true});
+  el.addEventListener("touchend", cancel, {passive:true});
+  el.addEventListener("touchcancel", cancel, {passive:true});
+  el.addEventListener("touchmove", onMove, {passive:true});
+  el.addEventListener("mousedown", (e)=>{
+    if(e.button !== 0) return;
+    start(e);
+  });
+  el.addEventListener("mouseup", cancel);
+  el.addEventListener("mouseleave", cancel);
+  el.addEventListener("mousemove", (e)=>{
+    if(timer) onMove();
+  });
+  el.addEventListener("click", suppressClickIfLongPress, true);
 }
 
 function renderMegaTimeline(key){
@@ -2812,6 +2886,7 @@ function renderWeekView(){
         del.innerHTML = icon("trash",15);
         del.onclick = (e)=>{ e.stopPropagation(); removeBooking(key, it.id); };
         row.onclick = ()=>{ showEventDetail(key, it.id); };
+        attachFollowingTooltip(row, it.res+" — "+it.label+" ("+timeLabel+")");
         row.appendChild(info);
         row.appendChild(del);
         bodyEl.appendChild(row);
@@ -2963,6 +3038,7 @@ function renderAgendaView(){
         <span class="agenda-time">${fmtHourLabel(it.start)}–${fmtHourLabel(it.end)}</span>
         <span class="agenda-info"><b>${escapeHtml(it.res)}</b> · ${escapeHtml(it.label)}</span>
       `;
+      attachFollowingTooltip(row, it.res+" — "+it.label+" ("+fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)+")");
       listEl.appendChild(row);
     });
   });
@@ -3052,7 +3128,8 @@ function renderGlobalView(){
         nameEl.className = "global-block-name";
         nameEl.textContent = it.label;
         block.appendChild(nameEl);
-        block.title = res + " — " + it.label + " (" + (it.allDay ? t("detail.allDay") : fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)) + ")";
+        const tooltipText = res + " — " + it.label + " (" + (it.allDay ? t("detail.allDay") : fmtHourLabel(it.start)+"-"+fmtHourLabel(it.end)) + ")";
+        attachFollowingTooltip(block, tooltipText);
         if(canEdit){
           block.onclick = ()=>{ showGlobalEventDetail(key, it.id); };
         }
@@ -3140,30 +3217,32 @@ function renderMonthView(){
     cell.appendChild(num);
 
     if(count>0){
+      const dayItems = bookings[key]||[];
       const dots = document.createElement("div");
       dots.className = "month-dots";
       const maxDots = Math.min(count, 4);
       for(let k=0;k<maxDots;k++){
         const dot = document.createElement("span");
+        const colors = getResourceColor(dayItems[k].res);
+        dot.style.background = colors[0];
         dots.appendChild(dot);
       }
       cell.appendChild(dots);
     }
 
-    cell.onclick = ()=>{ showMonthDayDetail(d); };
+    cell.onclick = ()=>{ openAddModal(key); };
+    attachLongPress(cell, ()=>{ showMonthDayDetail(d); });
     grid.appendChild(cell);
   }
-
-  showMonthDayDetail(today);
 }
 
 function showMonthDayDetail(d){
   const key = fmtDate(d);
   const items = (bookings[key]||[]).sort((a,b)=>a.start-b.start);
-  const detailEl = document.getElementById("month-detail");
+  const detailEl = document.getElementById("day-detail-modal-content");
   const isToday = sameDay(d, todayDate());
 
-  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "' data-count='" + items.length + (items.length===1 ? t("week.item") : t("week.items")) + "'><h4>" +
+  let html = "<div class='day-detail" + (isToday ? " is-today" : "") + "'><h4>" +
     (isToday ? "<span class='today-badge'>"+t("detail.today")+"</span> " : "") +
     d.toLocaleDateString(currentLocale(),{weekday:"long",day:"numeric",month:"long"}).replace(/^\w/,c=>c.toUpperCase()) +
     "</h4><div class='month-mini-timeline-wrap'><div class='mini-timeline' id='month-mt'></div></div>";
@@ -3176,11 +3255,15 @@ function showMonthDayDetail(d){
       html += "<div class='dd-item'><span style='cursor:pointer;' onclick='showEventDetail(\""+key+"\","+it.id+")'><b>"+it.res+"</b> &nbsp; "+timeLabel+" · "+escapeHtml(it.label)+"</span><span class='dd-del' onclick='removeBooking(\""+key+"\","+it.id+"); showMonthDayDetailByKey(\""+key+"\");'>"+icon("trash",13)+"</span></div>";
     });
   }
-  html += "</div>";
+  html += "<div class='modal-actions'><button class='btn-cancel' onclick='closeMonthDayDetail()'>"+t("detail.close")+"</button></div></div>";
   detailEl.innerHTML = html;
+  document.getElementById("day-detail-overlay").classList.add("open");
 
   const mtEl = renderMiniTimeline(items, "month-mt");
   addNowLineToTimeline(mtEl, d);
+}
+function closeMonthDayDetail(){
+  document.getElementById("day-detail-overlay").classList.remove("open");
 }
 function showMonthDayDetailByKey(key){
   const parts = key.split("-").map(Number);
@@ -3498,6 +3581,9 @@ function deleteFromDetail(dateKey, id){
 }
 document.getElementById("detail-overlay").addEventListener("click",(e)=>{
   if(e.target.id==="detail-overlay") closeEventDetail();
+});
+document.getElementById("day-detail-overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="day-detail-overlay") closeMonthDayDetail();
 });
 
 let addModalContext = "personal";
@@ -3850,45 +3936,6 @@ window.addEventListener("resize", ()=>{
     if(currentUser) switchView(currentView);
   }, 250);
 });
-
-(function(){
-  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-  let swipeEligible = false;
-  const SWIPE_MIN_DIST = 60;
-  const SWIPE_MAX_OFF_AXIS = 60;
-  const SWIPE_MAX_TIME = 600;
-
-  function anyModalOpen(){
-    return !!document.querySelector(".modal-overlay.open");
-  }
-
-  document.addEventListener("touchstart", (e)=>{
-    swipeEligible = false;
-    if(anyModalOpen()) return;
-    if(e.touches.length !== 1) return;
-    if(e.target.closest(".slot-list, .week-list, .search-results, .res-manage-list, .mega-timeline-scroll, .day-detail, .week-day-body, .month-grid")) return;
-    swipeEligible = true;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchStartTime = Date.now();
-  }, {passive:true});
-
-  document.addEventListener("touchend", (e)=>{
-    if(!swipeEligible) return;
-    if(anyModalOpen()) return;
-    if(!e.changedTouches || e.changedTouches.length !== 1) return;
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    const dt = Date.now() - touchStartTime;
-
-    if(dt > SWIPE_MAX_TIME) return;
-    if(Math.abs(dy) > SWIPE_MAX_OFF_AXIS) return;
-    if(Math.abs(dx) < SWIPE_MIN_DIST) return;
-
-    if(dx > 0) navPrev();
-    else navNext();
-  }, {passive:true});
-})();
 
 document.querySelectorAll(".modal-overlay").forEach(overlay=>{
   overlay.addEventListener("touchstart", (e)=>{ e.stopPropagation(); }, {passive:true});
