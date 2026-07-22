@@ -1,6 +1,6 @@
 const CACHE_NAME = "gestionale-cache-v1";
 const urlsToCache = [
-  "./gestionale.html",
+  "./index.html",
   "./manifest.json"
 ];
 
@@ -29,7 +29,7 @@ self.addEventListener("fetch", (event) => {
         cached ||
         fetch(event.request).catch(() => {
           if (event.request.mode === "navigate") {
-            return caches.match("./gestionale.html");
+            return caches.match("./index.html");
           }
         })
       );
