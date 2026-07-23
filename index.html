@@ -788,7 +788,7 @@
     aspect-ratio:1;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);
     display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 2px;
     cursor:pointer;transition:background .15s ease, border-color .15s ease, transform .12s cubic-bezier(.2,.8,.3,1);
-    position:relative;
+    position:relative;overflow:hidden;
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   }
   .month-cell:hover{background:var(--bg-soft);border-color:var(--border-strong);transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.08);}
@@ -1035,6 +1035,8 @@
     .profile-badge{padding:3px 9px 3px 3px;gap:5px;}
     .date-nav .date-label{font-size:13.5px;}
     .month-cell .mc-num{font-size:12px;}
+    .month-dots{gap:2px;margin-top:2px;}
+    .month-dots span{width:4px;height:4px;}
     .fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:46px;height:46px;font-size:20px;}
     .view-switch button{font-size:9.5px;padding:9px 2px;gap:2px;}
     .view-switch button i{font-size:13px;}
@@ -3227,7 +3229,8 @@ function renderMonthView(){
       const dayItems = bookings[key]||[];
       const dots = document.createElement("div");
       dots.className = "month-dots";
-      const maxDots = Math.min(count, 4);
+      const isMobile = window.matchMedia("(max-width:600px)").matches;
+      const maxDots = Math.min(count, isMobile ? 8 : 16);
       for(let k=0;k<maxDots;k++){
         const dot = document.createElement("span");
         const colors = getResourceColor(dayItems[k].res);
