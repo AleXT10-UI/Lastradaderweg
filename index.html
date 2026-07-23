@@ -984,7 +984,16 @@
   .res-manage-item .rm-name{flex:1;font-size:var(--fs-sm);font-weight:600;color:var(--text-main);}
   .res-manage-item .rm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
   .user-announce-toggle{display:flex;align-items:center;gap:4px;font-size:var(--fs-sm);cursor:pointer;flex-shrink:0;color:var(--text-muted);}
-  .user-announce-toggle input{width:15px;height:15px;cursor:pointer;accent-color:var(--accent);}
+  .user-announce-toggle input{
+    width:15px !important;height:15px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;padding:0;margin:0;
+    -webkit-appearance:none;appearance:none;border:2px solid var(--border-strong);border-radius:4px;
+    background:var(--bg-soft);position:relative;
+  }
+  .user-announce-toggle input:checked{background:var(--accent);border-color:var(--accent);}
+  .user-announce-toggle input:checked::after{
+    content:"";position:absolute;left:2px;top:-1px;width:3px;height:7px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
   .rm-arrows{display:flex;flex-direction:column;gap:1px;flex-shrink:0;}
   .rm-arrows button{
     border:none;background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;
